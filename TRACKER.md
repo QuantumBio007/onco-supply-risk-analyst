@@ -1,0 +1,791 @@
+# OncoSupply Risk Analyst — Weekend Build Tracker
+**Project:** OncoSupply Risk Analyst  
+**Goal:** Working Streamlit RAG app by end of weekend  
+**Week 6 check-in target:** ~2 weeks from now  
+**Last updated:** 2026-04-18  
+**Knowledge base scope revised:** 3 docs you write + 4 Claude drafts + 4 auto-generated sim files (not 8 from scratch)
+
+---
+
+## Status Legend
+- `[ ]` Not started  
+- `[~]` In progress  
+- `[x]` Done  
+- `[!]` Blocked / needs attention
+
+---
+
+## PRE-SESSION CHECKLIST (15 min before you start)
+
+- [ ] You have a credit card ready for Anthropic (see API KEY SETUP below)
+- [ ] Terminal is open in the Project folder
+- [ ] Python 3.9+ confirmed: run `python3 --version`
+- [ ] Internet connection (sentence-transformers downloads ~90MB on first use)
+- [ ] GitHub account exists (see BLOCK 0 below)
+
+---
+
+## BLOCK 0 — GitHub Setup (Target: 20 min)
+**Goal:** Public repo exists, local folder connected, .gitignore protecting your API key.
+
+### Step 1: Create a GitHub account (skip if you have one)
+1. Go to https://github.com
+2. Click **Sign up**
+3. Use your personal email (not BU — this repo is yours to keep)
+4. Choose a username (e.g. `carlosmartino`)
+
+Status: `[x]` GitHub account exists — QuantumBio007
+
+### Step 2: Create the public repo
+1. Once logged in, click **+** (top right) → **New repository**
+2. Repository name: `onco-supply-risk-analyst`
+3. Set to **Public** (required — grader must clone it)
+4. Check **Add a README file**
+5. Click **Create repository**
+
+Status: `[x]` Repo created at https://github.com/QuantumBio007/onco-supply-risk-analyst
+
+### Step 3: Install Git (if not already installed)
+```bash
+git --version
+```
+If you see `git version 2.x.x` → skip to Step 4.  
+If you see `command not found` → install from https://git-scm.com/download/mac
+
+Status: `[ ]` Git installed and working
+
+### Step 4: Connect your local Project folder to GitHub
+Run these commands one at a time from your Project folder:
+```bash
+git init
+git remote add origin https://github.com/QuantumBio007/onco-supply-risk-analyst.git
+git branch -M main
+```
+
+Status: `[ ]` Local folder connected to GitHub
+
+### Step 5: Create .gitignore BEFORE your first commit
+This is critical — it prevents your API key and large files from being pushed.
+
+Create the file `/Project/.gitignore`:
+```
+# Secrets — never commit these
+.env
+*.env
+
+# ChromaDB index (large, rebuilt locally from documents)
+chroma_db/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Mac junk
+.DS_Store
+
+# Sim outputs can be regenerated
+knowledge_base/sim_outputs/
+```
+
+Status: `[ ]` .gitignore created
+
+### Step 6: First commit and push
+```bash
+git add .gitignore TRACKER.md requirements.txt
+git commit -m "initial project structure"
+git push -u origin main
+```
+Go to your GitHub repo in the browser — you should see the files there.
+
+**Check:** Does the repo show `.gitignore`, `TRACKER.md`, `requirements.txt`? If yes → done.  
+**Check:** Is `chroma_db/` visible in the repo? If yes → something is wrong with .gitignore, fix before continuing.
+
+Status: `[ ]` First push successful, no secrets in repo
+
+### Step 7: Install Cursor
+1. Go to https://cursor.com
+2. Download for Mac, install
+3. Open Cursor → **File** → **Open Folder** → select your Project folder
+4. You'll now see all your files in the left sidebar
+
+Use Cursor to: edit files, paste error messages into its chat for debugging help.  
+Use Claude Code (here) for: architecture decisions, updating this tracker, drafting knowledge base documents.
+
+Status: `[ ]` Cursor installed and Project folder open
+
+---
+
+## API KEY SETUP — Step by Step
+
+### Step 1: Create an Anthropic account
+1. Go to https://console.anthropic.com
+2. Click **Sign up** (top right)
+3. Enter your email and create a password
+4. Verify your email (check inbox)
+
+### Step 2: Add a payment method
+1. Once logged in, click your name (top right) → **Billing**
+2. Click **Add payment method**
+3. Enter a credit card (you control spend limits — see Step 4)
+4. Anthropic does NOT charge until you use credits
+
+### Step 3: Generate your API key
+1. In the Console, click **API Keys** in the left sidebar
+2. Click **+ Create Key**
+3. Name it: `onco-supply-dev`
+4. Click **Create Key**
+5. **COPY THE KEY NOW** — it is only shown once
+6. It looks like: `sk-ant-api03-...`
+
+### Step 4: Set a spend limit (critical — do this before any code)
+1. In Console → **Billing** → **Usage limits**
+2. Set **Monthly spend limit** to `$10`
+3. Set **Hard limit** to `$15`
+4. This project should cost under $5 total — these limits protect you
+
+### Step 5: Store the key safely (never commit to git)
+Open your terminal and run:
+```bash
+# Add to your shell profile so it persists across sessions
+echo 'export ANTHROPIC_API_KEY="sk-ant-api03-YOUR-KEY-HERE"' >> ~/.zshrc
+source ~/.zshrc
+```
+Then verify it works:
+```bash
+python3 -c "import anthropic; c = anthropic.Anthropic(); print('API key works')"
+```
+If you see `API key works` → move on. If you see an auth error → re-check the key was copied correctly.
+
+**CRITICAL: Never paste your API key into any code file. Always use `os.environ["ANTHROPIC_API_KEY"]`.**
+
+Status: `[ ]` API key created and tested
+
+---
+
+## BLOCK 1 — Repo & Environment (Target: 45 min)
+**Goal:** Folder structure exists, all packages install, sim outputs generated.
+
+### Step 1: Create the folder structure
+In terminal, from the Project folder:
+```bash
+mkdir -p app knowledge_base/docs knowledge_base/sim_outputs evaluation/checklists
+```
+Verify:
+```bash
+ls -R
+```
+You should see: `app/`, `knowledge_base/docs/`, `knowledge_base/sim_outputs/`, `evaluation/checklists/`
+
+Status: `[ ]` Folders created
+
+### Step 2: Create requirements.txt
+Create the file `/Project/requirements.txt` with this exact content:
+```
+anthropic
+streamlit
+chromadb
+sentence-transformers
+numpy
+matplotlib
+```
+
+Status: `[ ]` requirements.txt created
+
+### Step 3: Install dependencies
+```bash
+pip3 install -r requirements.txt
+```
+This will take 3–5 minutes. The sentence-transformers line downloads a ~90MB model on first import (happens later, not now).
+
+Verify each key package:
+```bash
+python3 -c "import anthropic, streamlit, chromadb, sentence_transformers; print('all OK')"
+```
+Expected output: `all OK`
+
+Status: `[ ]` All packages installed and verified
+
+### Step 4: Generate simulation outputs
+Run the existing simulation across 4 scenarios and save outputs to files.
+
+Create `/Project/knowledge_base/run_sims.py`:
+```python
+import sys, json
+sys.path.insert(0, '/Users/carlosmartino/Documents/MBA/2026/Spring 2/GenAI/Project')
+from simple_sim import simulate_inventory
+
+scenarios = [
+    {"name": "baseline",            "lead_time": 10, "daily_mean_demand": 8,  "label": "Normal operations"},
+    {"name": "export_restriction",  "lead_time": 30, "daily_mean_demand": 8,  "label": "API export restriction (3x lead time)"},
+    {"name": "currency_crisis",     "lead_time": 10, "daily_mean_demand": 12, "label": "Currency crisis (demand spike +50%)"},
+    {"name": "combined_shock",      "lead_time": 30, "daily_mean_demand": 12, "label": "Combined shock (export restriction + currency crisis)"},
+]
+
+for s in scenarios:
+    res = simulate_inventory(
+        lead_time=s["lead_time"],
+        daily_mean_demand=s["daily_mean_demand"],
+        plot=False
+    )
+    out = f"""SCENARIO: {s["label"]}
+DRUG: all
+COUNTRY: all
+TOPIC: simulation, inventory, stockout
+SOURCE: simple_sim.py internal model
+DATE: 2026
+---
+Scenario: {s["label"]}
+Parameters: lead_time={s["lead_time"]} days, daily_mean_demand={s["daily_mean_demand"]} units/day
+Results:
+- Stockout days (out of 365): {res["stockout_days"]}
+- Average inventory level: {res["avg_inventory"]:.1f} units
+- Service level (days without stockout): {res["service_level_days"]:.1%}
+- Service level (units fulfilled): {res["service_level_units"]:.1%}
+
+Interpretation: Under {s["label"].lower()} conditions, the modeled oncology drug supply
+experiences {res["stockout_days"]} stockout days per year with a unit service level of
+{res["service_level_units"]:.1%}. {"This represents a critical risk to treatment continuity." if res["stockout_days"] > 20 else "This is within acceptable operational range." if res["stockout_days"] < 5 else "This represents moderate supply risk."}
+"""
+    fname = f'/Users/carlosmartino/Documents/MBA/2026/Spring 2/GenAI/Project/knowledge_base/sim_outputs/{s["name"]}.txt'
+    with open(fname, 'w') as f:
+        f.write(out)
+    print(f"Written: {s['name']}.txt — stockout_days={res['stockout_days']}, service_level={res['service_level_units']:.1%}")
+```
+
+Run it:
+```bash
+python3 knowledge_base/run_sims.py
+```
+Expected: 4 lines printed, 4 `.txt` files in `knowledge_base/sim_outputs/`
+
+Status: `[ ]` 4 simulation output files generated
+
+---
+
+## BLOCK 2 — Knowledge Base (Target: 90 min)
+**Goal:** 8 core documents written. Quality over quantity — do not write past 2:15.
+
+### How to write each document
+Each file goes in `knowledge_base/docs/`. Format:
+```
+DRUG: [drug name or "all"]
+COUNTRY: [country or "all"]
+TOPIC: [comma-separated topics]
+SOURCE: [public source or "domain knowledge"]
+DATE: [year]
+---
+[body: 300-500 words of structured, factual text]
+```
+
+Write what you **know to be true**. Do not invent statistics. If uncertain, write "estimated" or "reported." The evaluation checks briefs against these docs — a wrong doc produces a wrong brief.
+
+### Document 1: Argentina Procurement System
+File: `knowledge_base/docs/argentina_procurement_system.txt`
+
+Topics to cover:
+- The four procurement channels: (1) public hospitals/Ministry of Health, (2) obras sociales (social health insurance funds), (3) provincial health systems, (4) private insurance/pharmacies
+- Why fragmentation matters for shortage risk: no single entity has full visibility
+- ANMAT as the regulatory authority for drug approvals
+- Budget constraints and delayed payments to suppliers in public channel
+- Currency controls and their impact on import-dependent drugs
+
+Status: `[ ]` Written
+
+### Document 2: Cisplatin Supply Chain Profile
+File: `knowledge_base/docs/cisplatin_profile.txt`
+
+Topics to cover:
+- Drug class: platinum-based chemotherapy
+- WHO EML status: on the Model List of Essential Medicines (oncology)
+- Generic/off-patent: yes — off-patent, multiple generic manufacturers
+- API origin: >80% of global API manufactured in India and China
+- Formulation: injectable, requires cold storage
+- Key shortage risk factors: API concentration in 2 countries, generic market price pressure on manufacturer margins, any geopolitical event in India/China cascades globally
+- Argentina context: no domestic API manufacturing; fully import-dependent
+
+Status: `[ ]` Written
+
+### Document 3: Doxorubicin Supply Chain Profile
+File: `knowledge_base/docs/doxorubicin_profile.txt`
+
+Topics to cover:
+- Drug class: anthracycline antibiotic, broad oncology use (breast, leukemia, lymphoma)
+- WHO EML status: yes
+- Generic/off-patent: yes
+- API origin: India-dominant global supply
+- Formulation: injectable (liposomal and conventional forms)
+- Shortage history: documented global shortages 2010s–2020s due to manufacturing consolidation
+- Currency devaluation impact: peso-denominated hospital budgets vs. USD-priced imports → purchasing power loss directly reduces order volumes
+
+Status: `[ ]` Written
+
+### Document 4: Carboplatin Supply Chain Profile
+File: `knowledge_base/docs/carboplatin_profile.txt`
+
+Topics to cover:
+- Drug class: platinum-based (second-generation cisplatin analog)
+- WHO EML status: yes
+- Generic/off-patent: yes
+- API origin: India and China, similar to cisplatin
+- Formulation: injectable
+- Colombia context: INVIMA registration required; different regulatory timeline than ANMAT
+
+Status: `[ ]` Written
+
+### Document 5: Trastuzumab Supply Chain Profile
+File: `knowledge_base/docs/trastuzumab_profile.txt`
+
+Topics to cover:
+- Drug class: monoclonal antibody (biologic), HER2+ breast cancer
+- WHO EML status: yes (added 2019)
+- Generic equivalent: biosimilars exist but uptake in Latin America is limited
+- API origin: manufactured by a small number of biologic manufacturers globally; no India/China generic API dynamic — this is NOT a small-molecule generic
+- Cold chain requirement: 2–8°C throughout supply chain — logistics disruptions have outsized impact
+- Unit cost: orders of magnitude higher than cisplatin/doxorubicin — budget impact per patient is extreme
+- Argentina context: primarily accessed through obras sociales and private insurance; public system access limited by cost
+
+Status: `[ ]` Written
+
+### Document 6: WHO EML Oncology Summary
+File: `knowledge_base/docs/who_eml_oncology.txt`
+
+Topics to cover:
+- What the WHO Model List of Essential Medicines is and why it matters (procurement priority signal)
+- Oncology section added in 2015, expanded in subsequent editions
+- Drugs on the list that appear in this project: cisplatin, doxorubicin, carboplatin, trastuzumab, methotrexate
+- EML inclusion = signal that countries should stock these drugs; does NOT guarantee they do
+- Policy implication: shortage of an EML drug triggers WHO reporting obligations
+
+Status: `[ ]` Written
+
+### Document 7: Colombia Procurement System
+File: `knowledge_base/docs/colombia_procurement_system.txt`
+
+Topics to cover:
+- INVIMA: Colombian equivalent of ANMAT — drug registration and surveillance authority
+- Health system structure: contributory regime (formal employment) vs. subsidized regime (low income)
+- EPS (Entidades Promotoras de Salud): the health insurers who manage oncology drug procurement
+- Drug registration process: INVIMA approval required; biosimilar approval pathway differs from ANMAT
+- Comparison to Argentina: less fragmented institutionally, but still has access gaps
+
+Status: `[ ]` Written
+
+### Document 8: API Concentration and Supply Chain Risk
+File: `knowledge_base/docs/api_concentration_profiles.txt`
+
+Topics to cover:
+- API = Active Pharmaceutical Ingredient; most are manufactured in India and China
+- For oncology generics: India accounts for estimated 30–40% of global API supply; China 25–35%
+- Key risk: any Indian or Chinese export restriction (regulatory, political, pandemic) simultaneously affects ALL generic oncology drugs
+- Historical examples: COVID-19 (2020) caused API export delays; Indian government has imposed export bans in past
+- Implication for Latin America: no regional API manufacturing backup; fully exposed to single-region disruption
+
+Status: `[ ]` Written
+
+### Block 2 completion check
+- [ ] At least 5 of 8 documents written (minimum to proceed)
+- [ ] Each document has the metadata header
+- [ ] No invented statistics without a "estimated" qualifier
+
+---
+
+## BLOCK 3 — RAG Pipeline (Target: 60 min)
+**Goal:** `build_index.py` runs, retrieval returns correct chunks for a test query.
+
+### Step 1: Create the embedding script
+Create `/Project/knowledge_base/build_index.py`:
+```python
+from sentence_transformers import SentenceTransformer
+import chromadb, os, glob
+
+DOCS_DIR = "knowledge_base/docs"
+SIM_DIR = "knowledge_base/sim_outputs"
+CHROMA_PATH = "./chroma_db"
+
+model = SentenceTransformer("all-MiniLM-L6-v2")  # downloads ~90MB on first run
+client = chromadb.PersistentClient(path=CHROMA_PATH)
+
+# Fresh rebuild — delete collection if exists
+try:
+    client.delete_collection("onco_supply")
+except:
+    pass
+collection = client.create_collection("onco_supply")
+
+def parse_doc(text, source_file):
+    """Split header metadata from body, then chunk body by paragraph."""
+    parts = text.split("---\n", 1)
+    if len(parts) < 2:
+        return [{"text": text, "meta": {}}]
+    
+    header, body = parts
+    meta = {}
+    for line in header.strip().splitlines():
+        if ":" in line:
+            k, v = line.split(":", 1)
+            meta[k.strip().lower()] = v.strip().lower()
+    meta["source_file"] = os.path.basename(source_file)
+    
+    paragraphs = [p.strip() for p in body.split("\n\n") if p.strip()]
+    return [{"text": p, "meta": meta} for p in paragraphs]
+
+ids, texts, metadatas = [], [], []
+for fpath in glob.glob(f"{DOCS_DIR}/*.txt") + glob.glob(f"{SIM_DIR}/*.txt"):
+    raw = open(fpath).read()
+    chunks = parse_doc(raw, fpath)
+    for i, chunk in enumerate(chunks):
+        chunk_id = f"{os.path.basename(fpath)}_chunk{i}"
+        ids.append(chunk_id)
+        texts.append(chunk["text"])
+        metadatas.append(chunk["meta"])
+
+embeddings = model.encode(texts).tolist()
+collection.add(ids=ids, embeddings=embeddings, documents=texts, metadatas=metadatas)
+print(f"Indexed {len(ids)} chunks from {len(set(m['source_file'] for m in metadatas))} files")
+```
+
+Run it (first run downloads model — takes 2–3 min):
+```bash
+python3 knowledge_base/build_index.py
+```
+Expected: `Indexed N chunks from M files` — N should be 20–50+ depending on doc length.
+
+Status: `[ ]` Index built successfully
+
+### Step 2: Test retrieval
+Run this in the terminal to verify retrieval works:
+```bash
+python3 -c "
+import chromadb
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+client = chromadb.PersistentClient(path='./chroma_db')
+collection = client.get_collection('onco_supply')
+
+query = 'cisplatin Argentina procurement shortage risk'
+embedding = model.encode([query]).tolist()
+results = collection.query(query_embeddings=embedding, n_results=5)
+
+for i, (doc, meta) in enumerate(zip(results['documents'][0], results['metadatas'][0])):
+    print(f'--- Result {i+1} [{meta.get(\"source_file\",\"?\")}] ---')
+    print(doc[:200])
+    print()
+"
+```
+**Expected:** Top results should include chunks from `cisplatin_profile.txt` and `argentina_procurement_system.txt`.
+
+If you get random or irrelevant results: re-check that documents were written with enough relevant keywords.
+
+Status: `[ ]` Retrieval returns sensible results for cisplatin/Argentina query
+
+---
+
+## BLOCK 4 — Streamlit App (Target: 60 min)
+**Goal:** App runs, generates a brief, shows sources, refuses adversarial inputs.
+
+### Step 1: Create the app file
+Create `/Project/app/app.py` with the full app.
+
+Key components:
+1. **Sidebar** — drug selector, country selector, scenario selector, Generate button
+2. **Retrieval** — query ChromaDB, get top 5 chunks
+3. **Generation** — call Claude with structured prompt
+4. **Display** — brief in main panel, sources in expander
+
+```python
+import streamlit as st
+import anthropic
+import chromadb
+from sentence_transformers import SentenceTransformer
+import os
+
+# --- Config ---
+ALLOWED_DRUGS = ["cisplatin", "doxorubicin", "carboplatin", "trastuzumab", "methotrexate"]
+ALLOWED_COUNTRIES = ["Argentina", "Colombia", "Venezuela"]
+ALLOWED_SCENARIOS = ["Baseline", "API export restriction", "Currency devaluation", "Combined shock"]
+MODEL = "claude-haiku-4-5-20251001"   # use haiku during dev; switch to claude-sonnet-4-6 for demo
+
+# --- Load resources once ---
+@st.cache_resource
+def load_retriever():
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    client = chromadb.PersistentClient(path="./chroma_db")
+    collection = client.get_collection("onco_supply")
+    return model, collection
+
+@st.cache_resource
+def load_client():
+    return anthropic.Anthropic()
+
+# --- Retrieval ---
+def retrieve(drug, country, scenario, n=5):
+    embed_model, collection = load_retriever()
+    query = f"{drug} {country} {scenario} shortage risk supply chain"
+    embedding = embed_model.encode([query]).tolist()
+    results = collection.query(query_embeddings=embedding, n_results=n)
+    return list(zip(results["documents"][0], results["metadatas"][0]))
+
+# --- Generation ---
+SYSTEM_PROMPT = """You are an expert supply-chain analyst at JCNB Biotech Consulting specializing in oncology drug shortage risk in Latin America.
+
+You produce structured Drug Shortage Risk Briefs based ONLY on the retrieved context provided. 
+
+Output format — use exactly these section headers:
+## Drug Profile
+## Supply Chain Vulnerability  
+## Scenario Impact Analysis
+## Policy Recommendations
+## Confidence & Limitations
+
+Rules you must follow:
+- Base all claims on the provided context. Do not invent statistics.
+- If the context does not contain enough information for a section, say so explicitly.
+- Never provide clinical advice or drug substitution recommendations.
+- Include a Confidence & Limitations section that honestly states what is uncertain.
+"""
+
+FEW_SHOT = """Example of a well-formatted brief (for tone and structure reference only):
+
+## Drug Profile
+Cisplatin is a platinum-based chemotherapy agent on the WHO Model List of Essential Medicines. It is generic and off-patent, with API manufacturing concentrated in India and China.
+
+## Supply Chain Vulnerability
+Argentina has no domestic API manufacturing and is fully import-dependent. The multi-channel procurement landscape (public hospitals, obras sociales, provincial systems, private) creates visibility gaps — no single entity tracks national stock levels.
+
+## Scenario Impact Analysis
+Under baseline conditions, modeled service levels exceed 95%. Under an API export restriction scenario (lead time tripling to 30 days), stockout days increase to 47/year, reducing service level to 87%.
+
+## Policy Recommendations
+1. Establish a national strategic reserve of 60-day buffer stock for cisplatin.
+2. Coordinate procurement across public and obras sociales channels to reduce fragmentation.
+
+## Confidence & Limitations
+Stockout figures are from a simplified inventory model and are illustrative, not actuarial. Registry and procurement data reflects publicly available sources as of 2024. Institutional dynamics are not fully captured.
+"""
+
+def generate_brief(drug, country, scenario, chunks):
+    client = load_client()
+    context = "\n\n".join([f"[Source: {meta.get('source_file','?')}]\n{doc}" 
+                            for doc, meta in chunks])
+    user_msg = f"""Generate a Drug Shortage Risk Brief for:
+- Drug: {drug}
+- Country: {country}
+- Scenario: {scenario}
+
+Retrieved context:
+{context}
+
+{FEW_SHOT}
+
+Now write the brief for {drug} in {country} under the {scenario} scenario."""
+    
+    response = client.messages.create(
+        model=MODEL,
+        max_tokens=1500,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": user_msg}]
+    )
+    return response.content[0].text
+
+# --- Refusals ---
+def check_refusal(drug, country):
+    if drug not in ALLOWED_DRUGS:
+        return f"This system only covers oncology drugs. '{drug}' is not in scope."
+    if country not in ALLOWED_COUNTRIES:
+        return f"This system only covers Argentina, Colombia, and Venezuela. '{country}' is not in scope."
+    return None
+
+# --- UI ---
+st.set_page_config(page_title="OncoSupply Risk Analyst", layout="wide")
+st.title("OncoSupply Risk Analyst")
+st.caption("AI-powered oncology drug shortage risk briefs for Latin America")
+
+with st.sidebar:
+    st.header("Parameters")
+    drug = st.selectbox("Drug", ALLOWED_DRUGS)
+    country = st.selectbox("Country", ALLOWED_COUNTRIES)
+    scenario = st.selectbox("Scenario", ALLOWED_SCENARIOS)
+    generate = st.button("Generate Risk Brief", type="primary")
+
+if generate:
+    refusal = check_refusal(drug, country)
+    if refusal:
+        st.error(refusal)
+    else:
+        with st.spinner("Retrieving context and generating brief..."):
+            chunks = retrieve(drug, country, scenario)
+            brief = generate_brief(drug, country, scenario, chunks)
+        
+        st.markdown(f"## {drug.title()} — {country} — {scenario}")
+        st.markdown(brief)
+        
+        with st.expander("Sources (retrieved context)"):
+            for i, (doc, meta) in enumerate(chunks):
+                st.markdown(f"**Source {i+1}: `{meta.get('source_file','?')}`**")
+                st.text(doc[:400] + ("..." if len(doc) > 400 else ""))
+```
+
+### Step 2: Run the app
+```bash
+cd "/Users/carlosmartino/Documents/MBA/2026/Spring 2/GenAI/Project"
+streamlit run app/app.py
+```
+Opens in browser at `http://localhost:8501`
+
+Status: `[ ]` App runs without errors
+
+### Step 3: Test adversarial refusals
+In the running app, manually test (these should all show error messages, not generate briefs):
+- [ ] Select any non-listed drug manually (you'll need to test via code — sidebar only shows allowed drugs; test by temporarily adding "amoxicillin" to the selectbox options)
+- [ ] Note: refusals for out-of-scope drugs/countries are enforced at the selectbox level (only allowed options shown) — that IS the refusal mechanism for the UI. The `check_refusal()` function is the safety net if called programmatically.
+
+Practical adversarial test — run this in terminal:
+```bash
+python3 -c "
+import sys
+sys.path.insert(0, 'app')
+from app import check_refusal
+print(check_refusal('amoxicillin', 'Argentina'))   # should refuse
+print(check_refusal('cisplatin', 'Germany'))        # should refuse
+print(check_refusal('cisplatin', 'Argentina'))      # should return None (allowed)
+"
+```
+
+Status: `[ ]` Refusals work correctly
+
+---
+
+## BLOCK 5 — Evaluation MVP (Target: 45 min)
+**Goal:** Case 1 scored (RAG vs. prompt-only), adversarial cases confirmed passing.
+
+### Step 1: Write the Case 1 fact checklist
+Create `/Project/evaluation/checklists/case1_cisplatin_argentina_baseline.md`:
+
+```markdown
+# Fact Checklist: Case 1 — Cisplatin / Argentina / Baseline
+
+Score: 1 if present and correct, 0 if absent or wrong, -1 if hallucinated (stated but false)
+
+| # | Check | RAG score | Prompt-only score |
+|---|-------|-----------|-------------------|
+| 1 | Identifies India and/or China as primary API source | | |
+| 2 | Mentions obra social procurement channel | | |
+| 3 | Mentions public hospital/Ministry of Health channel | | |
+| 4 | States WHO EML inclusion for cisplatin | | |
+| 5 | States cisplatin is generic/off-patent | | |
+| 6 | Mentions Argentina's import dependence (no domestic API) | | |
+| 7 | Includes a stockout risk or service level metric | | |
+| 8 | Includes at least 1 concrete policy recommendation | | |
+| 9 | Includes Confidence & Limitations section | | |
+| 10 | Does NOT claim Argentina manufactures cisplatin API (hallucination check) | | |
+
+**Total RAG: /10**  
+**Total Prompt-only: /10**
+
+Notes:
+```
+
+Status: `[ ]` Case 1 checklist written
+
+### Step 2: Generate prompt-only baseline
+Create `/Project/evaluation/run_baseline.py`:
+```python
+import anthropic, os
+
+client = anthropic.Anthropic()
+
+SYSTEM_PROMPT = """You are an expert supply-chain analyst at JCNB Biotech Consulting specializing in oncology drug shortage risk in Latin America.
+
+Output format — use exactly these section headers:
+## Drug Profile
+## Supply Chain Vulnerability  
+## Scenario Impact Analysis
+## Policy Recommendations
+## Confidence & Limitations
+
+Never provide clinical advice or drug substitution recommendations."""
+
+def prompt_only_brief(drug, country, scenario):
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=1500,
+        system=SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": f"Generate a Drug Shortage Risk Brief for {drug} in {country} under scenario: {scenario}"}]
+    )
+    return response.content[0].text
+
+brief = prompt_only_brief("cisplatin", "Argentina", "Baseline")
+print(brief)
+
+with open("evaluation/case1_prompt_only_output.txt", "w") as f:
+    f.write(brief)
+print("\nSaved to evaluation/case1_prompt_only_output.txt")
+```
+
+Run it:
+```bash
+python3 evaluation/run_baseline.py
+```
+
+Status: `[ ]` Prompt-only baseline output saved
+
+### Step 3: Score both outputs against the checklist
+1. Open `evaluation/case1_prompt_only_output.txt`
+2. Generate the RAG output via the Streamlit app (cisplatin / Argentina / Baseline)
+3. Score both outputs against the Case 1 checklist
+4. Record scores in the checklist file
+
+Status: `[ ]` Both outputs scored, results recorded
+
+### Step 4: Write session notes
+Create `/Project/evaluation/session_notes_2026-04-XX.md` and record:
+- What worked
+- What produced unexpected output
+- What to fix for Week 6
+- Retrieval quality observations
+- Any hallucinations observed
+
+Status: `[ ]` Session notes written
+
+---
+
+## WEEK 6 CHECK-IN TARGETS (from your plan)
+- [ ] Working Streamlit app with full RAG pipeline end-to-end
+- [ ] At least 3 drug–country combinations producing coherent briefs
+- [ ] Sources tab functional
+- [ ] Fact checklists written for at least 3 of 5 test cases
+- [ ] Model-as-judge pipeline running
+- [ ] At least 2 cases scored (RAG vs. prompt-only)
+- [ ] Prompt-only baseline tested on at least 3 cases
+
+---
+
+## WEEK 8 FINAL TARGETS
+- [ ] All 5 test cases scored
+- [ ] All 3 adversarial cases pass
+- [ ] Model-as-judge vs. manual scoring compared
+- [ ] Timed manual comparison on 1 case
+- [ ] Chunk size experiment (256 vs. 512 tokens) documented
+- [ ] README with clone-install-run instructions
+- [ ] No API keys or secrets in repo
+
+---
+
+## KNOWN ISSUES / BLOCKERS
+*(Update this section as you hit problems)*
+
+| Issue | Status | Notes |
+|-------|--------|-------|
+| | | |
+
+---
+
+## COST LOG
+*(Track API spend here)*
+
+| Date | Task | Approx. calls | Estimated cost |
+|------|------|---------------|----------------|
+| | | | |
+
+**Running total: $0.00 / $10.00 limit**
