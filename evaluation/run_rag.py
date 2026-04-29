@@ -21,6 +21,8 @@ CASES = [
     ("cisplatin",    "Argentina", "Baseline",              "case1_rag.txt"),
     ("trastuzumab",  "Venezuela", "Baseline",              "case2_rag.txt"),
     ("cisplatin",    "Argentina", "API export restriction", "case3_rag.txt"),
+    ("doxorubicin",  "Colombia",  "Currency devaluation",  "case4_rag.txt"),
+    ("carboplatin",  "Venezuela", "Combined shock",         "case5_rag.txt"),
 ]
 
 SYSTEM_PROMPT = """You are an expert supply-chain analyst at JCNB Biotech Consulting \
@@ -65,7 +67,7 @@ level to 85%.
 Stockout figures are from a simplified inventory model and are illustrative, not actuarial. \
 Procurement data reflects publicly available sources as of 2024."""
 
-embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+embed_model = SentenceTransformer("all-mpnet-base-v2")
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collection = chroma_client.get_collection("onco_supply")
 claude = anthropic.Anthropic()

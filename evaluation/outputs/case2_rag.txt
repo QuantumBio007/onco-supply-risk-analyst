@@ -1,0 +1,99 @@
+CASE: trastuzumab / Venezuela / Baseline
+SOURCE: RAG (ChromaDB retrieval + Claude generation)
+============================================================
+
+## Drug Profile
+
+Trastuzumab is a HER2-targeted monoclonal antibody biologic on the WHO Model List of Essential Medicines. It is patent-protected (originator: Herceptin, USD 50,000–70,000 per patient per year) with limited biosimilar availability in Latin America. Trastuzumab requires unbroken cold-chain maintenance throughout the supply chain; any break in refrigeration (port delays, customs holds, warehouse power outages) renders entire shipments unusable. This cold-chain vulnerability is particularly acute in Venezuela, where 66% of the largest hospitals lack consistent running water and documented power instability is endemic.
+
+## Supply Chain Vulnerability
+
+Venezuela's trastuzumab supply chain operates under structural collapse, not temporary disruption:
+
+- **Import dependence:** 100% for trastuzumab and all specialized biologics.
+- **Regulatory barrier:** INHRR registration timelines are 12–18 months or longer; registrations are country-specific and do not transfer from other regulatory approvals.
+- **Currency control:** Hard-currency allocation for USD-denominated imports is controlled by the national government through successive currency control systems (CADIVI, CENCOEX, DICOM). This is a permanent structural barrier independent of any scenario shock.
+- **Procurement channels:** Trastuzumab is accessed through (1) private, dollarized out-of-pocket purchase (affordable only to a small fraction); (2) international NGO and donation programs; and (3) the severely degraded IVSS (social security system).
+- **Healthcare financing collapse:** Out-of-pocket health expenditure reached 62.99% of total health spending in 2017 (vs. ~28% regional average). Public healthcare spending fell from 8.1% of GDP in 2006 to 1.18% in 2017.
+- **Cold-chain infrastructure failure:** 66% of largest hospitals lack consistent running water; power instability compromises refrigeration for biologics throughout logistics and storage.
+
+## Scenario Impact Analysis
+
+**Baseline (Normal Operations) Simulation Results** (500 Monte Carlo runs, 365 days):
+
+| Metric | Value | 95% CI |
+|--------|-------|--------|
+| **Stockout days per year** | 117.3 days | ±1.35 |
+| **Service level (unit fill rate)** | 73.2% | ±0.0% |
+| **Service level (days without stockout)** | 67.9% | — |
+| **Average inventory on hand** | 3 units | — |
+| **Probability of any stockout during year** | 100% | — |
+| **Probability of critical shortage (>60 stockout days)** | 99.8% | — |
+
+**Overall Risk Assessment: CRITICAL**
+
+Under baseline conditions, trastuzumab supply in Venezuela experiences **117.3 stockout days per year**—equivalent to **68% of the year without reliable access**. This reflects:
+
+- Effective order fill rate of 57% (structural floor 60% × scenario 95%), driven by chronic procurement failures due to fiscal constraints and informal supply chains.
+- Effective budget multiplier of 30%, reflecting the structural ceiling on foreign-exchange allocation and institutional purchasing power.
+- Mean lead time of 60 days (std: 36 days, log-normal), a consequence of port delays, customs holds, and cold-chain infrastructure constraints.
+- Permanent disruption duration modeled across the full simulation horizon—no recovery assumption because the structural barriers are persistent.
+
+**Key interpretation:** Venezuela's baseline is already a sustained crisis. The 117.3 stockout days reflect not temporary shocks but endemic system failure. Unlike Argentina (5.1 baseline stockout days) or Colombia (presumed functional baseline), Venezuela lacks a functioning institutional procurement channel for oncology biologics. The simulation models this as a structural supply ceiling, not a scenario deviation.
+
+## Policy Recommendations
+
+The context provided does not contain explicit Venezuelan policy recommendations. However, structural realities warrant consideration:
+
+1. **International coordination:** Strengthen partnerships with international NGO supply programs and donation channels, as these represent the only reliable access pathways outside private out-of-pocket purchase.
+
+2. **Cold-chain rehabilitation:** Any procurement increase depends on urgent infrastructure investment in hospital refrigeration, backup power, and water supply. Without this, shortages persist even if hard currency becomes available.
+
+3. **INHRR expedited pathways:** Explore regulatory streamlining for biosimilar registration (e.g., recognition of WHO prequalification) to reduce 12–18 month approval barriers and increase generic/biosimilar competition.
+
+4. **Transparent reporting:** Formalize shortage documentation to WHO EML reporting platform. Trastuzumab shortage in Venezuela is not a supply chain optimization problem—it is a failure of essential care obligations and warrants international health system attention.
+
+5. **Acknowledgment of limits:** Current policy capacity may not support demand-side interventions (pricing, negotiation) until structural currency and fiscal constraints are addressed at macroeconomic level.
+
+## Confidence & Limitations
+
+**Confidence:**
+- Simulation results (117.3 stockout days/year) are derived from an explicit Monte Carlo model with stated parameter assumptions.
+- Structural barriers (import dependence, currency controls, INHRR registration timelines, cold-chain infrastructure) are documented in the retrieved context.
+- The characterization of Venezuela as a "sustained crisis" baseline is consistent with reported healthcare collapse (1.18% GDP health spending, 72% population unable to access public services as of 2023).
+
+**Limitations:**
+- The retrieved context does not contain **primary procurement data** from Venezuelan hospitals, IVSS, or importers. Stockout figures are model-based, not observational.
+- The 57% order fill rate and 30% budget multiplier are illustrative structural assumptions, not validated against recent Venezuelan procurement records.
+- **Cold-chain failure rates** are not quantified in the context; the 66% hospital water-access statistic is indirect evidence.
+- The context does not specify which trastuzumab presentations (IV, SC) or manufacturing origins (originator vs. biosimilar) are relevant to Venezuelan supply.
+- **Donation and NGO supply volumes** are not characterized; actual patient access may be higher than the institutional procurement model suggests.
+- **Pricing and insurance coverage rules** for trastuzumab in the IVSS and private market are not detailed.
+
+**Data gaps for full risk assessment:**
+- Recent (2024–2025) documented trastuzumab stockout events in Venezuela.
+- Current hard-currency allocation
+
+============================================================
+RETRIEVED SOURCES:
+
+[1] venezuela_procurement_system.txt
+approximately 45% of the pharmaceutical market overall is import-dependent, and for biologics and specialized oncology agents (cisplatin, carboplatin, trastuzumab), import dependence is effectively 100%. Cold-chain logistics for biologics such as trastuzumab are additionally compromised by documente...
+
+[2] colombia_procurement_system.txt
+not transfer to Colombia. Generic oncology drugs approved in other markets must complete the Colombian registration process independently. INVIMA has worked to streamline biosimilar approval pathways, though timelines remain a practical barrier for some products. Colombia's currency, the Colombian p...
+
+[3] trastuzumab_profile.txt
+entire supply chain — from manufacture to pharmacy to patient. Any break in the cold chain compromises product integrity. This makes trastuzumab uniquely vulnerable to logistics disruptions: port delays with inadequate refrigeration, customs holds without cold storage, or power outages at warehouses...
+
+[4] venezuela_procurement_system.txt
+Venezuela's oncology drug procurement system has experienced a structural collapse over the 2013–2024 period driven by fiscal crisis, currency controls, and institutional degradation. Unlike Argentina (fragmented but functioning) or Colombia (strained but operational), Venezuela's public procurement...
+
+[5] who_eml_oncology.txt
+event. 2. WHO reporting: member states are encouraged to report EML drug shortages to WHO through the medicines shortage reporting platform. 3. Price negotiations: EML status strengthens the hand of governments negotiating prices with manufacturers, particularly for patented or high-cost drugs like ...
+
+[6] trastuzumab_venezuela_baseline.txt
+Simulation Results: Trastuzumab (HER2+ monoclonal antibody, biologic) in Venezuela Scenario: Normal operations Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days --- Optimal Policy (Warren OM Textbook §6.6) --- Safety stock (S...
+
+[7] trastuzumab_argentina_baseline.txt
+Simulation Results: Trastuzumab (HER2+ monoclonal antibody, biologic) in Argentina Scenario: Normal operations Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days --- Optimal Policy (Warren OM Textbook §6.6) --- Safety stock (S...

@@ -1,0 +1,24 @@
+DRUG: cisplatin, doxorubicin, carboplatin, trastuzumab, methotrexate, all
+COUNTRY: all
+TOPIC: who_eml, policy, procurement_priority, essential_medicines
+SOURCE: WHO Model List of Essential Medicines 23rd edition 2023
+DATE: 2023
+---
+The WHO Model List of Essential Medicines (EML) is published by the World Health Organization and updated every two years. It identifies the medicines considered most effective, safe, and cost-effective for priority health conditions. For governments and health systems, EML inclusion is the primary international signal that a drug should be stocked, procured, and made accessible to patients.
+
+Oncology section history: The WHO EML historically focused on infectious diseases and primary care. In 2015, a landmark expansion added a dedicated cancer medicines section, recognizing that oncology drugs are essential, not optional luxuries. This expansion included trastuzumab — a high-cost biologic — signaling that cost alone cannot justify excluding life-saving cancer treatments.
+
+Drugs relevant to this project on the WHO EML (23rd edition, 2023):
+- Cisplatin: on EML since 1979. Platinum-based chemotherapy for multiple cancer types.
+- Doxorubicin: on EML. Anthracycline for breast cancer, leukemia, lymphoma, sarcoma.
+- Carboplatin: on EML. Second-generation platinum compound.
+- Methotrexate: on EML. Antimetabolite for leukemia, breast cancer, osteosarcoma.
+- Trastuzumab: on EML since 2015. Monoclonal antibody for HER2-positive cancers.
+
+What EML inclusion means in practice:
+1. Procurement priority: health ministries are expected to ensure availability of EML drugs. Shortages of EML drugs are a policy failure, not just a supply chain event.
+2. WHO reporting: member states are encouraged to report EML drug shortages to WHO through the medicines shortage reporting platform.
+3. Price negotiations: EML status strengthens the hand of governments negotiating prices with manufacturers, particularly for patented or high-cost drugs like trastuzumab.
+4. No guarantee of availability: EML inclusion is a normative statement, not an enforcement mechanism. Countries frequently experience shortages of EML-listed oncology drugs.
+
+Policy implication for shortage risk briefs: When a drug on the WHO EML experiences a shortage in Argentina, Colombia, or Venezuela, it is not merely a supply chain problem — it is a failure of the health system's obligation to provide essential care. This framing is relevant to policy recommendations and the urgency assigned to shortage risk.

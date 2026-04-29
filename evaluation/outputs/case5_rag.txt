@@ -1,0 +1,99 @@
+CASE: carboplatin / Venezuela / Combined shock
+SOURCE: RAG (ChromaDB retrieval + Claude generation)
+============================================================
+
+## Drug Profile
+
+Carboplatin is a second-generation platinum-based chemotherapy agent on the WHO Model List of Essential Medicines (oncology section). It is used to treat ovarian, lung, head and neck, and other cancers and has largely replaced cisplatin in some regimens due to reduced nephrotoxicity. Carboplatin is fully off-patent with multiple generic manufacturers globally. The Active Pharmaceutical Ingredient (API) is manufactured primarily in India and China. Carboplatin is formulated as an injectable solution requiring only room-temperature storage (15–30°C, protected from light) — it does not require refrigeration.
+
+## Supply Chain Vulnerability
+
+Venezuela's oncology drug procurement system has undergone structural collapse over the 2013–2024 period and does not function as an institutional channel for carboplatin or other oncology drugs. Key vulnerabilities:
+
+**Regulatory and Administrative Barriers:**
+- All carboplatin imports require registration with the INHRR (Instituto Nacional de Higiene "Rafael Rangel"), which operates independently of registrations in other countries (ANMAT, INVIMA).
+- INHRR registration timelines are reported at 12–18 months or longer, creating persistent lead-time barriers.
+
+**Currency and Fiscal Constraints (Permanent Structural):**
+- Carboplatin is traded globally in USD. Successive Venezuelan currency control systems (CADIVI, CENCOEX, DICOM) have severely restricted hard-currency access for pharmaceutical importers — a permanent barrier independent of disruption scenarios.
+- Healthcare spending collapsed from 8.1% of GDP (2006) to approximately 1.18% (2017), eliminating meaningful public procurement capacity.
+
+**Import Dependence:**
+- Approximately 100% of carboplatin supply depends on imports; there is no domestic manufacturing.
+- Carboplatin shares the API supply chain with cisplatin. An export restriction from India or China would simultaneously disrupt both drugs, compounding oncology treatment program impact.
+
+**Market Access and Out-of-Pocket Burden:**
+- In practice, carboplatin access occurs through: (1) private, dollarized out-of-pocket purchase (affordable only to a small fraction of the population given median incomes); (2) international NGO donation programs; and (3) the IVSS (Instituto Venezolano de los Seguros Sociales), which is severely degraded. Out-of-pocket health expenditure reached 62.99% of total health spending (2017), compared to a Latin American regional average of ~28%.
+- By August 2023, 72% of the Venezuelan population reported being unable to access public health services when needed.
+
+## Scenario Impact Analysis
+
+**Combined Shock Scenario** (API restriction + currency devaluation):
+
+Monte Carlo simulation (500 runs, 365 days) under combined shock conditions yields:
+
+| Metric | Result | 95% CI |
+|--------|--------|---------|
+| **Stockout days/year** | 35.2 | ±2.53 |
+| **Unit service level** | 90.8% | ±1.0% |
+| **Days without stockout** | 90.4% | — |
+| **Average inventory on hand** | 504 units | — |
+| **Probability of any stockout** | 100% | — |
+| **Probability of critical shortage (>60 days)** | 15.8% | — |
+
+**Key Assumptions:**
+- Mean lead time during disruption: 150 days (std: 90 days, log-normal)
+- Effective order fill rate: 33% (structural floor 60% × scenario factor 55%)
+- Effective budget multiplier: 18% (structural cap 30% × scenario factor 60%)
+- Disruption duration: ~120 days (geometric distribution)
+
+**Interpretation:**
+The combined shock scenario projects carboplatin supply to experience 35 stockout days per year with a unit fill rate of 90.8%, indicating **HIGH supply risk**. This represents treatment delays and rationing without intervention. However, the context notes that Venezuela's baseline is already in sustained crisis: the baseline (no shock) condition already yields 31 stockout days/year. Thus, the combined shock produces a marginal (4-day) increase in absolute terms because the system is already operating near the floor of institutional function. The critical distinction is that whereas other Latin American systems (Colombia, Argentina) degrade under shocks, Venezuela's system is degraded at baseline.
+
+## Policy Recommendations
+
+The retrieved context provides insufficient information to develop actionable policy recommendations specific to Venezuela's institutional capacity or governance structures. However, standard supply-chain interventions are noted as impractical under current conditions:
+
+1. **Strategic reserve establishment** — not feasible given the absence of functional government procurement and 18% effective budget allocation.
+2. **Registration pathway acceleration** — INHRR timelines (12–18 months) are a documented barrier, but the context does not specify reform mechanisms or institutional reform capacity.
+3. **Currency access coordination** — hard-currency allocation for pharmaceutical imports is controlled by the national government as part of broader macroeconomic policy; pharmaceutical-specific policy levers are limited.
+
+The context suggests that meaningful carboplatin supply stability in Venezuela will require systemic fiscal and institutional recovery beyond pharmaceutical supply-chain interventions alone.
+
+## Confidence & Limitations
+
+**What is uncertain:**
+
+- **Monte Carlo model scope:** The 35.2 stockout days/year figure derives from a continuous-review (Q, r) inventory model with stochastic lead times and is illustrative of supply-chain dynamics under the specified parameters. It is not a forecast of actual Venezuelan carboplatin availability and does not account for informal market access, donation programs, or patient migration for treatment.
+
+- **Baseline definition:** The context distinguishes Venezuela's "baseline" (31 stockout days/year) from the combined shock (35 days/year), but does not clarify the operational definition of "baseline" in a system with 72% population-level access failure. The simulation assumes institutional procurement still occurs; data on actual institutional carboplatin volumes in Venezuela are not provided.
+
+- **Shared API risk quantification:** The context confirms that carboplatin and cisplatin share the India/China API supply chain and that simultaneous disruption is "plausible," but does not provide probability estimates or historical frequency data for coordinated API export restrictions affecting both drugs.
+
+- **Currency control impact:** The 18% effective budget multiplier (structural cap 30% × scenario factor 60%) reflects documented currency constraints, but the context does not specify the mechanism by which this multiplier was derived or its sensitivity to different devaluation magnitudes.
+
+- **
+
+============================================================
+RETRIEVED SOURCES:
+
+[1] carboplatin_profile.txt
+Argentina's ANMAT process. Generic carboplatin products approved in one country are not automatically approved in the other. Importers must maintain active INVIMA registrations, and lapses can create temporary supply gaps even when global supply is adequate. Key shortage risk factors: - Shared API s...
+
+[2] venezuela_procurement_system.txt
+Venezuela's oncology drug procurement system has experienced a structural collapse over the 2013–2024 period driven by fiscal crisis, currency controls, and institutional degradation. Unlike Argentina (fragmented but functioning) or Colombia (strained but operational), Venezuela's public procurement...
+
+[3] venezuela_procurement_system.txt
+approximately 45% of the pharmaceutical market overall is import-dependent, and for biologics and specialized oncology agents (cisplatin, carboplatin, trastuzumab), import dependence is effectively 100%. Cold-chain logistics for biologics such as trastuzumab are additionally compromised by documente...
+
+[4] carboplatin_profile.txt
+Carboplatin is a second-generation platinum-based chemotherapy agent, developed as a less toxic alternative to cisplatin. It is used to treat ovarian, lung, head and neck, and other cancers. It has largely replaced cisplatin in some regimens due to its more manageable side effect profile, particular...
+
+[5] colombia_procurement_system.txt
+not transfer to Colombia. Generic oncology drugs approved in other markets must complete the Colombian registration process independently. INVIMA has worked to streamline biosimilar approval pathways, though timelines remain a practical barrier for some products. Colombia's currency, the Colombian p...
+
+[6] carboplatin_venezuela_combined_shock.txt
+Simulation Results: Carboplatin (platinum-based, 2nd generation) in Venezuela Scenario: Combined shock (API restriction + currency devaluation) Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days --- Optimal Policy (Warren OM T...
+
+[7] carboplatin_colombia_combined_shock.txt
+Simulation Results: Carboplatin (platinum-based, 2nd generation) in Colombia Scenario: Combined shock (API restriction + currency devaluation) Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days --- Optimal Policy (Warren OM Te...

@@ -5,3 +5,18 @@ __pycache__/
 *.pyc
 .DS_Store
 knowledge_base/sim_outputs/
+
+# Course and personal documents — not part of the public project
+*.docx
+*.pdf
+BusinessPlan/
+Literature/
+Modules/
+"Week 6/"
+Week\ 6/
+argentina_template_para_venezuela.txt
+email_pablo_followup.md
+email_souza_venezuela.md
+email_souza_venezuela.txt
+knowledge_base/drafts/
+knowledge_base/references/

@@ -11,7 +11,7 @@ MODEL             = "claude-haiku-4-5-20251001"
 
 @st.cache_resource
 def load_retriever():
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model = SentenceTransformer("all-mpnet-base-v2")
     client = chromadb.PersistentClient(path="./chroma_db")
     collection = client.get_collection("onco_supply")
     return model, collection

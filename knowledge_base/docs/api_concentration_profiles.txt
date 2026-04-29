@@ -1,0 +1,21 @@
+DRUG: all
+COUNTRY: all
+TOPIC: api_dependence, supply_chain, geopolitical_risk, export_restriction
+SOURCE: UN Comtrade, WHO, published pharmaceutical supply chain literature
+DATE: 2024
+---
+API (Active Pharmaceutical Ingredient) concentration risk is the single largest structural vulnerability in the global oncology drug supply chain. API is the chemically active component of a drug — it is manufactured separately and then formulated into the final product (tablets, injections, etc.) by pharmaceutical companies.
+
+Global API manufacturing concentration: India and China together account for an estimated 60–70% of global API supply for generic pharmaceuticals. For oncology generics specifically — including cisplatin, carboplatin, doxorubicin, and methotrexate — this concentration is even higher. India alone supplies an estimated 30–40% of global generic pharmaceutical exports by volume. China supplies a large share of the basic chemical intermediates that Indian API manufacturers depend on, creating a two-tier dependency.
+
+Why concentration creates risk: When API manufacturing is concentrated in two countries, any disruption — regulatory enforcement action, export restriction, pandemic-related shutdown, geopolitical event, or natural disaster — simultaneously affects all generic manufacturers worldwide who source from those countries. There is no backup regional supply chain for Latin America. The region has no significant oncology API manufacturing capacity.
+
+Historical precedents for API supply disruption:
+- COVID-19 pandemic (2020): India and China imposed temporary export restrictions on pharmaceutical ingredients in March 2020, causing global supply anxiety and stockpiling.
+- India export bans: The Indian government has historically imposed export restrictions on specific drugs during domestic shortage events (e.g., paracetamol in 2020).
+- Quality enforcement: The US FDA and European EMA have periodically shut down Indian API manufacturing facilities for Good Manufacturing Practice (GMP) violations, removing significant supply from the global market overnight.
+- Chinese chemical intermediates: China supplies key chemical precursors to Indian API manufacturers. Any disruption at the Chinese intermediate level cascades into Indian API production.
+
+Implication for Latin American oncology supply: Latin American countries import finished formulations, not API directly. However, if global API supply tightens due to an India/China disruption, finished product manufacturers globally reduce their export volumes, and Latin American importers — who typically have lower purchasing power and less contractual priority than US or European buyers — are disproportionately affected. Argentina, Colombia, and Venezuela have no domestic API fallback.
+
+Scenario modeling note: The inventory simulation in this knowledge base models an API export restriction as a tripling of lead time (from 10 to 30 days). Under this scenario, stockout days increase from 20 to 49 per year and service level drops from 94.5% to 85.1%, representing a critical disruption to treatment continuity.

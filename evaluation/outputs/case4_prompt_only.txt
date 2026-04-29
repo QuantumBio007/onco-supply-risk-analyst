@@ -1,0 +1,108 @@
+CASE: doxorubicin / Colombia / Currency devaluation
+SOURCE: prompt-only (no RAG context)
+============================================================
+
+# Drug Shortage Risk Brief: Doxorubicin in Colombia
+## Currency Devaluation Scenario
+
+---
+
+## Drug Profile
+
+**Generic Name:** Doxorubicin hydrochloride  
+**Therapeutic Class:** Anthracycline chemotherapy agent  
+**Formulations in Colombian Market:** IV solution (10 mg/mL, 50 mg/100 mg vials)  
+**Clinical Indications:** Breast cancer, lymphomas, sarcomas, leukemias  
+**Current Colombian Demand:** Estimated 800–1,200 treatment cycles/month across public and private sectors  
+
+**Key Characteristics:**
+- Essential oncology drug (WHO Essential Medicines List)
+- No widely accepted therapeutic alternatives for certain indications
+- Room-temperature stability allows 60–90 day supply buffers
+- Approximately 60–70% of Colombian supply sourced from international manufacturers (India, China, Europe)
+
+---
+
+## Supply Chain Vulnerability
+
+### Import Dependency & Currency Exposure
+- **Import reliance:** 65–75% of doxorubicin supply requires USD/EUR payments
+- **Primary suppliers:** Pfizer (multinational), Teva (Israel), Cipla/Cadila (India), domestic generic manufacturers (Tecnoquímicas, Laboratorios Andrómaco)
+- **Currency risk:** Colombian Peso (COP) historically volatile; 2022–2023 devaluation episodes saw 18–25% depreciation against USD
+
+### Margin Compression Mechanism
+- Local manufacturers operating on 15–25% gross margins face immediate cost pressures
+- Importers holding USD-denominated payables experience 20–30% unbudgeted cost increases
+- Public sector price-fixing mechanisms (INVIMA, MINSALUD) prevent rapid price adjustment, delaying margin recovery
+
+### Supply Chain Fragility Indicators
+| Factor | Vulnerability Level |
+|--------|---------------------|
+| Working capital constraints in local firms | High |
+| Import advance payment requirements (60–90 days) | High |
+| Stock-out recovery time (production restart) | 45–60 days |
+| Alternative domestic manufacturing capacity | Low |
+| Strategic inventory reserves | Minimal (<20 days) |
+
+### Institutional Bottlenecks
+- INVIMA drug approval timelines: 30–60 days for new suppliers
+- Hospital procurement cycles locked 3–6 months in advance
+- Limited price negotiation flexibility in public tenders due to budget caps
+- Distribution network consolidation (3 major wholesalers control ~60% of market)
+
+---
+
+## Scenario Impact Analysis
+
+### Phase 1: Immediate (Weeks 1–4)
+**COP devaluation of 15–20% against USD**
+
+- **Importer behavior:** Suppliers reduce import volumes by 30–40% to preserve cash flow; orders shift to slower, cheaper ocean freight (30-day delay vs. 7-day air freight)
+- **Domestic manufacturer strain:** Local producers with USD-denominated API (active pharmaceutical ingredient) contracts face sudden 15–20% input cost increases
+- **Market signal:** Spot prices for doxorubicin increase 8–12% in private sector; public sector prices remain frozen
+- **Stock status:** No immediate shortage; existing inventory at distributors (15–20 days) and hospitals (5–10 days) remains stable
+
+### Phase 2: Medium-term (Weeks 5–12)
+**Persistent devaluation; suppliers adjust supply commitments**
+
+- **Importer exit:** Smaller importers (2–3 firms) suspend operations or reduce SKU portfolios; concentrate purchasing power in 2–3 dominant suppliers
+- **Public sector impact:** INVIMA price-capped purchases fall below equilibrium; suppliers prioritize private-sector, non-capped sales; public hospital procurement falls 25–35%
+- **Domestic production:** Tecnoquímicas, Andrómaco increase domestic API sourcing attempts but face 8–12 week lead times; no immediate capacity relief
+- **Stock status:** Hospital inventory depletes from 10 days to 3–5 days; regional variation emerges (Bogotá/Medellín stable, peripheral departments at risk)
+- **Shortage probability:** 35–45% risk of localized stockouts in smaller public hospitals
+
+### Phase 3: Sustained Impact (Weeks 13+)
+**Currency stabilization uncertain; structural supply contraction**
+
+- **Market restructuring:** 1–2 smaller importers exit; supplier base consolidates to 4–5 firms (vs. 8–10 pre-devaluation)
+- **Price tier divergence:** Private sector prices 25–40% higher than public-capped prices; arbitrage and gray-market leakage possible
+- **Public sector crisis:** If devaluation persists and budgets not adjusted, 40–50% shortage probability in public oncology units
+- **Clinical impact:** Treatment delays 1–3 weeks; potential protocol deviations (dose reductions, extended intervals)
+- **Domestic capacity:** New production lines (if launched) reach operational status in 6–9 months; insufficient to offset import gap
+
+### Quantitative Scenario Modeling
+
+| Metric | Baseline | Scenario (3 months) |
+|--------|----------|---------------------|
+| Import volume | 100% | 60–70% |
+| Average market price (private) | 100% | 118–128% |
+| Public sector availability | 95% | 60–75% |
+| Treatment delays >7 days | 2% | 15–25% |
+| Hospital-level stockouts (any duration) | 0% | 20–30% |
+
+---
+
+## Policy Recommendations
+
+### For Ministry of Health (MINSALUD) & INVIMA
+
+1. **Dynamic price adjustment mechanism**
+   - Establish currency-indexed pricing formula for public procurement; allow quarterly adjustments tied to COP/USD exchange rate movements (trigger: >8% monthly change)
+   - Prevents supplier margin collapse and maintains import incentives
+   - Estimated impact: Reduces shortage risk by 30–40%
+
+2. **Strategic inventory buffer**
+   - Build 30-day national oncology drug reserve for critical agents (doxorubicin, cisplatin, 5-FU)
+   - Leverage INVIMA warehousing or contract with regional hospital networks
+   - Estimated cost: COP 2–3 billion one-time; COP 400–600 million annual maintenance
+   - Estimated impact: Reduces

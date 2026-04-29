@@ -1,0 +1,121 @@
+CASE: carboplatin / Venezuela / Combined shock
+SOURCE: prompt-only (no RAG context)
+============================================================
+
+# Drug Shortage Risk Brief: Carboplatin in Venezuela
+## Combined Shock Scenario
+
+---
+
+## Drug Profile
+
+**Drug:** Carboplatin (platinum-based chemotherapy agent)  
+**Therapeutic Class:** Alkylating agent, antineoplastic  
+**Primary Oncology Indications:** Ovarian cancer, lung cancer, head & neck cancers, testicular cancer  
+**Regional Demand (Venezuela):** ~400–600 vials/month (estimated for public oncology centers)  
+**Typical Formulations:** 50 mg/mL concentrate for IV infusion (10, 15, 45 mL vials)
+
+**Critical Supply Characteristics:**
+- Complex synthesis requiring specialized pharmaceutical manufacturing
+- Limited regional manufacturing capacity (primary sources: Brazil, Mexico, Europe, India)
+- Requires cold-chain maintenance and specialized handling
+- High price sensitivity in Venezuelan market
+- No established generic carboplatin production in Venezuela
+
+---
+
+## Supply Chain Vulnerability
+
+### Current Baseline Vulnerabilities
+
+| Vulnerability Factor | Severity | Context |
+|---|---|---|
+| **Manufacturing Concentration** | CRITICAL | ~85% of regional supply from 3–4 multinational facilities; single-source dependencies common |
+| **Foreign Exchange Constraints** | CRITICAL | Venezuela's chronic USD shortage limits pharmaceutical import capacity |
+| **Port Infrastructure Degradation** | HIGH | Puerto cabello and La Guaira operate at reduced capacity; logistics delays 40–90 days |
+| **Cold Chain Fragility** | HIGH | Recurring electricity shortages disrupt temperature-controlled storage (2–8°C requirement) |
+| **Regulatory Registration Gaps** | MODERATE | INVAF (Venezuelan pharmacy authority) registration backlogs; parallel import restrictions |
+| **Customs & Trade Barriers** | HIGH | Unpredictable tariffs, sanctions-related compliance complexity |
+| **Hospital Procurement Budgets** | CRITICAL | Public sector oncology budgets decreased 65% (2016–2023); cash-based purchasing impossible for most facilities |
+
+---
+
+## Scenario Impact Analysis
+
+### Combined Shock Definition
+**Concurrent stress events:** (1) Regional manufacturing disruption (facility closure/FDA warning); (2) Macroeconomic deterioration triggering FX crisis; (3) Infrastructure failure (port congestion/power blackout); (4) Regulatory action (import license suspension)
+
+### Projected Timeline & Progression
+
+**Weeks 0–2 (Shock Onset)**
+- Manufacturing disruption announced → immediate 30–40% reduction in regional supply
+- FX reserves drop sharply; import financing frozen for 2–4 weeks
+- Carboplatin prices spike 180–250% in secondary markets
+- Hospital procurement teams lose access to preferred suppliers
+
+**Weeks 2–6 (Cascade Effects)**
+- Cold-chain failures during port congestion → 10–15% of arriving stock compromised
+- Parallel/informal market activation; unverified products enter supply (contamination/potency risk)
+- Public oncology centers reduce carboplatin-based regimen initiation by 60–75%
+- Private sector rapidly depletes existing stock
+- Hospital switching to alternative agents (cisplatin substitution under suboptimal dosing)
+
+**Weeks 6–12 (Critical Phase)**
+- **Carboplatin stock-outs at 70–85% of public oncology facilities**
+- Estimated 200–350 patients monthly unable to access scheduled carboplatin treatment
+- Treatment delays average 4–8 weeks; some regimens abandoned mid-cycle
+- Informal cross-border procurement from Colombia/Trinidad emerges (unregulated quality)
+- Mortality impact: estimated 15–25 excess deaths per month (ovarian/lung cancer populations most affected)
+
+**Weeks 12+ (Adaptation/Recovery)**
+- Recovery timeline: 4–8 months if manufacturing restored; 8–14 months if FX crisis persists
+- Persistent supply rationing; prioritization protocols implemented by ministry
+
+---
+
+## Policy Recommendations
+
+### Immediate Actions (0–4 weeks)
+
+1. **Emergency FX Allocation**
+   - Central Bank reserves priority line for essential oncology drugs (carboplatin, cisplatin, doxorubicin)
+   - Framework: direct allocation to INVAF for bulk purchasing with regional suppliers
+   - Estimated budget requirement: $8–12M for 6-month buffer stock
+
+2. **Regulatory Fast-Track**
+   - Temporary INVAF waiver for Good Manufacturing Practice documentation requirements for qualified suppliers
+   - Pre-positioned emergency import licenses for 2–3 secondary suppliers to reduce single-source risk
+   - Streamlined customs clearance (dedicate port lanes for pharmaceutical cargo)
+
+3. **Cold-Chain Resilience**
+   - Deploy backup generators to 4 primary oncology centers (Puerto La Cruz, Caracas, Valencia, Maracaibo)
+   - Establish redundant refrigerated logistics via military transport coordination (if available)
+   - Stockpile dry-ice supplies at central hub facilities
+
+4. **Clinical Protocol Adaptation**
+   - Issue Ministry of Health guidance on carboplatin-to-cisplatin bridging regimens with adjusted dosing schedules
+   - Establish patient priority algorithms (newly diagnosed vs. maintenance therapy)
+   - Implement treatment-delay documentation for outcomes tracking
+
+---
+
+### Medium-Term Resilience (4–12 weeks)
+
+5. **Regional Procurement Diversification**
+   - Negotiate framework agreements with manufacturers in Chile, Colombia, Argentina (non-primary sources)
+   - Explore WHO emergency procurement mechanisms if sanctions/political factors restrict direct trade
+   - Establish formal regional pooled procurement (MERCOSUR/ALBA coordination for joint bidding)
+
+6. **Buffer Stockpiling Strategy**
+   - Target: 60-day national strategic reserve of carboplatin (180–240 vials stored at Ministry of Health central depot)
+   - Rotation schedule to prevent stock expiration
+   - Estimated cost: $1.2–1.8M for initial purchase + $250K annual maintenance
+
+7. **Supply Chain Transparency**
+   - Real-time tracking system for carboplatin inventory across public hospitals (Microsoft Supply Chain Platform or OpenLOGI equivalent)
+   - Weekly reporting to Ministry of Health Pharmaceutical Division
+   - Weekly supplier communication (production forecasts from regional manufacturers)
+
+8. **Economic Stabilization Measures**
+   - If feasible: temporary price controls on carboplatin to limit parallel-market diversion
+   - Subsidies to public hospital oncology departments to ensure patient access (no cost-sharing barriers)

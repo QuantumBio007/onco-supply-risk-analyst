@@ -1,0 +1,16 @@
+DRUG: all
+COUNTRY: colombia
+TOPIC: procurement, invima, eps, health_system, regulatory
+SOURCE: public domain, pending primary source validation
+DATE: 2026
+STATUS: PLACEHOLDER — pending field research from Colombia-based source
+---
+Colombia's oncology drug procurement system is organized around a mandatory health insurance model with two regimes: the contributory regime, which covers formally employed workers and their families through payroll contributions, and the subsidized regime, which covers lower-income populations through government funding. Together these regimes cover the majority of the population, giving Colombia broader formal coverage than Venezuela but a different institutional structure from Argentina's obras sociales model.
+
+The primary procurement actors for oncology drugs are the EPS (Entidades Promotoras de Salud) — the health insurers who administer both regimes and are responsible for ensuring their enrolled populations have access to medications on the national formulary (Plan de Beneficios en Salud). EPS entities negotiate drug procurement contracts with distributors and manufacturers, either individually or through group purchasing arrangements. Unlike Argentina's highly fragmented obras sociales landscape, Colombia has fewer but larger EPS entities, providing somewhat more procurement coordination — though EPS financial fragility has been a recurring policy problem.
+
+INVIMA (Instituto Nacional de Vigilancia de Medicamentos y Alimentos) is Colombia's drug regulatory authority, equivalent in function to Argentina's ANMAT. All oncology drugs must hold a valid INVIMA registration before they can be legally marketed or procured in Colombia. INVIMA registration is country-specific — ANMAT approval in Argentina does not transfer to Colombia. Generic oncology drugs approved in other markets must complete the Colombian registration process independently. INVIMA has worked to streamline biosimilar approval pathways, though timelines remain a practical barrier for some products.
+
+Colombia's currency, the Colombian peso, is more stable than the Argentine peso but still subject to exchange rate fluctuation against the USD. Import-dependent oncology drugs are priced in USD, and peso depreciation increases procurement costs for EPS entities and hospitals operating on peso-denominated budgets. The impact is less acute than in Argentina but still a material factor in procurement planning, particularly for high-cost biologics such as trastuzumab.
+
+NOTE: This document is a preliminary placeholder based on public domain information. It requires validation from a Colombia-based healthcare professional or supply chain expert before Week 8 final evaluation. Key gaps include: EPS procurement coordination mechanisms in practice, INVIMA registration timelines for generics, and documented oncology drug shortage events in 2023-2025.

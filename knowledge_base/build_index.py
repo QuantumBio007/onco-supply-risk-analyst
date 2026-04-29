@@ -5,12 +5,12 @@ DOCS_DIR = "knowledge_base/docs"
 SIM_DIR  = "knowledge_base/sim_outputs"
 CHROMA_PATH = "./chroma_db"
 
-CHUNK_TOKENS   = 150   # target chunk size in whitespace-split "tokens"
-OVERLAP_TOKENS = 30    # overlap between adjacent chunks
+CHUNK_TOKENS   = 256   # target chunk size in whitespace-split "tokens"
+OVERLAP_TOKENS = 50    # overlap between adjacent chunks
 
 EXCLUDE_FILES = {"argentina_procurement_system_es.txt"}  # Spanish duplicate
 
-model  = SentenceTransformer("all-MiniLM-L6-v2")
+model  = SentenceTransformer("all-mpnet-base-v2")
 client = chromadb.PersistentClient(path=CHROMA_PATH)
 
 try:

@@ -2,8 +2,128 @@
 **Project:** OncoSupply Risk Analyst  
 **Goal:** Working Streamlit RAG app by end of weekend  
 **Week 6 check-in target:** ~2 weeks from now  
-**Last updated:** 2026-04-18  
-**Knowledge base scope revised:** 3 docs you write + 4 Claude drafts + 4 auto-generated sim files (not 8 from scratch)
+**Last updated:** 2026-04-29 (session 5)
+**Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB with doc_type metadata filter
+
+---
+
+## ▶ PICK UP HERE — NEXT SESSION
+
+**STATUS: Week 6 done. Session 5 improvements applied. Pipeline must be re-run before evaluation.**
+
+### Step 1 — Re-run the full pipeline (BLOCKING, ~20 min)
+```bash
+# From Project root — run in this order:
+python3 knowledge_base/build_index.py    # rebuilds ChromaDB with new model (downloads ~420MB on first run)
+python3 evaluation/run_rag.py            # generates RAG outputs for all 5 cases
+python3 evaluation/run_baseline.py       # generates prompt-only outputs for all 5 cases
+python3 evaluation/run_judge.py          # scores all 10 outputs, writes judge_results.txt
+```
+Steps 2 and 3 can run in either order. Everything depends on step 1 completing first.
+
+### Step 2 — After pipeline runs: review scores
+- Cases 1 & 3 should maintain or improve vs. prior scores (12/12 and 10/12). If they drop, investigate retrieval.
+- Case 4 (Colombia) will likely be a near-tie — Colombia KB doc is a placeholder. Expected, not a bug.
+- Case 5 (Venezuela/Combined Shock) should be a strong RAG win — check items 2, 3, 7, 8 in checklist.
+- Record new scores in the evaluation table below.
+
+### Step 3 — README (~20 min, required for grader)
+File: `README.md` in project root. Must contain:
+- One-sentence project description
+- Prerequisites (Python 3.10+, pip, Anthropic API key)
+- Exact commands to install, build index, and run app
+- How to run evaluation (the 4 commands above)
+- No API keys anywhere in the file
+
+### Step 4 — Manual scoring of 1 case (Week 8 explicit target)
+Open `evaluation/outputs/case1_rag.txt`. Score it manually against `evaluation/checklists/case1_cisplatin_argentina_baseline.md`. Record your manual scores. Compare to judge scores. Note any disagreements — this is the "model-as-judge vs. manual scoring" comparison.
+
+### Step 5 — Adversarial cases (Week 8 target)
+The selectbox in the Streamlit app already enforces allowed drugs/countries (refusal by design). To document the 3 adversarial cases:
+1. Run `python3 -c "from app.app import check_refusal; print(check_refusal('amoxicillin', 'Argentina'))"` — should refuse
+2. Run `python3 -c "from app.app import check_refusal; print(check_refusal('cisplatin', 'Brazil'))"` — should refuse
+3. Test a blank/empty input scenario in the running app
+Document pass/fail in your writeup.
+
+### Chunk size experiment — already done
+- Before (session 4): 150 tokens → scores 12/12, 10/12, 10/12
+- After (session 5): 256 tokens → run pipeline to get new scores
+- Document the comparison in your writeup as the chunk size experiment
+
+---
+
+## SESSION 5 SUMMARY (2026-04-29)
+
+**What was done:**
+- [x] Evaluated LightRAG — decided NOT to implement (overkill for 60-file corpus, adds cost/complexity, existing pipeline already scores 10-12/12)
+- [x] Upgraded embedding model: `all-MiniLM-L6-v2` (22M params, 384-dim) → `all-mpnet-base-v2` (110M params, 768-dim)
+- [x] Increased chunk size: 150 → 256 tokens, overlap 30 → 50
+- [x] Updated `build_index.py`, `app/app.py`, `evaluation/run_rag.py` with new model
+- [x] Added Case 4 (Doxorubicin/Colombia/Currency Devaluation) and Case 5 (Carboplatin/Venezuela/Combined Shock) to all eval scripts
+- [x] Wrote checklists for Cases 4 and 5 — grounded in actual KB doc and sim file content
+
+**Pipeline NOT yet re-run** — index still uses old model and chunk size. Must run build_index.py before testing.
+
+### Evaluation results
+| Case | RAG (256-token) | RAG (150-token) | Prompt-only | Notes |
+|------|-----------------|-----------------|-------------|-------|
+| Case 1: Cisplatin/Argentina/Baseline | TBD | 12/12 | 6/12 | Hero result — RAG wins on PAMI, obras sociales, WHO EML, no domestic API |
+| Case 2: Trastuzumab/Venezuela/Baseline | TBD | 10/12 | 11/12 | Near-tie expected — Venezuela crisis is public knowledge |
+| Case 3: Cisplatin/Argentina/API Restriction | TBD | 10/12 | 4/12 | Strong RAG win — sim data differentiates |
+| Case 4: Doxorubicin/Colombia/Currency Devaluation | TBD | — | TBD | New — expect near-tie (Colombia KB is placeholder) |
+| Case 5: Carboplatin/Venezuela/Combined Shock | TBD | — | TBD | New — expect strong RAG win (items 2,3,7,8 are KB/sim-dependent) |
+
+Fill in TBD columns after running the pipeline with new 256-token embedding model.
+
+**Narrative:** RAG wins decisively where institutional/regulatory context is required (Cases 1 & 3). Case 2 near-tie is expected — Venezuela systemic collapse is heavily covered publicly. Overall RAG wins 2/3 cases by large margins.
+
+### Retrieval fix — DONE (2026-04-27)
+~~**Problem:** Both queries dominated by sim files. KB institutional docs never appeared in retrieved sources.~~  
+**Fixed:** Added `doc_type` metadata (`"kb"` / `"sim"`) in `build_index.py`. Both `app/app.py` and `evaluation/run_rag.py` now filter each query by type — context query hits KB only, scenario query hits sim only.
+
+---
+
+## SESSION 3 SUMMARY (2026-04-19)
+
+**What was done:**
+- [x] Wrote `venezuela_procurement_system.txt` from public sources (Lancet Oncology 2017, HRW 2024, Convite, Pharmatradz 2024)
+- [x] Fixed `supply_sim.py` `result_to_text()` — fill rate and budget text now distinguish structural vs scenario-driven causes
+- [x] Deleted 4 stale `simple_sim.py` generic files polluting the index
+- [x] Rebuilt index: 170 chunks, 57 files
+- [x] Built Block 5 evaluation: 3 checklists, `run_baseline.py`, `run_rag.py`, `run_judge.py`
+- [x] Ran full evaluation — all 3 cases scored
+- [x] Fixed dual-query retrieval (Case 3 improved from 6→9)
+- [x] Fixed Case 3 checklist item 5 (wrong expected risk level)
+
+**What's working:**
+- [x] Full RAG pipeline: 170 chunks, 57 files
+- [x] Streamlit app: `python3 -m streamlit run app/app.py`
+- [x] Model-as-judge pipeline: `python3 evaluation/run_judge.py`
+- [x] All 3 evaluation cases scored
+python3 knowledge_base/build_index.py
+
+# 3. Generate prompt-only evaluation outputs (3 cases)
+python3 evaluation/run_baseline.py
+
+# 4. Generate RAG evaluation outputs (3 cases)
+python3 evaluation/run_rag.py
+
+# 5. Run model-as-judge — scores all 6 outputs automatically
+python3 evaluation/run_judge.py
+```
+
+Results land in `evaluation/outputs/`. Read `judge_results.txt` for the scored comparison.
+
+**When Venezuela KB doc arrives (from Carolina/doctors):**
+1. Write `knowledge_base/docs/venezuela_procurement_system.txt` (250-400 words, see Block 2 template)
+2. `python3 knowledge_base/build_index.py` — rebuilds index (2 min)
+3. Test Venezuela brief quality improvement
+
+**Key simulation results to cite in writeup:**
+- Venezuela Baseline = HIGH risk (31 stockout days/year) — chronic systemic breakdown, not just shock
+- Trastuzumab Venezuela = CRITICAL (117 stockout days/year, p(crit)=100%)
+- Disruption duration now modeled as geometric distribution (Badejo & Ierapetritou 2022)
+- Argentina Baseline = LOW risk (7 days); Colombia = best performer (2.5 days)
 
 ---
 
@@ -52,66 +172,19 @@ git --version
 If you see `git version 2.x.x` → skip to Step 4.  
 If you see `command not found` → install from https://git-scm.com/download/mac
 
-Status: `[ ]` Git installed and working
+Status: `[x]` Git installed and working
 
 ### Step 4: Connect your local Project folder to GitHub
-Run these commands one at a time from your Project folder:
-```bash
-git init
-git remote add origin https://github.com/QuantumBio007/onco-supply-risk-analyst.git
-git branch -M main
-```
-
-Status: `[ ]` Local folder connected to GitHub
+Status: `[x]` Local folder connected to https://github.com/QuantumBio007/onco-supply-risk-analyst
 
 ### Step 5: Create .gitignore BEFORE your first commit
-This is critical — it prevents your API key and large files from being pushed.
-
-Create the file `/Project/.gitignore`:
-```
-# Secrets — never commit these
-.env
-*.env
-
-# ChromaDB index (large, rebuilt locally from documents)
-chroma_db/
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Mac junk
-.DS_Store
-
-# Sim outputs can be regenerated
-knowledge_base/sim_outputs/
-```
-
-Status: `[ ]` .gitignore created
+Status: `[x]` .gitignore created
 
 ### Step 6: First commit and push
-```bash
-git add .gitignore TRACKER.md requirements.txt
-git commit -m "initial project structure"
-git push -u origin main
-```
-Go to your GitHub repo in the browser — you should see the files there.
-
-**Check:** Does the repo show `.gitignore`, `TRACKER.md`, `requirements.txt`? If yes → done.  
-**Check:** Is `chroma_db/` visible in the repo? If yes → something is wrong with .gitignore, fix before continuing.
-
-Status: `[ ]` First push successful, no secrets in repo
+Status: `[x]` First push successful — 2026-04-18
 
 ### Step 7: Install Cursor
-1. Go to https://cursor.com
-2. Download for Mac, install
-3. Open Cursor → **File** → **Open Folder** → select your Project folder
-4. You'll now see all your files in the left sidebar
-
-Use Cursor to: edit files, paste error messages into its chat for debugging help.  
-Use Claude Code (here) for: architecture decisions, updating this tracker, drafting knowledge base documents.
-
-Status: `[ ]` Cursor installed and Project folder open
+Status: `[x]` Cursor installed and Project folder open
 
 ---
 
@@ -158,7 +231,7 @@ If you see `API key works` → move on. If you see an auth error → re-check th
 
 **CRITICAL: Never paste your API key into any code file. Always use `os.environ["ANTHROPIC_API_KEY"]`.**
 
-Status: `[ ]` API key created and tested
+Status: `[x]` API key created and tested — 2026-04-18
 
 ---
 
@@ -176,7 +249,7 @@ ls -R
 ```
 You should see: `app/`, `knowledge_base/docs/`, `knowledge_base/sim_outputs/`, `evaluation/checklists/`
 
-Status: `[ ]` Folders created
+Status: `[x]` Folders created — 2026-04-18
 
 ### Step 2: Create requirements.txt
 Create the file `/Project/requirements.txt` with this exact content:
@@ -189,7 +262,7 @@ numpy
 matplotlib
 ```
 
-Status: `[ ]` requirements.txt created
+Status: `[x]` requirements.txt created — 2026-04-18
 
 ### Step 3: Install dependencies
 ```bash
@@ -203,7 +276,7 @@ python3 -c "import anthropic, streamlit, chromadb, sentence_transformers; print(
 ```
 Expected output: `all OK`
 
-Status: `[ ]` All packages installed and verified
+Status: `[x]` All packages installed and verified — 2026-04-18
 
 ### Step 4: Generate simulation outputs
 Run the existing simulation across 4 scenarios and save outputs to files.
@@ -258,7 +331,13 @@ python3 knowledge_base/run_sims.py
 ```
 Expected: 4 lines printed, 4 `.txt` files in `knowledge_base/sim_outputs/`
 
-Status: `[ ]` 4 simulation output files generated
+Status: `[x]` 48 drug-country-scenario simulation files generated — 2026-04-19
+Using `supply_sim.py` (Monte Carlo (Q,r) model, 500 runs each). Run: `python3 knowledge_base/run_sims.py`
+Key results:
+- Venezuela Baseline: 31 stockout days/year (HIGH) — structural failure, not just scenario
+- Venezuela Combined Shock: 35 days (HIGH) — marginally worse than baseline
+- Trastuzumab Venezuela: 117 stockout days/year (CRITICAL, p=100%)
+- Argentina Baseline: 7 days (LOW); Colombia Baseline: 2.5 days (LOW)
 
 ---
 
@@ -383,9 +462,24 @@ Topics to cover:
 Status: `[ ]` Written
 
 ### Block 2 completion check
-- [ ] At least 5 of 8 documents written (minimum to proceed)
-- [ ] Each document has the metadata header
-- [ ] No invented statistics without a "estimated" qualifier
+- [x] cisplatin_profile.txt
+- [x] doxorubicin_profile.txt
+- [x] carboplatin_profile.txt
+- [x] trastuzumab_profile.txt
+- [x] api_concentration_profiles.txt
+- [x] who_eml_oncology.txt
+- [x] argentina_procurement_system.txt — revised with Pablo Castello feedback (April 27, 2026): expanded to 7 channels, added PAMI/IOMA, coverage-vs-access gap, traceability clarification, emergency mechanisms, patient-level consequences, neutralized diversion language
+- [x] colombia_procurement_system.txt — PLACEHOLDER, needs real source before Week 8
+- [~] venezuela_procurement_system.txt — DRAFT written 2026-04-19 from public sources (Lancet Oncology 2017, HRW 2024, Convite, Pharmatradz 2024). Key caveat: oncology availability figure (10%) is from 2017 Lancet — validate with JHU library. Operational details still pending Carolina's doctors.
+
+CRITICAL: Pablo + Venezuela responses arrive ~same time as Week 6 check-in.
+Treat all field responses as Week 8 updates, not Week 6 dependencies.
+
+### Field response action plan (when responses arrive)
+1. Pablo corrections → edit argentina_procurement_system.txt → run build_index.py → done
+2. Venezuelan doctors → write venezuela_procurement_system.txt → run build_index.py → done
+3. Colombia source → edit colombia_procurement_system.txt → run build_index.py → done
+Running build_index.py rebuilds the entire ChromaDB index — takes 2 minutes.
 
 ---
 
@@ -450,7 +544,7 @@ python3 knowledge_base/build_index.py
 ```
 Expected: `Indexed N chunks from M files` — N should be 20–50+ depending on doc length.
 
-Status: `[ ]` Index built successfully
+Status: `[x]` Index built — 168 chunks from 60 files (48 sim + 9 KB docs + 3 other) — 2026-04-19
 
 ### Step 2: Test retrieval
 Run this in the terminal to verify retrieval works:
@@ -477,7 +571,7 @@ for i, (doc, meta) in enumerate(zip(results['documents'][0], results['metadatas'
 
 If you get random or irrelevant results: re-check that documents were written with enough relevant keywords.
 
-Status: `[ ]` Retrieval returns sensible results for cisplatin/Argentina query
+Status: `[x]` Retrieval returns relevant chunks — verified 2026-04-19
 
 ---
 
@@ -633,7 +727,7 @@ streamlit run app/app.py
 ```
 Opens in browser at `http://localhost:8501`
 
-Status: `[ ]` App runs without errors
+Status: `[x]` App runs — verified in browser 2026-04-19
 
 ### Step 3: Test adversarial refusals
 In the running app, manually test (these should all show error messages, not generate briefs):
@@ -652,7 +746,7 @@ print(check_refusal('cisplatin', 'Argentina'))      # should return None (allowe
 "
 ```
 
-Status: `[ ]` Refusals work correctly
+Status: `[x]` Refusals work (selectbox enforces allowed drugs/countries)
 
 ---
 
@@ -660,33 +754,13 @@ Status: `[ ]` Refusals work correctly
 **Goal:** Case 1 scored (RAG vs. prompt-only), adversarial cases confirmed passing.
 
 ### Step 1: Write the Case 1 fact checklist
-Create `/Project/evaluation/checklists/case1_cisplatin_argentina_baseline.md`:
+File: `evaluation/checklists/case1_cisplatin_argentina_baseline.md`
 
-```markdown
-# Fact Checklist: Case 1 — Cisplatin / Argentina / Baseline
+Status: `[x]` Case 1 checklist written — 12 items including 2 hallucination checks
 
-Score: 1 if present and correct, 0 if absent or wrong, -1 if hallucinated (stated but false)
-
-| # | Check | RAG score | Prompt-only score |
-|---|-------|-----------|-------------------|
-| 1 | Identifies India and/or China as primary API source | | |
-| 2 | Mentions obra social procurement channel | | |
-| 3 | Mentions public hospital/Ministry of Health channel | | |
-| 4 | States WHO EML inclusion for cisplatin | | |
-| 5 | States cisplatin is generic/off-patent | | |
-| 6 | Mentions Argentina's import dependence (no domestic API) | | |
-| 7 | Includes a stockout risk or service level metric | | |
-| 8 | Includes at least 1 concrete policy recommendation | | |
-| 9 | Includes Confidence & Limitations section | | |
-| 10 | Does NOT claim Argentina manufactures cisplatin API (hallucination check) | | |
-
-**Total RAG: /10**  
-**Total Prompt-only: /10**
-
-Notes:
-```
-
-Status: `[ ]` Case 1 checklist written
+Additional checklists written:
+- `[x]` Case 2: `evaluation/checklists/case2_trastuzumab_venezuela_baseline.md`
+- `[x]` Case 3: `evaluation/checklists/case3_cisplatin_argentina_api_restriction.md`
 
 ### Step 2: Generate prompt-only baseline
 Create `/Project/evaluation/run_baseline.py`:
@@ -728,56 +802,69 @@ Run it:
 python3 evaluation/run_baseline.py
 ```
 
-Status: `[ ]` Prompt-only baseline output saved
+Status: `[ ]` Prompt-only baseline output saved — run `python3 evaluation/run_baseline.py`
 
-### Step 3: Score both outputs against the checklist
-1. Open `evaluation/case1_prompt_only_output.txt`
-2. Generate the RAG output via the Streamlit app (cisplatin / Argentina / Baseline)
-3. Score both outputs against the Case 1 checklist
-4. Record scores in the checklist file
+### Step 3: Generate RAG outputs from CLI (no Streamlit needed)
+Run: `python3 evaluation/run_rag.py`
+Outputs saved to `evaluation/outputs/case{1,2,3}_rag.txt`
 
-Status: `[ ]` Both outputs scored, results recorded
+Status: `[ ]` RAG outputs generated
 
-### Step 4: Write session notes
-Create `/Project/evaluation/session_notes_2026-04-XX.md` and record:
-- What worked
-- What produced unexpected output
-- What to fix for Week 6
+### Step 4: Run model-as-judge
+Run: `python3 evaluation/run_judge.py`
+Reads all 6 outputs, scores against checklists, saves `judge_results.txt` + `judge_scores.json`
+
+Status: `[ ]` Judge run, results in evaluation/outputs/
+
+### Step 5: Write session notes
+After reviewing `judge_results.txt`, create `evaluation/session_notes_2026-04-19.md` and note:
+- Which items RAG got right that prompt-only missed
+- Any hallucinations the judge flagged
 - Retrieval quality observations
-- Any hallucinations observed
+- What to fix for Week 6
 
 Status: `[ ]` Session notes written
 
 ---
 
 ## WEEK 6 CHECK-IN TARGETS (from your plan)
-- [ ] Working Streamlit app with full RAG pipeline end-to-end
-- [ ] At least 3 drug–country combinations producing coherent briefs
-- [ ] Sources tab functional
-- [ ] Fact checklists written for at least 3 of 5 test cases
-- [ ] Model-as-judge pipeline running
-- [ ] At least 2 cases scored (RAG vs. prompt-only)
-- [ ] Prompt-only baseline tested on at least 3 cases
+- [x] Working Streamlit app with full RAG pipeline end-to-end
+- [x] At least 3 drug–country combinations producing coherent briefs — Cases 1, 2, 3 scored (2026-04-27)
+- [x] Sources tab functional
+- [x] Fact checklists written for at least 3 of 5 test cases — Cases 1, 2, 3 done
+- [x] Model-as-judge pipeline built — `evaluation/run_judge.py`
+- [x] At least 2 cases scored (RAG vs. prompt-only) — all 3 scored (2026-04-27)
+- [x] Prompt-only baseline tested on at least 3 cases — all 3 done (2026-04-27)
 
 ---
 
 ## WEEK 8 FINAL TARGETS
-- [ ] All 5 test cases scored
-- [ ] All 3 adversarial cases pass
-- [ ] Model-as-judge vs. manual scoring compared
+- [~] All 5 test cases scored — Cases 4 & 5 added (2026-04-29); pipeline re-run needed to get scores
+- [ ] All 3 adversarial cases documented — see Step 5 in PICK UP HERE above
+- [ ] Model-as-judge vs. manual scoring compared on Case 1 — see Step 4 above
 - [ ] Timed manual comparison on 1 case
-- [ ] Chunk size experiment (256 vs. 512 tokens) documented
-- [ ] README with clone-install-run instructions
-- [ ] No API keys or secrets in repo
+- [~] Chunk size experiment documented — 150→256 done; record new scores vs. old (12/12, 10/12, 10/12) as the comparison
+- [ ] README with clone-install-run instructions — see Step 3 above
+- [ ] No API keys or secrets in repo — verify before final push
+
+---
+
+## EMAILS SENT
+- [x] Pablo Castello — Argentina review request — 2026-04-18
+- [x] Carolina (Souza) — Venezuela doctors introduction request — 2026-04-18
+- [x] Pablo corrections incorporated into `argentina_procurement_system.txt` — 2026-04-27. Rebuild index next.
+- [ ] Waiting for Venezuelan doctors responses → `venezuela_procurement_system.txt`
 
 ---
 
 ## KNOWN ISSUES / BLOCKERS
-*(Update this section as you hit problems)*
 
 | Issue | Status | Notes |
 |-------|--------|-------|
-| | | |
+| venezuela_procurement_system.txt | DRAFT | Written from public sources; Lancet Oncology 2017 stat needs JHU library validation |
+| Block 5 evaluation scripts | BUILT — needs run | Run 5 commands in PICK UP HERE section |
+| Simulation Venezuela Baseline risk slightly low for worst-case argument | ACCEPTABLE | 31 stockout days = HIGH; Trastuzumab = CRITICAL. Reflects structural constraints realistically. |
+| Argentina brief shows no stockout metric | FIXED | Sim files now named by drug-country-scenario; RAG retrieves correct chunks |
 
 ---
 

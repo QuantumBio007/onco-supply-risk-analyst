@@ -1,0 +1,89 @@
+OncoSupply Risk Analyst — Model-as-Judge Evaluation
+============================================================
+
+Case 1: Cisplatin / Argentina / Baseline
+  RAG score:         12/12
+  Prompt-only score: 6/12
+  RAG advantage:     +6 points
+
+  Item-level breakdown:
+    [ 1] RAG=+1 Baseline=+1  Identifies India and/or China as primary API source for cisplatin
+  **[ 2] RAG=+1 Baseline=+0  Mentions obras sociales as a procurement channel in Argentina
+       RAG note:  The brief specifically lists 'obras sociales nacionales' and 'provincial obras sociales' among the seven independent procurement channels.
+       Base note: The brief mentions PAMI and provincial systems but does not specifically reference obras sociales as a procurement channel.
+    [ 3] RAG=+1 Baseline=+1  Mentions public hospital or Ministry of Health as a procurement channe
+  **[ 4] RAG=+1 Baseline=+0  States WHO EML inclusion for cisplatin
+       RAG note:  The brief states 'Cisplatin is a platinum-based chemotherapy agent on the WHO Model List of Essential Medicines.'
+       Base note: The brief does not mention WHO Essential Medicines List or cisplatin's inclusion on it.
+    [ 5] RAG=+1 Baseline=+1  States cisplatin is generic and/or off-patent
+  **[ 6] RAG=+1 Baseline=+0  States Argentina has no domestic API manufacturing (fully import-depen
+       RAG note:  The brief states 'Argentina is fully import-dependent for cisplatin API with no regional alternative sources available' and 'No significant API manufacturing capacity exists in Latin America.'
+       Base note: The brief explicitly states Argentina has 'Local production (30–40%): 2–3 Argentine manufacturers', contradicting full import dependency.
+    [ 7] RAG=+1 Baseline=+1  Includes a quantitative stockout risk or service level metric (e.g., s
+    [ 8] RAG=+1 Baseline=+1  Mentions fragmentation across procurement channels as a risk factor
+    [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation
+  **[10] RAG=+1 Baseline=+0  Includes Confidence & Limitations section
+       RAG note:  The brief contains a dedicated 'Confidence & Limitations' section that outlines strengths and limitations of the assessment.
+       Base note: The brief does not include an explicit Confidence & Limitations section addressing data quality, assumptions, or uncertainties.
+  **[11] RAG=+1 Baseline=-1  Does NOT claim Argentina manufactures cisplatin API [hallucination che
+       RAG note:  The brief correctly states Argentina is 'fully import-dependent' and explicitly confirms 'No significant API manufacturing capacity exists in Latin America.'
+       Base note: The brief claims Argentina has '2–3 Argentine manufacturers' producing cisplatin as local production (30–40%), which contradicts the typical import-dependency of platinum API manufacturing in Argentina.
+    [12] RAG=+1 Baseline=+1  Does NOT fabricate a specific stockout statistic not in context [hallu
+
+Case 2: Trastuzumab / Venezuela / Baseline
+  RAG score:         10/12
+  Prompt-only score: 11/12
+  RAG advantage:     -1 points
+
+  Item-level breakdown:
+    [ 1] RAG=+1 Baseline=+1  Identifies trastuzumab as a biologic / monoclonal antibody (not a smal
+  **[ 2] RAG=+1 Baseline=+0  States WHO EML inclusion for trastuzumab (added 2019)
+       RAG note:  The brief references 'WHO Model List of Essential Medicines' for trastuzumab in the Drug Profile section, confirming EML status.
+       Base note: The brief does not mention WHO EML inclusion or reference the 2019 addition to the list.
+    [ 3] RAG=+1 Baseline=+1  Mentions cold chain requirement (2–8°C)
+    [ 4] RAG=+1 Baseline=+1  Notes Venezuela's structural procurement failures (not scenario-specif
+  **[ 5] RAG=+0 Baseline=+1  Includes a quantitative risk metric (stockout days, service level, or 
+       RAG note:  The brief explicitly acknowledges in the Confidence & Limitations section that 'The provided context contains Monte Carlo models for Colombia and Argentina but none for Venezuela' and cannot quantify baseline metrics for Venezuela.
+       Base note: The brief provides quantitative metrics including public sector availability (35–45%), treatment initiation rate (40–50%), treatment abandonment rate (25–35%), and average treatment delay (6–12 weeks).
+  **[ 6] RAG=+0 Baseline=+1  Risk classification is HIGH or CRITICAL (Venezuela trastuzumab baselin
+       RAG note:  No baseline simulation data exists for Venezuela; the brief states 'Baseline supply risk cannot be quantified from the retrieved sources' and explicitly does not assign a risk classification, only notes it is 'materially higher' than Colombia/Argentina directionally.
+       Base note: The brief assigns CRITICAL risk classification to import dependency, currency mechanism, local manufacturing absence, and private sector access constraints.
+    [ 7] RAG=+1 Baseline=+1  Distinguishes trastuzumab from small-molecule generics (no India/China
+    [ 8] RAG=+1 Baseline=+1  Mentions cost / budget impact as a barrier to access
+    [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation
+    [10] RAG=+1 Baseline=+1  Includes Confidence & Limitations section
+    [11] RAG=+1 Baseline=+1  Does NOT claim biosimilar uptake in Venezuela is high [hallucination c
+    [12] RAG=+1 Baseline=+1  Does NOT cite cisplatin or carboplatin supply chain profile as applica
+
+Case 3: Cisplatin / Argentina / API Export Restriction
+  RAG score:         10/12
+  Prompt-only score: 4/12
+  RAG advantage:     +6 points
+
+  Item-level breakdown:
+    [ 1] RAG=+1 Baseline=+1  Describes the API export restriction scenario (India/China supply disr
+  **[ 2] RAG=+1 Baseline=+0  States or implies lead time increase under API restriction (>2x baseli
+       RAG note:  The brief states 'tripled lead times' in the scenario design, which exceeds the 2x baseline threshold.
+       Base note: The brief mentions baseline lead times (8-12 weeks API-to-formulation) and ANMAT delays (2-4 weeks) but does not explicitly quantify or imply a >2x increase in lead time under the restriction scenario.
+  **[ 3] RAG=+1 Baseline=+0  References fill rate reduction under this scenario (~55% per Izen 2025
+       RAG note:  The brief explicitly models '50% fill rate allocation cap' under the export restriction scenario, which aligns with the ~55% reference point.
+       Base note: The brief does not cite or reference the Izen 2025 study or provide a specific fill rate reduction percentage like 55% under the API restriction scenario.
+  **[ 4] RAG=+1 Baseline=+0  Includes a stockout risk metric that is higher than Baseline
+       RAG note:  The brief reports 7.9 stockout days/year under API restriction versus 7.0 days/year in baseline, confirming deterioration in service level metrics.
+       Base note: The brief provides qualitative risk levels (MODERATE, HIGH, CRITICAL) but does not include quantitative stockout risk metrics comparable to a baseline scenario.
+  **[ 5] RAG=+1 Baseline=-1  Risk classification is LOW (Argentina API restriction = 7.9 stockout d
+       RAG note:  The brief explicitly classifies overall supply risk as 'LOW' in the risk assessment section and characterizes the impact as 'minimal deterioration from baseline conditions.'
+       Base note: The brief classifies the risk as CRITICAL/SYSTEM FAILURE rather than LOW, contradicting the checklist specification that the scenario should be classified as LOW risk due to finite disruption duration.
+    [ 6] RAG=+1 Baseline=+1  Notes Argentina's import dependence as the key vulnerability
+    [ 7] RAG=+0 Baseline=+0  Mentions disruption duration is finite (not permanent) — Badejo & Iera
+  **[ 8] RAG=+0 Baseline=+1  Mentions ANMAT regulatory clearance as part of lead time
+       RAG note:  The brief does not mention ANMAT (Argentina's drug regulatory authority) or regulatory clearance timelines as a component of lead time under API restriction scenarios.
+       Base note: The brief explicitly references ANMAT import licensing delays (2-4 weeks) and ANMAT regulatory approval as part of the supply chain vulnerability and policy recommendations.
+    [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation specific to this 
+  **[10] RAG=+1 Baseline=+0  Includes Confidence & Limitations section
+       RAG note:  The brief includes a dedicated 'Confidence & Limitations' section explicitly identifying model scope, data gaps, and conditional assumptions.
+       Base note: The brief does not include a dedicated Confidence & Limitations section acknowledging uncertainties in consumption estimates, supplier behavior, or regulatory response timing.
+    [11] RAG=+1 Baseline=+1  Does NOT claim Argentina has domestic API manufacturing [hallucination
+  **[12] RAG=+1 Baseline=+0  Does NOT claim the restriction is permanent (baseline scenario lasts ~
+       RAG note:  The brief describes the impact as 'minimal deterioration' and does not characterize the scenario as permanent; it frames impacts in terms of annual stockout days, implying bounded disruption.
+       Base note: The brief does not explicitly state the restriction is finite (~90 days); it projects impacts over 6+ months as if the restriction persists without an assumed endpoint.

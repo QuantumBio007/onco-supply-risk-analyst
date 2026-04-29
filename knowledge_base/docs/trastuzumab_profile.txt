@@ -1,0 +1,19 @@
+DRUG: trastuzumab
+COUNTRY: all
+TOPIC: drug_profile, supply_chain, who_eml, biologic, cold_chain, cost
+SOURCE: WHO EML 2023, published literature, PAHO reports
+DATE: 2024
+---
+Trastuzumab is a monoclonal antibody that targets the HER2 receptor, used to treat HER2-positive breast cancer and HER2-positive gastric cancer. It was originally developed by Genentech (marketed as Herceptin by Roche) and represents a fundamentally different drug class from the platinum compounds and anthracyclines in this knowledge base.
+
+WHO Essential Medicines status: Trastuzumab was added to the WHO Model List of Essential Medicines in 2015, reflecting growing recognition that targeted biologics for cancer are essential, not optional. Its inclusion created procurement obligations for health systems that previously could not justify the cost.
+
+Patent and biosimilar status: The original trastuzumab patent has expired. Multiple biosimilars are approved globally (including Herzuma, Ogivri, Kanjinti, and others). However, biosimilar uptake in Latin America is slower than in high-income countries due to regulatory complexity, physician familiarity, and procurement inertia.
+
+Manufacturing origin: Unlike small-molecule generics, trastuzumab is a biologic manufactured through cell culture processes. It cannot be synthesized from chemical precursors the way cisplatin or doxorubicin can. A small number of manufacturers globally produce trastuzumab and its biosimilars. There is no India/China generic API dynamic for this drug — the manufacturing base is different and more concentrated among specialized biologic facilities.
+
+Cold chain requirement: Trastuzumab must be refrigerated at 2–8°C throughout the entire supply chain — from manufacture to pharmacy to patient. Any break in the cold chain compromises product integrity. This makes trastuzumab uniquely vulnerable to logistics disruptions: port delays with inadequate refrigeration, customs holds without cold storage, or power outages at warehouses can render entire shipments unusable. This risk is higher in Latin America than in high-income countries due to infrastructure variability.
+
+Unit cost and budget impact: Trastuzumab is orders of magnitude more expensive per treatment course than cisplatin or doxorubicin. A full course of originator trastuzumab (Herceptin) can cost USD 50,000–70,000 per patient per year. Even biosimilars cost substantially more than generic small-molecule chemotherapy. This means that budget pressure — currency devaluation, fiscal austerity — affects trastuzumab access first and most severely.
+
+Argentina-specific access: In Argentina, trastuzumab is primarily accessed through obras sociales (social health insurance funds) and private insurance. Public hospital access is limited by cost. This creates an equity gap: patients in the public system face greater access barriers than those covered by obras sociales. Any disruption to obras sociales financing directly affects trastuzumab availability.

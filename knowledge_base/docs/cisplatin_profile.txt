@@ -1,0 +1,23 @@
+DRUG: cisplatin
+COUNTRY: all
+TOPIC: drug_profile, supply_chain, who_eml, api_dependence
+SOURCE: WHO EML 2023, FDA drug database, published literature
+DATE: 2024
+---
+Cisplatin is a platinum-based alkylating chemotherapy agent used to treat testicular, ovarian, bladder, lung, and head and neck cancers. It has been in clinical use since 1978 and is one of the most widely used chemotherapy drugs globally.
+
+WHO Essential Medicines status: Cisplatin has been on the WHO Model List of Essential Medicines since 1979 and remains on the current oncology section. Its inclusion signals that countries should treat it as a procurement priority.
+
+Patent and generic status: Cisplatin is fully off-patent with multiple generic manufacturers worldwide. This creates price competition that lowers margins for manufacturers and can drive market consolidation, increasing shortage risk.
+
+Active Pharmaceutical Ingredient (API) origin: The overwhelming majority of cisplatin API is manufactured in India and China. Estimates suggest India and China together account for over 80% of global cisplatin API supply. No significant API manufacturing exists in Latin America. Countries in the region are fully import-dependent.
+
+Formulation and storage: Cisplatin is available as an injectable solution or powder for reconstitution. It must be stored at room temperature (15–25°C) and protected from light. Importantly, cisplatin should NOT be refrigerated — refrigeration causes precipitation and renders the product unusable. This storage requirement is different from many other oncology injectables.
+
+Key shortage risk factors:
+- API supply concentrated in two countries (India, China) — any export restriction, regulatory action, or geopolitical disruption simultaneously affects all generic manufacturers globally
+- Generic market price pressure reduces manufacturer margins, leading some producers to exit the market
+- Single-source or dual-source API scenarios for specific formulations are common
+- Latin American importers have no alternative regional API source
+
+Historical shortage context: Cisplatin has experienced periodic global supply disruptions, including shortages reported in the United States in 2023 linked to manufacturing consolidation at Indian API suppliers.

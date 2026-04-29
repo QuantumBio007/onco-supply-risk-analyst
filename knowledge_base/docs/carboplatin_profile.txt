@@ -1,0 +1,22 @@
+DRUG: carboplatin
+COUNTRY: all
+TOPIC: drug_profile, supply_chain, who_eml, api_dependence
+SOURCE: WHO EML 2023, FDA drug database, published literature
+DATE: 2024
+---
+Carboplatin is a second-generation platinum-based chemotherapy agent, developed as a less toxic alternative to cisplatin. It is used to treat ovarian, lung, head and neck, and other cancers. It has largely replaced cisplatin in some regimens due to its more manageable side effect profile, particularly reduced nephrotoxicity.
+
+WHO Essential Medicines status: Carboplatin is on the WHO Model List of Essential Medicines (oncology section), reflecting its critical role in cancer treatment globally.
+
+Patent and generic status: Carboplatin is fully off-patent with multiple generic manufacturers. Like cisplatin, price competition among generics reduces manufacturer margins and increases consolidation risk.
+
+Active Pharmaceutical Ingredient (API) origin: Carboplatin API manufacturing is concentrated in India and China, mirroring the cisplatin supply chain. This means an API export restriction from India or China would simultaneously affect both cisplatin and carboplatin supply — compounding the impact on oncology treatment programs that use both drugs.
+
+Formulation and storage: Carboplatin is available as injectable solution. It is stored at room temperature (15–30°C), protected from light. It does not require refrigeration, unlike doxorubicin or trastuzumab.
+
+Colombia-specific context: In Colombia, carboplatin must be registered with INVIMA (Instituto Nacional de Vigilancia de Medicamentos y Alimentos) before it can be marketed or procured. INVIMA registration follows different timelines and requirements than Argentina's ANMAT process. Generic carboplatin products approved in one country are not automatically approved in the other. Importers must maintain active INVIMA registrations, and lapses can create temporary supply gaps even when global supply is adequate.
+
+Key shortage risk factors:
+- Shared API supply chain with cisplatin — simultaneous disruption of both drugs is plausible in an export restriction scenario
+- INVIMA registration requirements in Colombia create administrative supply risk independent of global availability
+- Generic market consolidation reducing number of active manufacturers
