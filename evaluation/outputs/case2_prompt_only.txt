@@ -9,122 +9,119 @@ SOURCE: prompt-only (no RAG context)
 
 ## Drug Profile
 
-**Generic Name:** Trastuzumab (Herceptin®, biosimilars)
+**Generic/Brand Name:** Trastuzumab (Herceptin®, biosimilar alternatives)
 
-**Therapeutic Class:** HER2-directed monoclonal antibody
+**Therapeutic Class:** HER2-targeted monoclonal antibody
 
-**Indication:** HER2-positive breast cancer, gastric cancer
+**Primary Indication:** HER2-positive breast cancer (adjuvant and metastatic); HER2-positive gastric cancer
 
-**Formulation:** IV concentrate (440 mg vial, requires reconstitution)
+**Typical Dosing:** 8 mg/kg IV loading dose, then 6 mg/kg maintenance every 3 weeks (or 2 mg/kg weekly)
 
-**Manufacturer Footprint in Region:**
-- Roche (originator, EU/US production)
-- Biosimilar producers: Pfizer, Sandoz, Celltrion, Amgen (primarily Asia-Pacific/EU manufacturing)
+**Treatment Duration:** 12 months (adjuvant); ongoing until progression (metastatic)
 
-**Critical Supply Characteristics:**
-- Long manufacturing lead times (6-9 months)
-- Cold-chain dependent (2-8°C)
-- High price point (~$2,000–$4,000 USD per treatment cycle)
-- Limited interchangeability due to biosimilar immunogenicity variability in resource-limited settings
+**Annual Per-Patient Cost (USD):** $40,000–$80,000 (brand); $15,000–$30,000 (biosimilar, where available)
 
 ---
 
 ## Supply Chain Vulnerability
 
-### Current State Assessment (Baseline)
+### Current Baseline Status
 
-**Import Dependency:** >95%
-- Venezuela has zero domestic manufacturing capacity for monoclonal antibodies
-- All trastuzumab sourced through private importers, NGO channels, or residual government procurement (severely constrained since 2018)
+| Factor | Assessment | Risk Level |
+|--------|-----------|-----------|
+| **Local Manufacturing** | None—Venezuela has no trastuzumab production capacity | CRITICAL |
+| **Import Dependency** | 100% reliant on imports (primarily Argentina, Mexico, Colombia) | CRITICAL |
+| **Registration Status** | Limited portfolio; primarily brand Herceptin; biosimilars unavailable or unregistered | HIGH |
+| **National Inventory Buffer** | 0–2 months (highly fragmented; no centralized reserve) | HIGH |
+| **Currency Access** | Severe forex constraints; USD shortage and price controls | CRITICAL |
+| **Port/Logistics Infrastructure** | Degraded customs clearance; periodic port disruptions | HIGH |
+| **Cold Chain Integrity** | Unreliable electricity supply in distribution hubs; limited refrigeration capacity | HIGH |
+| **Healthcare System Capacity** | Oncology centers under-resourced; patient identification/tracking weak | HIGH |
 
-**Key Vulnerability Factors:**
+### Key Structural Vulnerabilities
 
-| Factor | Severity | Rationale |
-|--------|----------|-----------|
-| **Currency Controls** | CRITICAL | Official/parallel exchange rates create arbitrage; importers lack hard currency allocation |
-| **Port Infrastructure Deterioration** | CRITICAL | La Guaira and Puerto Cabello customs delays (30–90 days observed) increase product expiration risk |
-| **Cold-Chain Gaps** | HIGH | Inadequate electricity; medical refrigeration failures documented in 60% of public hospitals |
-| **Regulatory Authority Dysfunction** | HIGH | INVIMA-equivalent (Ministry of Health) lacks import inspection capacity |
-| **Private Sector Fragmentation** | MEDIUM-HIGH | <5 licensed importers; supply concentrated among 2–3 entities with inconsistent stock |
-| **Payment System Instability** | CRITICAL | Sanctions restrict wire transfers; SWIFT access unreliable for pharmaceutical importers |
+1. **Macroeconomic Constraints**
+   - Venezuelan government faces acute forex scarcity; healthcare imports compete with food/fuel
+   - Official exchange rates do not reflect market reality, deterring private importers
+   - Price controls on pharmaceutical distribution margins limit wholesaler incentive to stock
 
-**Baseline Availability Metrics:**
-- Stock-outs in public sector: **chronic (>75% of months in 2023)**
-- Private sector availability: **episodic (50–70% of quarters)**
-- Price volatility (parallel market): **±200–400% YoY**
+2. **Regulatory Fragility**
+   - INVEMA (regulatory authority) operates with minimal staffing; import approvals slow or suspended
+   - No preferential fast-track pathway for oncology drugs
+   - Biosimilar approvals extremely limited; competition relies on single originator product
+
+3. **Physical Supply-Chain Gaps**
+   - Border closures (periodic) interrupt Colombian/Brazilian supply routes
+   - Air cargo capacity severely constrained; shipping delays 6–12+ weeks
+   - Customs documentation backlogs; pharmaceutical shipments often held indefinitely
+
+4. **End-User Fragmentation**
+   - Trastuzumab predominantly accessed via private/semi-private oncology centers (high out-of-pocket cost)
+   - Public sector (MPPS) has minimal reliable stock; patients referred to private sources
+   - No unified patient registry; difficult to estimate true demand or coordinate procurement
 
 ---
 
 ## Scenario Impact Analysis
 
-### Baseline Scenario Definition
-No major new disruptions; continuation of current chronic undersupply and fragmented market conditions through 12-month forecast horizon.
+### Baseline (No Major Disruption) — Assumed Conditions
+- **Current import rate:** ~500–800 vials/month (est. insufficient for ~50–100 patients in concurrent treatment)
+- **No new macroeconomic collapse, sanctions escalation, or port shutdown**
+- **Regulatory environment remains static** (i.e., no new registration approvals; no widening of bans)
+- **Neighboring countries maintain export capacity and diplomatic relations**
 
-### Projected Impact (12-Month Outlook)
+### Baseline Shortage Risk: **MODERATE-TO-HIGH**
 
-**Public Sector Impact:**
-- **Stock-out Duration:** 60–80% of months
-- **Patient Population Affected:** ~2,500–3,500 women initiating/continuing HER2+ breast cancer treatment annually
-- **Access Gap:** 70–85% of diagnosed patients unable to access trastuzumab through public oncology networks
-- **Treatment Consequence:** Significant disease progression and increased mortality in untreated/under-treated cohorts
+#### Key Findings
 
-**Private Sector Impact:**
-- **Availability:** Maintained for high-income patients via private importers; intermittent supply
-- **Price Range:** $2,500–$6,000+ USD per cycle (3–4× global reference prices)
-- **Out-of-Pocket Burden:** Unsustainable for middle-income Venezuelans; affordability barrier affects 90%+ of non-elite population
+**1. Existing Supply Deficit**
+- Estimated 150–250 HER2+ breast cancer patients require trastuzumab annually in Venezuela
+- Current import volumes support only 20–40% of potential demand
+- Chronic stockout periods at public hospitals; rationing in private sector
 
-**Supply Continuity Risk:**
-- **Mild deterioration expected:** 5–10% further constraint attributed to:
-  - Ongoing dollar scarcity for importers
-  - Incremental port congestion
-  - Marginal currency devaluation (8–12% additional depreciation vs. USD projected)
+**2. Price & Access Barrier**
+- Out-of-pocket cost for one 12-month course: $40,000–$80,000 USD
+- Estimated <5% of eligible patients can afford continuous therapy
+- Baseline shortage is as much *rationing by price* as by availability
 
-**No acute shortage spike anticipated** absent external shocks (new sanctions, major importer insolvency, regional logistics collapse).
+**3. Inventory Volatility**
+- Private importers operate on thin margins; irregular order cycles (3–6 month intervals)
+- Public sector inventory often reaches zero between procurement rounds
+- No emergency reserve or national stockpile mechanism
+
+**4. Degraded Cold Chain**
+- Approximately 15–20% of imported stock estimated lost to temperature excursions
+- Damage often undetected until point of use (late detection increases effective shortage)
+
+**5. Patient Continuity Risk**
+- Patients initiating therapy face high risk of treatment discontinuation due to supply gaps
+- Median treatment interruption: 4–8 weeks (baseline scenario assumes gaps occur 2–3× per year)
 
 ---
 
 ## Policy Recommendations
 
-### Immediate Actions (0–3 months)
+### Short-Term (0–6 months)
 
-1. **Establish Emergency Procurement Mechanism**
-   - Activate direct government-to-manufacturer agreements (e.g., PAHO revolving fund) to bypass private importer bottleneck
-   - Target: secured quarterly allocations of 200–300 treatment units for public sector
-   - Funding requirement: ~$500,000–$750,000 USD per quarter (requires international financing)
+1. **Emergency Procurement Framework**
+   - Establish MPPS reserve mechanism: centralized purchasing of 2-month national buffer (50–100 vials)
+   - Negotiate currency swap or concessional financing with regional development banks for trastuzumab imports
+   - Streamline INVEMA approval pathway for oncology agents; establish "conditional import" status during shortages
 
-2. **Cold-Chain Audit & Rehabilitation**
-   - Conduct rapid assessment of oncology center refrigeration infrastructure
-   - Deploy solar-powered backup units to top 15 treatment sites
-   - Cost: ~$100,000 USD; timeline: 8–12 weeks
+2. **Biosimilar Registration Fast-Track**
+   - Expedite review of WHO-prequalified trastuzumab biosimilars (e.g., Ogivri, Kanjinti, Herzuma)
+   - Reduce regulatory dossier requirements; leverage WHO technical guidance
+   - Goal: Register ≥1 biosimilar within 6 months to diversify supply base
 
-3. **Port Expediting Protocol**
-   - Establish pharmaceutical-priority lane at customs (Caracas, Puerto Cabello)
-   - Target: <14-day clearance for oncology drugs
-   - Regulatory burden: low; requires inter-agency MOU
+3. **Forex Allocation Priority**
+   - Designate trastuzumab/oncology imports as CADIVI/forex priority sector
+   - Separate authorization channel for life-saving biologics to bypass general price-control regime
 
-### Medium-Term Measures (3–12 months)
+### Medium-Term (6–18 months)
 
-4. **Biosimilar Equivalence Recognition**
-   - Formally adopt EMA/WHO prequalified biosimilar list (Pfizer, Sandoz, Celltrion products)
-   - Negotiate tiered pricing with regional wholesalers (EMPSAA, established vendors in Colombia/Brazil)
-   - Expected savings: 20–35% vs. originator; improves supply resilience via multiple sources
+4. **Regional Supply-Chain Diversification**
+   - Establish memoranda with Argentina, Mexico, and Brazil for committed quarterly supply (e.g., 200 vials/quarter)
+   - Create joint procurement platform with CARICOM/ALBA nations to increase negotiating power with manufacturers
+   - Explore technology transfer or fill-finish partnerships in region (e.g., Chile, Colombia)
 
-5. **PAHO Bulk Procurement**
-   - Include Venezuela in regional pooled procurement for HER2-targeted therapies
-   - Leverage volume discounts across Central America/Caribbean
-   - Estimated price reduction: 15–25%; higher order predictability
-
-6. **Importer Capacity Building**
-   - Provide credit lines/guarantees to 2–3 licensed importers for strategic reserves
-   - Training: regulatory compliance, cold-chain management
-   - Mechanism: IDB or CAF concessional finance (~$200,000 USD)
-
-### Longer-Term Structural Reforms (6–18 months)
-
-7. **Currency Stabilization & Importer Access**
-   - Advocate for pharmaceutical sector inclusion in priority foreign exchange allocation
-   - Establish escrow accounts for verified oncology purchases
-   - Requires central bank cooperation; political feasibility: contested
-
-8. **Regional Supply Agreement**
-   - Formalize onc
+5. **Cold-Chain Investment**

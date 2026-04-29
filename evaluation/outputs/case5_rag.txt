@@ -4,75 +4,65 @@ SOURCE: RAG (ChromaDB retrieval + Claude generation)
 
 ## Drug Profile
 
-Carboplatin is a second-generation platinum-based chemotherapy agent on the WHO Model List of Essential Medicines (oncology section). It is used to treat ovarian, lung, head and neck, and other cancers and has largely replaced cisplatin in some regimens due to reduced nephrotoxicity. Carboplatin is fully off-patent with multiple generic manufacturers globally. The Active Pharmaceutical Ingredient (API) is manufactured primarily in India and China. Carboplatin is formulated as an injectable solution requiring only room-temperature storage (15–30°C, protected from light) — it does not require refrigeration.
+Carboplatin is a second-generation platinum-based chemotherapy agent on the WHO Model List of Essential Medicines (oncology section). It is used to treat ovarian, lung, head and neck, and other cancers. The drug is fully off-patent with multiple generic manufacturers globally. Active Pharmaceutical Ingredient (API) manufacturing is concentrated in India and China, mirroring the cisplatin supply chain. Carboplatin is formulated as an injectable solution and requires only room-temperature storage (15–30°C), without cold-chain requirements.
 
 ## Supply Chain Vulnerability
 
-Venezuela's oncology drug procurement system has undergone structural collapse over the 2013–2024 period and does not function as an institutional channel for carboplatin or other oncology drugs. Key vulnerabilities:
+Venezuela's carboplatin supply chain operates within a structurally collapsed procurement system, not a strained but functional one. The baseline operating environment includes:
 
-**Regulatory and Administrative Barriers:**
-- All carboplatin imports require registration with the INHRR (Instituto Nacional de Higiene "Rafael Rangel"), which operates independently of registrations in other countries (ANMAT, INVIMA).
-- INHRR registration timelines are reported at 12–18 months or longer, creating persistent lead-time barriers.
-
-**Currency and Fiscal Constraints (Permanent Structural):**
-- Carboplatin is traded globally in USD. Successive Venezuelan currency control systems (CADIVI, CENCOEX, DICOM) have severely restricted hard-currency access for pharmaceutical importers — a permanent barrier independent of disruption scenarios.
-- Healthcare spending collapsed from 8.1% of GDP (2006) to approximately 1.18% (2017), eliminating meaningful public procurement capacity.
-
-**Import Dependence:**
-- Approximately 100% of carboplatin supply depends on imports; there is no domestic manufacturing.
-- Carboplatin shares the API supply chain with cisplatin. An export restriction from India or China would simultaneously disrupt both drugs, compounding oncology treatment program impact.
-
-**Market Access and Out-of-Pocket Burden:**
-- In practice, carboplatin access occurs through: (1) private, dollarized out-of-pocket purchase (affordable only to a small fraction of the population given median incomes); (2) international NGO donation programs; and (3) the IVSS (Instituto Venezolano de los Seguros Sociales), which is severely degraded. Out-of-pocket health expenditure reached 62.99% of total health spending (2017), compared to a Latin American regional average of ~28%.
-- By August 2023, 72% of the Venezuelan population reported being unable to access public health services when needed.
+- **Import dependency at 100%**: Carboplatin is not manufactured domestically and all supply depends on USD-denominated imports.
+- **Currency control barriers**: Hard-currency access for pharmaceutical imports is controlled by the national government through successive currency systems (CADIVI, CENCOEX, DICOM). This creates a permanent structural barrier independent of scenario shocks.
+- **Regulatory lead-time risk**: INHRR (Instituto Nacional de Higiene "Rafael Rangel") registration timelines are reported at 12–18 months or longer. Registrations are country-specific and do not transfer from ANMAT (Argentina) or INVIMA (Colombia).
+- **Shared API vulnerability**: Carboplatin API supply is concentrated in India and China. An API export restriction from either country would simultaneously disrupt both carboplatin and cisplatin, compounding oncology program impacts.
+- **Procurement system collapse**: Healthcare spending fell from 8.1% of GDP (2006) to 1.18% (2017). By August 2023, 72% of the population reported inability to access public health services when needed. The MPPS and IVSS function only as residual structures.
+- **Out-of-pocket access dominance**: Approximately 62.99% of total health spending is out-of-pocket (vs. 28% regional average), meaning carboplatin access is limited to private, dollarized purchase (affordable to a small fraction of the population), NGO donation programs, or a severely degraded social security system.
 
 ## Scenario Impact Analysis
 
-**Combined Shock Scenario** (API restriction + currency devaluation):
+**Combined Shock Definition**: Simultaneous API export restriction (India/China) + currency devaluation.
 
-Monte Carlo simulation (500 runs, 365 days) under combined shock conditions yields:
+**Modeled Outcomes** (500 Monte Carlo simulations, 365-day horizon):
+- **Stockout days per year**: 35.2 ± 2.53 days (95% CI)
+- **Service level (unit fill rate)**: 90.8% ± 1.0%
+- **Service level (days without stockout)**: 90.4%
+- **Probability of any stockout during year**: 100%
+- **Probability of critical shortage (>60 stockout days)**: 15.8%
+- **Average inventory on hand**: 504 units
+- **Overall supply risk classification**: **HIGH**
 
-| Metric | Result | 95% CI |
-|--------|--------|---------|
-| **Stockout days/year** | 35.2 | ±2.53 |
-| **Unit service level** | 90.8% | ±1.0% |
-| **Days without stockout** | 90.4% | — |
-| **Average inventory on hand** | 504 units | — |
-| **Probability of any stockout** | 100% | — |
-| **Probability of critical shortage (>60 days)** | 15.8% | — |
-
-**Key Assumptions:**
-- Mean lead time during disruption: 150 days (std: 90 days, log-normal)
-- Effective order fill rate: 33% (structural floor 60% × scenario factor 55%)
-- Effective budget multiplier: 18% (structural cap 30% × scenario factor 60%)
+**Key Parameters**:
+- Mean lead time during disruption: 150.0 days (std: 90.0 days, log-normal)
+- Effective order fill rate: 33% (structural floor 60% × scenario 55%)
+- Effective budget multiplier: 18% (structural cap 30% × scenario 60%)
 - Disruption duration: ~120 days (geometric distribution)
 
-**Interpretation:**
-The combined shock scenario projects carboplatin supply to experience 35 stockout days per year with a unit fill rate of 90.8%, indicating **HIGH supply risk**. This represents treatment delays and rationing without intervention. However, the context notes that Venezuela's baseline is already in sustained crisis: the baseline (no shock) condition already yields 31 stockout days/year. Thus, the combined shock produces a marginal (4-day) increase in absolute terms because the system is already operating near the floor of institutional function. The critical distinction is that whereas other Latin American systems (Colombia, Argentina) degrade under shocks, Venezuela's system is degraded at baseline.
+**Interpretation**: The combined shock produces 35.2 stockout days/year. However, the context notes that this represents only a **marginal increase** from the baseline of 31 stockout days/year because Venezuela's baseline is already at or near crisis floor. The system cannot meaningfully degrade further; treatment delays and rationing occur under both baseline and shock scenarios. The distinction is that combined shocks extend the duration and intensity of an already chronic shortage state rather than creating an acute transition.
 
 ## Policy Recommendations
 
-The retrieved context provides insufficient information to develop actionable policy recommendations specific to Venezuela's institutional capacity or governance structures. However, standard supply-chain interventions are noted as impractical under current conditions:
+**Note**: Policy recommendations must operate within the constraint that Venezuela's public procurement system is non-functional as an institutional channel. Any intervention below the national level will have limited reach.
 
-1. **Strategic reserve establishment** — not feasible given the absence of functional government procurement and 18% effective budget allocation.
-2. **Registration pathway acceleration** — INHRR timelines (12–18 months) are a documented barrier, but the context does not specify reform mechanisms or institutional reform capacity.
-3. **Currency access coordination** — hard-currency allocation for pharmaceutical imports is controlled by the national government as part of broader macroeconomic policy; pharmaceutical-specific policy levers are limited.
+1. **International NGO coordination and donation tracking**: Since oncology drug access in Venezuela is primarily mediated through NGO programs and private out-of-pocket purchase, establish transparent inventory tracking and allocation protocols across major NGO suppliers (MSF, direct donation programs) to prevent stock hoarding and optimize coverage for uninsured populations.
 
-The context suggests that meaningful carboplatin supply stability in Venezuela will require systemic fiscal and institutional recovery beyond pharmaceutical supply-chain interventions alone.
+2. **Regional procurement cooperation**: Explore negotiated access to carboplatin purchased through Colombia's EPS system or regional pooled procurement mechanisms (PAHO, LAFTA agreements) to leverage Colombia's more stable peso currency and functioning INVIMA registration pathway, conditional on Venezuelan government currency allocation for import payment.
+
+3. **INHRR registration acceleration**: If currency access can be secured, reduce INHRR registration timelines from 12–18 months to <6 months through: (a) pre-submission technical support for registrants, (b) parallel review pathways, or (c) recognition of INVIMA/ANMAT approvals as partial de facto evidence for safety/efficacy to shorten local review scope.
+
+4. **Strategic buffer stock (if currency allocation improves)**: Establish a 45–60 day buffer stock at IVSS distribution hub(s), sized to the optimal safety stock of 1022 units, conditional on securing hard-currency budget allocation.
+
+5. **Admission and allocation protocols**: In the absence of sufficient stock, establish transparent clinical triage protocols for carboplatin allocation to oncology services, with priority to curative-intent regimens (ovarian, testicular cancers) over palliative settings, to maximize clinical benefit under scarcity.
 
 ## Confidence & Limitations
 
-**What is uncertain:**
+**Confidence Level**: MODERATE with substantial caveats.
 
-- **Monte Carlo model scope:** The 35.2 stockout days/year figure derives from a continuous-review (Q, r) inventory model with stochastic lead times and is illustrative of supply-chain dynamics under the specified parameters. It is not a forecast of actual Venezuelan carboplatin availability and does not account for informal market access, donation programs, or patient migration for treatment.
+**Limitations**:
 
-- **Baseline definition:** The context distinguishes Venezuela's "baseline" (31 stockout days/year) from the combined shock (35 days/year), but does not clarify the operational definition of "baseline" in a system with 72% population-level access failure. The simulation assumes institutional procurement still occurs; data on actual institutional carboplatin volumes in Venezuela are not provided.
+1. **Structural baseline uncertainty**: The simulation assumes a baseline of 31 stockout days/year under non-shock conditions. This figure is derived from publicly available sources (Ballard Brief, BYU, 2023; HRW 2024) but is not independently validated against internal Venezuelan MPPS or INHRR procurement records, which are not publicly accessible.
 
-- **Shared API risk quantification:** The context confirms that carboplatin and cisplatin share the India/China API supply chain and that simultaneous disruption is "plausible," but does not provide probability estimates or historical frequency data for coordinated API export restrictions affecting both drugs.
+2. **API restriction assumption**: The combined shock model assumes a 150-day mean lead time during disruption. This is plausible for India/China API export restrictions but is not calibrated to a specific geopolitical scenario or documented policy announcement. Lead time variance under disruption (std: 90 days) reflects high uncertainty.
 
-- **Currency control impact:** The 18% effective budget multiplier (structural cap 30% × scenario factor 60%) reflects documented currency constraints, but the context does not specify the mechanism by which this multiplier was derived or its sensitivity to different devaluation magnitudes.
-
-- **
+3. **Fill rate and budget multiplier**: The effective order fill rate of 33% and budget multiplier of 18% are derived by applying scenario factors (55% of structural capacity) to structural parameters
 
 ============================================================
 RETRIEVED SOURCES:
