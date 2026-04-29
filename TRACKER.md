@@ -64,16 +64,18 @@ Document pass/fail in your writeup.
 
 **Pipeline NOT yet re-run** — index still uses old model and chunk size. Must run build_index.py before testing.
 
-### Evaluation results
-| Case | RAG (256-token) | RAG (150-token) | Prompt-only | Notes |
-|------|-----------------|-----------------|-------------|-------|
-| Case 1: Cisplatin/Argentina/Baseline | TBD | 12/12 | 6/12 | Hero result — RAG wins on PAMI, obras sociales, WHO EML, no domestic API |
-| Case 2: Trastuzumab/Venezuela/Baseline | TBD | 10/12 | 11/12 | Near-tie expected — Venezuela crisis is public knowledge |
-| Case 3: Cisplatin/Argentina/API Restriction | TBD | 10/12 | 4/12 | Strong RAG win — sim data differentiates |
-| Case 4: Doxorubicin/Colombia/Currency Devaluation | TBD | — | TBD | New — expect near-tie (Colombia KB is placeholder) |
-| Case 5: Carboplatin/Venezuela/Combined Shock | TBD | — | TBD | New — expect strong RAG win (items 2,3,7,8 are KB/sim-dependent) |
+### Evaluation results (2026-04-29 — old index, 150-token chunks, all-MiniLM-L6-v2)
+| Case | RAG | Prompt-only | RAG advantage | Notes |
+|------|-----|-------------|---------------|-------|
+| Case 1: Cisplatin/Argentina/Baseline | 12/12 | 8/12 | +4 | RAG wins on obras sociales, WHO EML, no domestic API, fragmentation |
+| Case 2: Trastuzumab/Venezuela/Baseline | 12/12 | 10/12 | +2 | RAG wins — previously a near-tie; now clean win |
+| Case 3: Cisplatin/Argentina/API Restriction | 10/12 | 1/12 | +9 | Dominant RAG win — prompt-only collapsed on scenario specifics |
+| Case 4: Doxorubicin/Colombia/Currency Devaluation | 10/12 | 3/12 | +7 | Strong RAG win despite placeholder Colombia KB doc |
+| Case 5: Carboplatin/Venezuela/Combined Shock | 10/12 | 2/12 | +8 | Dominant RAG win — sim data and Venezuela structural context decisive |
 
-Fill in TBD columns after running the pipeline with new 256-token embedding model.
+**RAG wins 5/5 cases. Average RAG: 10.8/12 (90%). Average prompt-only: 4.8/12 (40%). Mean advantage: +6 points.**
+
+Note: These results use the old index (all-MiniLM-L6-v2, 150-token chunks). Re-run after build_index.py for 256-token/all-mpnet-base-v2 comparison data.
 
 **Narrative:** RAG wins decisively where institutional/regulatory context is required (Cases 1 & 3). Case 2 near-tie is expected — Venezuela systemic collapse is heavily covered publicly. Overall RAG wins 2/3 cases by large margins.
 
