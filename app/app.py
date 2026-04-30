@@ -18,6 +18,14 @@ ALLOWED_COUNTRIES = ["Argentina", "Venezuela", "Colombia"]
 ALLOWED_SCENARIOS = ["Baseline", "API export restriction",
                      "Currency devaluation", "Combined shock"]
 
+def check_refusal(drug, country):
+    """Validate that drug and country are in scope. Returns error message or None."""
+    if not drug or drug.lower() not in [d.lower() for d in ALLOWED_DRUGS]:
+        return f"This system only covers oncology drugs in scope. '{drug}' is not available. Allowed: {', '.join(ALLOWED_DRUGS)}"
+    if country not in ALLOWED_COUNTRIES:
+        return f"This system only covers Argentina, Colombia, and Venezuela. '{country}' is not in scope."
+    return None
+
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="OncoSupply Risk Analyst", layout="wide")
 st.title("OncoSupply Risk Analyst")
