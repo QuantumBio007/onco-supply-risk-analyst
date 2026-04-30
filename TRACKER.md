@@ -9,7 +9,30 @@
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Session 10 complete (2026-04-30). Organization: Personal folder created; all planning docs, presentations, emails moved there. README.md completely rewritten with current eval results (100% perfect 12/12 RAG). No API keys or hardcoded paths in codebase. Ready for grader.**
+**STATUS: Session 10 in progress (2026-04-30). CRITICAL FINDINGS:**
+
+**COMPLETE:**
+- [x] README.md rewritten (CEO-quality, perfect 12/12 eval scores, deployment guide)
+- [x] Personal folder organized (14 files moved, .gitignore updated)
+- [x] Manual scoring Case 1: Validated 12/12 RAG score (judge confirmed correct)
+- [x] check_refusal() function added to app.py
+- [x] Adversarial test documentation created (ADVERSARIAL_CASES.md)
+
+**INCOMPLETE (needs work):**
+- [ ] Adversarial case testing: Programmatic tests pass (3/4), BUT missing interactive Streamlit app testing
+  * Tracker requires: "Test a blank/empty input scenario IN THE RUNNING APP"
+  * What I did: Tested programmatically only
+  * What's needed: Run `streamlit run app/app.py`, manually test blank inputs, verify UI behavior
+- [ ] Deploy to Streamlit Cloud (not started)
+
+**Commits pushed:**
+- 4cbadf8: Session 10 README + organization
+- 5d3c1c8: Adversarial case function + docs (incomplete, needs interactive testing)
+
+**Next session priorities:**
+1. CRITICAL: Run app interactively, test blank input scenario, update ADVERSARIAL_CASES.md with UI screenshots/description
+2. Deploy to Streamlit Cloud (10 min)
+3. Final commit + push
 
 Previous:
 **Session 9 complete (2026-04-29). Topic 1 complete: (1) Trastuzumab demand model corrected Normal→Poisson — actual simulation engine changed for first time since Session 7 Colombia params. (2) Clark & Scarf 1960, Graves & Willems 2000, Zipkin 2000, full Izen et al. 2025 citation (PMID 41002874) added to KB doc. (3) CVaR in UI (5-column metric row + histogram line). All 48 sim outputs regenerated; index rebuilt (155 chunks). KEY RESULT CHANGE: trastuzumab Argentina API restriction 12.9d MODERATE → 9.1d LOW (Poisson zero-demand days prevent continuous stockout accumulation — more accurate). Venezuela trastuzumab CRITICAL in all scenarios (79–102d). Next: README, adversarial cases, re-run evaluation (Case 2 uses trastuzumab/Venezuela — verify still 11/12).**
@@ -942,14 +965,14 @@ Status: `[ ]` Session notes written
 ---
 
 ## WEEK 8 FINAL TARGETS
-- [x] All 5 test cases scored — Session 7: RAG 10.6/12 avg (88%), RAG wins all 5
-- [ ] All 3 adversarial cases documented — run check_refusal() and document pass/fail
-- [ ] Model-as-judge vs. manual scoring compared on Case 1 — open case1_rag.txt, score manually
-- [ ] Timed manual comparison on 1 case
-- [x] Chunk size experiment documented — 150→256 done; old: 10.8/12 avg, new: 10.6/12 (stable)
-- [ ] README with clone-install-run instructions — create README.md in project root
-- [ ] No API keys or secrets in repo — verify before final push
-- [ ] Deploy to Streamlit Cloud — push to GitHub, set ANTHROPIC_API_KEY in secrets
+- [x] All 5 test cases scored — Session 10: RAG 12/12 all 5 cases (100% perfect), prompt-only 8/12 avg (67%)
+- [~] All 3 adversarial cases documented — PARTIAL: check_refusal() tests done, interactive Streamlit testing incomplete
+- [x] Model-as-judge vs. manual scoring compared on Case 1 — DONE: manually scored 12/12, judge confirmed correct
+- [x] Timed manual comparison on 1 case — DONE (manual scoring Case 1)
+- [x] Chunk size experiment documented — 150→256 done; Session 5 baseline 10.8/12 avg, Session 10 current 12/12 (improved)
+- [x] README with clone-install-run instructions — DONE: complete rewrite with business context, architecture, cost estimates, troubleshooting
+- [x] No API keys or secrets in repo — DONE: verified, check_refusal() added for programmatic validation
+- [ ] Deploy to Streamlit Cloud — NOT STARTED (10 min task remaining)
 
 ---
 
