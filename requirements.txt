@@ -4,3 +4,4 @@ chromadb
 sentence-transformers
 numpy
 matplotlib
+httpx

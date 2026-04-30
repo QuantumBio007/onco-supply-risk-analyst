@@ -4,7 +4,7 @@ TOPIC: drug_profile, supply_chain, who_eml, api_dependence
 SOURCE: WHO EML 2023, FDA drug database, published literature
 DATE: 2024
 ---
-Carboplatin is a second-generation platinum-based chemotherapy agent, developed as a less toxic alternative to cisplatin. It is used to treat ovarian, lung, head and neck, and other cancers. It has largely replaced cisplatin in some regimens due to its more manageable side effect profile, particularly reduced nephrotoxicity.
+Carboplatin is a second-generation platinum-based chemotherapy agent, developed as a less toxic alternative to cisplatin. Carboplatin and cisplatin share the same API supply chain: both drugs' active pharmaceutical ingredients are manufactured primarily in India and secondarily in China. This shared upstream origin means that an Indian or Chinese API export restriction, manufacturing shutdown, or quality enforcement action disrupts BOTH cisplatin and carboplatin simultaneously — eliminating substitution flexibility for oncology programs that use both platinum agents. It is used to treat ovarian, lung, head and neck, and other cancers. It has largely replaced cisplatin in some regimens due to its more manageable side effect profile, particularly reduced nephrotoxicity.
 
 WHO Essential Medicines status: Carboplatin is on the WHO Model List of Essential Medicines (oncology section), reflecting its critical role in cancer treatment globally.
 
@@ -13,6 +13,8 @@ Patent and generic status: Carboplatin is fully off-patent with multiple generic
 Active Pharmaceutical Ingredient (API) origin: Carboplatin API manufacturing is concentrated in India and China, mirroring the cisplatin supply chain. This means an API export restriction from India or China would simultaneously affect both cisplatin and carboplatin supply — compounding the impact on oncology treatment programs that use both drugs.
 
 Formulation and storage: Carboplatin is available as injectable solution. It is stored at room temperature (15–30°C), protected from light. It does not require refrigeration, unlike doxorubicin or trastuzumab.
+
+Venezuela-specific context: In Venezuela, the MPPS (Ministerio del Poder Popular para la Salud) nominally directs national drug policy and procurement for oncology drugs including carboplatin. The INHRR (Instituto Nacional de Higiene Rafael Rangel) is Venezuela's drug regulatory authority. MPPS issues import permits once INHRR grants authorization. In practice, the formal MPPS-INHRR procurement channel is severely constrained by foreign-currency shortages and debt with international suppliers. Effective carboplatin access in Venezuela relies primarily on NGO programs, diaspora procurement, and private dollarized purchase — MPPS formal channels function only residually.
 
 Colombia-specific context: In Colombia, carboplatin must be registered with INVIMA (Instituto Nacional de Vigilancia de Medicamentos y Alimentos) before it can be marketed or procured. INVIMA registration follows different timelines and requirements than Argentina's ANMAT process. Generic carboplatin products approved in one country are not automatically approved in the other. Importers must maintain active INVIMA registrations, and lapses can create temporary supply gaps even when global supply is adequate.
 

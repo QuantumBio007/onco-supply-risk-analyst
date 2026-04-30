@@ -9,13 +9,28 @@ Theoretical foundation:
   - System dynamics / R3 inventory loop (price -> inventory -> stockout):
       Andrade & Wang, MIT SCM Capstone (2024)
   - Pharmaceutical shortage parameterization (2023 cisplatin/carboplatin):
-      Izen et al., Cancer Journal (2025)
+      Izen ML et al., Cancer Journal 2025;31(5):e0786. doi:10.1097/PPO.0000000000000786.
+      PMID 41002874. fill_rate=0.55 and lead_time_multiplier=2.5 sourced from this paper.
   - Discrete event simulation methodology:
       Kogler & Maxera, Journal of Simulation (2026)
+  - Model assumptions (known limitations):
+      Lost-sales (not backorders): demand exceeding inventory is lost, not queued.
+      Single-echelon: one inventory node (hospital/EPS level). Multi-echelon extension
+      per Clark & Scarf (Management Science 1960;6(4):475-490) is future work.
+      Strategic safety stock placement: Graves & Willems (MSOM 2000;2(1):68-83).
+      Demand distribution: normal with constant CV — adequate for high-volume generics;
+      trastuzumab demand is better characterized as intermittent (Poisson).
   - Disruption duration modeling via geometric distribution (rolling horizon):
       Badejo & Ierapetritou, Ind. Eng. Chem. Res. (2022)
       Key insight: disruptions are finite-duration events, not permanent state shifts.
       Disruption duration ~ Geometric(1/mu_disruption); mean = mu_disruption days.
+  - CVaR (Conditional Value at Risk) as tail risk metric for supply chain optimization:
+      Badejo & Ierapetritou, AIChE Journal (2025;71(6):e18770)
+      CVaR_90 = E[stockout days | stockout days >= VaR_90]; captures worst-10% scenarios.
+  - Correlated disruption: cisplatin + carboplatin share Intas Pharmaceuticals India as
+      major API source. Malta et al., Cancer Journal (2025, PMC12459138): one Indian
+      facility = 24% cisplatin + 8% carboplatin. Shared-source disruptions require
+      correlated simulation — independent runs underestimate joint portfolio risk.
 """
 
 import numpy as np
@@ -53,7 +68,12 @@ DRUG_PARAMS = {
     },
     "trastuzumab": {
         "daily_demand_mean": 1.5,
-        "daily_demand_std":  0.7,
+        "daily_demand_std":  0.7,   # superseded by Poisson σ=sqrt(λ)=1.22 in simulation
+        "demand_dist":       "poisson",  # HER2+ patients on 3-week cycles: lumpy integer
+                                         # demand better modeled as Poisson(λ=1.5) than
+                                         # Normal(1.5, 0.7). σ_D = sqrt(λ) ≈ 1.22 used in
+                                         # safety stock formula. Normal CV=0.47 underestimates
+                                         # variance at this low-volume count regime.
         "shelf_life_days":   365,   # 1 year — cold-chain biologic; shorter shelf life
         "unit_cost_usd":     800,
         "label":             "Trastuzumab (HER2+ monoclonal antibody, biologic)",
@@ -94,10 +114,14 @@ COUNTRY_PARAMS = {
     },
     "Colombia": {
         "lead_time_mean":         28,
-        "lead_time_cv":           0.20,
-        "structural_fill_rate":   0.93,
-        "structural_budget_cap":  0.85,
-        "initial_stock_days":     35,    # moderate stock: ~5 weeks on-hand
+        "lead_time_cv":           0.28,  # increased: EPS payment delays 180-365d add variance
+        "structural_fill_rate":   0.83,  # revised down from 0.93: EPS-IPS debt cascade (COP 4.2T pharma debt,
+                                         # distributors withholding supply); MINSALUD July 2025 confirms
+                                         # 80% of EPS non-compliant with reserve requirements; 52,655 PQRS
+                                         # non-delivery peak Jan 2025 (People's Health Movement 2025)
+        "structural_budget_cap":  0.80,  # EPS presupuestos máximos consistently underfunded;
+                                         # Constitutional Court ordered COP 819B unpaid transfers Feb 2025
+        "initial_stock_days":     30,    # revised: distributor credit restrictions reduce effective stock
         "label": "Colombia",
     },
 }
@@ -189,27 +213,33 @@ def _run_once(d, sigma_d, L_mean, L_cv, fill_rate, budget_multiplier,
               base_L_mean=None, base_L_cv=None,
               base_fill_rate=0.95, base_budget_multiplier=1.0,
               base_d=None, base_sigma_d=None,
-              initial_inventory=None):
+              initial_inventory=None,
+              disruption_start_override=None, disruption_end_override=None,
+              demand_dist='normal'):
     """
     One (Q, r) discrete-event simulation run with dynamic disruption modeling.
 
     Key mechanics:
     - Stochastic lead time: log-normal(L_mean, L_cv) — always positive, right-skewed
-    - Normal demand: truncated at 0
+    - Demand distribution: 'normal' (truncated at 0) for high-volume generics;
+      'poisson' for low-count biologics (trastuzumab). Poisson(λ) gives integer
+      non-negative draws and correct variance σ²=λ for safety stock sizing.
     - Partial fill rate: orders arrive at fill_rate * Q_ordered
     - Budget constraint: caps effective order quantity (MIT R3 loop)
-    - Backorders NOT allowed (stockout = lost treatment dose)
+    - Backorders NOT allowed (lost-sales model: stockout = lost/delayed treatment dose)
     - Disruption duration: geometric distribution (Badejo & Ierapetritou 2022)
       When disruption_duration_mean is set, the disruption starts on a random day
       within the first 60 days and lasts Geometric(1/disruption_duration_mean) days.
       Outside the disruption window, baseline parameters apply.
-      This reflects the empirical finding that supply shocks are finite events, not
-      permanent state changes — the rolling horizon insight from Badejo & Ierapetritou.
     """
     rng = np.random.default_rng(seed)
 
     # Disruption window (Badejo & Ierapetritou 2022: geometric distribution)
-    if disruption_duration_mean is not None and disruption_duration_mean > 0:
+    # Override allows correlated pair simulation (shared API source, e.g. cisplatin+carboplatin)
+    if disruption_start_override is not None:
+        disruption_start = disruption_start_override
+        disruption_end   = disruption_end_override
+    elif disruption_duration_mean is not None and disruption_duration_mean > 0:
         disruption_start = int(rng.integers(1, 45))  # onset within first 6 weeks
         # Geometric(p): duration with mean = disruption_duration_mean
         p_recovery = 1.0 / disruption_duration_mean
@@ -274,8 +304,11 @@ def _run_once(d, sigma_d, L_mean, L_cv, fill_rate, budget_multiplier,
                 new_pipeline.append((qty, arrival, order_fill))
         pipeline = new_pipeline
 
-        # 2. Daily demand (normal, floored at 0)
-        demand = max(0.0, float(rng.normal(cur_demand_d, cur_sigma_d)))
+        # 2. Daily demand — Poisson for low-count biologics, Normal (floored 0) for generics
+        if demand_dist == 'poisson':
+            demand = float(rng.poisson(max(0.001, cur_demand_d)))
+        else:
+            demand = max(0.0, float(rng.normal(cur_demand_d, cur_sigma_d)))
         total_demand += demand
 
         # 3. Fulfill demand — no backorders
@@ -315,7 +348,7 @@ def _run_once(d, sigma_d, L_mean, L_cv, fill_rate, budget_multiplier,
 # ── Monte Carlo wrapper ───────────────────────────────────────────────────────
 
 def simulate(drug, country, scenario, n_runs=500, days=365,
-             service_level_target=0.95):
+             service_level_target=0.95, return_distribution=False):
     """
     Run Monte Carlo simulation for a drug-country-scenario triple.
 
@@ -333,9 +366,15 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
     struct_fill   = cp["structural_fill_rate"]
     struct_budget = cp["structural_budget_cap"]
 
+    # Demand distribution: Poisson for low-count biologics (trastuzumab), Normal otherwise.
+    # For Poisson(λ): σ_D = sqrt(λ) — used in safety stock formula SS = z√(d²σ_L² + Lσ_D²).
+    # Normal CV assumption underestimates variance at trastuzumab's ~1.5 doses/day volume.
+    demand_dist = dp.get("demand_dist", "normal")
+
     # Disruption-state parameters (scenario multipliers × structural country floors)
     d        = dp["daily_demand_mean"] * sp["demand_multiplier"]
-    sigma_d  = dp["daily_demand_std"]  * sp["demand_multiplier"]
+    sigma_d  = (np.sqrt(d) if demand_dist == "poisson"
+                else dp["daily_demand_std"] * sp["demand_multiplier"])
     L_mean   = cp["lead_time_mean"]    * sp["lead_time_multiplier"]
     L_cv     = cp["lead_time_cv"]
     # Effective fill rate: structural floor × scenario fill rate (both constraints active)
@@ -343,8 +382,9 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
     eff_budget_mult = struct_budget * sp["budget_multiplier"]
 
     # Baseline (pre/post-disruption) parameters — structural constraints still apply
-    base_d          = dp["daily_demand_mean"]
-    base_sigma_d    = dp["daily_demand_std"]
+    base_d       = dp["daily_demand_mean"]
+    base_sigma_d = (np.sqrt(base_d) if demand_dist == "poisson"
+                   else dp["daily_demand_std"])
     base_L_mean     = cp["lead_time_mean"]
     base_L_cv       = cp["lead_time_cv"]
     base_fill_rate  = struct_fill   * SCENARIO_PARAMS["Baseline"]["fill_rate"]
@@ -375,6 +415,7 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
             base_budget_multiplier=base_budget_mult,
             base_d=base_d, base_sigma_d=base_sigma_d,
             initial_inventory=initial_inv,
+            demand_dist=demand_dist,
         )
         for i in range(n_runs)
     ]
@@ -387,9 +428,16 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
 
     ci = lambda a: round(1.96 * a.std() / np.sqrt(n_runs), 2)
 
-    return {
+    # CVaR_90: expected stockout days in worst 10% of simulations
+    # (Badejo & Ierapetritou, AIChE Journal 2025;71(6):e18770)
+    var_90      = float(np.percentile(so, 90))
+    exceedances = so[so >= var_90]
+    cvar_90     = round(float(exceedances.mean()) if len(exceedances) > 0 else var_90, 1)
+
+    result = {
         "drug": drug, "country": country, "scenario": scenario,
         "n_runs": n_runs, "days": days,
+        "demand_dist": demand_dist,
         # Policy (from textbook formulas)
         "reorder_point":     policy["reorder_point"],
         "safety_stock":      policy["safety_stock"],
@@ -405,6 +453,7 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
         # KPIs
         "stockout_days_mean":    round(float(so.mean()), 1),
         "stockout_days_ci":      ci(so),
+        "cvar_90":               cvar_90,
         "sl_units_mean":         round(float(slu.mean()), 4),
         "sl_units_ci":           ci(slu),
         "sl_days_mean":          round(float(sld.mean()), 4),
@@ -414,6 +463,9 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
         "prob_critical_shortage": round(float((so > 60).mean()), 3),
         "prob_any_stockout":      round(float((so > 0).mean()), 3),
     }
+    if return_distribution:
+        result["stockout_distribution"] = so.tolist()
+    return result
 
 
 # ── Output text generator ─────────────────────────────────────────────────────
@@ -481,15 +533,20 @@ def result_to_text(r):
     else:
         budget_note = ""
 
+    demand_dist_note = ("Poisson(λ) — integer non-negative draws; σ_D=√λ used in SS formula"
+                        if r.get("demand_dist") == "poisson"
+                        else "Normal (truncated at 0)")
+
     return f"""DRUG: {r["drug"]}
 COUNTRY: {r["country"]}
 TOPIC: simulation, inventory, stockout, supply chain, {r["scenario"].lower()}
-SOURCE: supply_sim.py Monte Carlo (Q,r) model — Warren OM Ch.6 / Izen 2025 / Badejo & Ierapetritou 2022
+SOURCE: supply_sim.py Monte Carlo (Q,r) model — Warren OM Ch.6 / Izen 2025 (PMID 41002874) / Badejo & Ierapetritou 2022
 DATE: 2026
 ---
 Simulation Results: {dp["label"]} in {cp["label"]}
 Scenario: {sp["label"]}
 Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | {r["n_runs"]} Monte Carlo runs | {r["days"]} days
+Demand distribution: {demand_dist_note}
 
 --- Optimal Policy (Warren OM Textbook §6.6) ---
 Safety stock (SS = z*sqrt(d^2*sigma_L^2 + L*sigma_D^2)): {r["safety_stock"]} units
@@ -506,6 +563,7 @@ Disruption duration: {dur_str}
 
 --- Monte Carlo Results ({r["n_runs"]} simulations) ---
 Stockout days per year: {r["stockout_days_mean"]} ± {r["stockout_days_ci"]} (95% CI)
+CVaR_90 (worst-10% mean stockout days): {r["cvar_90"]} days  [Badejo & Ierapetritou, AIChE 2025]
 Service level (unit fill rate): {r["sl_units_mean"]:.1%} ± {r["sl_units_ci"]:.1%} (95% CI)
 Service level (days without stockout): {r["sl_days_mean"]:.1%}
 Average inventory on hand: {r["avg_inventory_mean"]:.0f} units
@@ -528,6 +586,161 @@ The {r["fill_rate"]*100:.0f}% fill rate assumption reflects {fill_note}.
 """
 
 
+RISK_COLORS = {
+    "CRITICAL": "#d62728",
+    "HIGH":     "#ff7f0e",
+    "MODERATE": "#ffdd57",
+    "LOW":      "#2ca02c",
+}
+
+def _risk_label(stockout_days_mean: float) -> str:
+    if stockout_days_mean > 60:  return "CRITICAL"
+    if stockout_days_mean > 30:  return "HIGH"
+    if stockout_days_mean > 10:  return "MODERATE"
+    return "LOW"
+
+
+def portfolio_risk_matrix(country: str, n_runs: int = 300) -> dict:
+    """
+    Run all 4 drugs × 4 scenarios for a given country.
+    Returns a matrix dict suitable for heatmap rendering.
+
+    result["matrix"][drug][scenario] = {
+        "stockout_days_mean": float,
+        "risk": str,           # CRITICAL / HIGH / MODERATE / LOW
+        "sl_units_mean": float,
+        "prob_critical": float,
+    }
+    """
+    drugs     = list(DRUG_PARAMS.keys())
+    scenarios = list(SCENARIO_PARAMS.keys())
+    matrix = {}
+    for drug in drugs:
+        matrix[drug] = {}
+        for scenario in scenarios:
+            r = simulate(drug, country, scenario, n_runs=n_runs)
+            matrix[drug][scenario] = {
+                "stockout_days_mean": r["stockout_days_mean"],
+                "cvar_90":            r["cvar_90"],
+                "risk":               _risk_label(r["stockout_days_mean"]),
+                "sl_units_mean":      r["sl_units_mean"],
+                "prob_critical":      r["prob_critical_shortage"],
+            }
+    return {"country": country, "matrix": matrix,
+            "drugs": drugs, "scenarios": scenarios}
+
+
+def simulate_correlated_pair(country, scenario="API export restriction",
+                              n_runs=500, days=365, service_level_target=0.95):
+    """
+    Simulate cisplatin + carboplatin with correlated disruption timing.
+
+    Methodological motivation: Both drugs share Intas Pharmaceuticals (Ahmedabad, India)
+    as a major API source. Malta et al., Cancer Journal 2025 (PMC12459138): one Indian
+    facility accounts for 24% of cisplatin + 8% of carboplatin supply. In the 2023
+    shortage, cisplatin disruption triggered carboplatin demand spike (substitution effect),
+    so both drugs face correlated stockout risk — NOT independent as in separate simulate() calls.
+    Correlated modeling (Badejo & Ierapetritou AIChE 2025): a single shared disruption window
+    is drawn per run and applied to BOTH drugs; this correctly captures the joint tail risk.
+
+    Returns dict with per-drug KPIs plus joint metrics:
+      - joint_critical_prob: P(BOTH drugs exceed 60 stockout days in the same run)
+      - correlation: Pearson r of per-run stockout days across the two drugs
+    """
+    sp = SCENARIO_PARAMS[scenario]
+    cp = COUNTRY_PARAMS[country]
+
+    # Pre-compute per-drug policy and effective parameters
+    drug_configs = {}
+    for drug in ("cisplatin", "carboplatin"):
+        dp = DRUG_PARAMS[drug]
+        struct_fill   = cp["structural_fill_rate"]
+        struct_budget = cp["structural_budget_cap"]
+        d        = dp["daily_demand_mean"] * sp["demand_multiplier"]
+        sigma_d  = dp["daily_demand_std"]  * sp["demand_multiplier"]
+        L_mean   = cp["lead_time_mean"]    * sp["lead_time_multiplier"]
+        L_cv     = cp["lead_time_cv"]
+        eff_fill = struct_fill   * sp["fill_rate"]
+        eff_bud  = struct_budget * sp["budget_multiplier"]
+        policy   = compute_policy(d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=L_cv,
+                                  service_level=service_level_target,
+                                  unit_cost=dp["unit_cost_usd"], days=days)
+        base_fill = struct_fill * SCENARIO_PARAMS["Baseline"]["fill_rate"]
+        base_bud  = struct_budget * SCENARIO_PARAMS["Baseline"]["budget_multiplier"]
+        drug_configs[drug] = dict(
+            d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=L_cv,
+            eff_fill=eff_fill, eff_bud=eff_bud,
+            policy=policy,
+            base_fill=base_fill, base_bud=base_bud,
+            base_d=dp["daily_demand_mean"], base_sigma_d=dp["daily_demand_std"],
+            initial_inv=int(dp["daily_demand_mean"] * cp["initial_stock_days"]),
+        )
+
+    so_cisplatin    = np.zeros(n_runs)
+    so_carboplatin  = np.zeros(n_runs)
+    dur_mean = sp["disruption_duration_mean"]
+
+    # Draw SHARED disruption windows — one per run, applied to BOTH drugs
+    rng_shared = np.random.default_rng(42)
+    for i in range(n_runs):
+        if dur_mean is not None and dur_mean > 0:
+            onset    = int(rng_shared.integers(1, 45))
+            duration = int(rng_shared.geometric(1.0 / dur_mean))
+            end      = onset + duration
+        else:
+            onset, end = 0, days
+
+        for drug, arr in (("cisplatin", so_cisplatin), ("carboplatin", so_carboplatin)):
+            c = drug_configs[drug]
+            res = _run_once(
+                d=c["d"], sigma_d=c["sigma_d"], L_mean=c["L_mean"], L_cv=c["L_cv"],
+                fill_rate=c["eff_fill"], budget_multiplier=c["eff_bud"],
+                reorder_point=c["policy"]["reorder_point"],
+                order_quantity=c["policy"]["eoq"],
+                days=days, seed=i,
+                disruption_duration_mean=None,  # overridden below
+                base_L_mean=c["L_mean"] / sp["lead_time_multiplier"],
+                base_L_cv=c["L_cv"],
+                base_fill_rate=c["base_fill"],
+                base_budget_multiplier=c["base_bud"],
+                base_d=c["base_d"], base_sigma_d=c["base_sigma_d"],
+                initial_inventory=c["initial_inv"],
+                disruption_start_override=onset,
+                disruption_end_override=end,
+            )
+            arr[i] = res["stockout_days"]
+
+    joint_critical = float(((so_cisplatin > 60) & (so_carboplatin > 60)).mean())
+    corr = float(np.corrcoef(so_cisplatin, so_carboplatin)[0, 1])
+
+    def _cvar90(arr):
+        v = float(np.percentile(arr, 90))
+        exc = arr[arr >= v]
+        return round(float(exc.mean()) if len(exc) > 0 else v, 1)
+
+    return {
+        "country": country, "scenario": scenario, "n_runs": n_runs,
+        "cisplatin": {
+            "stockout_days_mean": round(float(so_cisplatin.mean()), 1),
+            "cvar_90": _cvar90(so_cisplatin),
+            "prob_critical": round(float((so_cisplatin > 60).mean()), 3),
+        },
+        "carboplatin": {
+            "stockout_days_mean": round(float(so_carboplatin.mean()), 1),
+            "cvar_90": _cvar90(so_carboplatin),
+            "prob_critical": round(float((so_carboplatin > 60).mean()), 3),
+        },
+        "joint_critical_prob": round(joint_critical, 3),
+        "disruption_correlation": round(corr, 3),
+    }
+
+
 if __name__ == "__main__":
     r = simulate("cisplatin", "Argentina", "Baseline", n_runs=200)
     print(result_to_text(r))
+
+    print("\n--- Correlated Platinum Pair (Argentina, API export restriction) ---")
+    cr = simulate_correlated_pair("Argentina", "API export restriction", n_runs=300)
+    print(f"Cisplatin:   mean={cr['cisplatin']['stockout_days_mean']}d  CVaR_90={cr['cisplatin']['cvar_90']}d  P(crit)={cr['cisplatin']['prob_critical']:.0%}")
+    print(f"Carboplatin: mean={cr['carboplatin']['stockout_days_mean']}d  CVaR_90={cr['carboplatin']['cvar_90']}d  P(crit)={cr['carboplatin']['prob_critical']:.0%}")
+    print(f"Joint P(both critical): {cr['joint_critical_prob']:.0%}  |  Disruption correlation: r={cr['disruption_correlation']:.2f}")

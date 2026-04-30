@@ -1,0 +1,63 @@
+DRUG: all
+COUNTRY: latam_regional (Argentina, Brazil, Chile, Colombia, Costa Rica, Dominican Republic, Ecuador, El Salvador, Mexico, Panama, Peru, Venezuela)
+TOPIC: access_delay, regulatory_approval, reimbursement_lag, pooled_procurement, fifarma_wait, paho_strategic_fund, judicial_access, tutela, amparo, oncology, orphan
+SOURCE: FIFARMA/IQVIA Patient W.A.I.T. Indicator 2024 Latin America (October 2024); PAHO press release February 3, 2025 (cancer medicines); PAHO-St. Jude Global Platform launch February 11, 2025; PAHO "Over $800 million in vaccines, medicines and health technology procured" February 24, 2025; Lancet Oncology companion call February 2025; PAHO-EMRO partnership December 17, 2024; PAHO-Argentina strategic alliance November 12, 2024; PAHO HTA tool for Strategic Fund List February 27, 2025
+DATE: 2026
+STATUS: NEW — created 2026-04-29 from FIFARMA WAIT 2024 and PAHO 2025 deep research items
+---
+Latin American patients face structural access delays for innovative medicines — including oncology drugs — that are severe by international standards. The quantitative benchmark is the FIFARMA Patient W.A.I.T. (Waiting to Access Innovative Therapies) Indicator 2024, the third edition of a regional study developed by IQVIA for FIFARMA (Federación Latinoamericana de la Industria Farmacéutica), modeled on the European EFPIA Patient WAIT methodology. The 2024 report analyzed 365 molecules representing approximately 80% of new active substances launched globally between 2014 and 2023 across 10 LATAM countries (Argentina, Brazil, Chile, Colombia, Costa Rica, Dominican Republic, Ecuador, Mexico, Panama, Peru).
+
+KEY FIFARMA WAIT 2024 FINDINGS
+
+Mean access delay from FDA/EMA approval to public availability: 4.75 years across the 10-country region (GaBI Online, October 2024). This is the time between international regulatory approval and the moment a medicine becomes fully or partially available through the public health system in a given LATAM country.
+
+Regional availability rates:
+- 61% of internationally approved medicines have local regulatory approval in at least one of the 10 LATAM countries studied.
+- Only 35% of internationally approved medicines have full or partial public availability (reimbursement/formulary listing) in at least one of the 10 LATAM countries.
+- For medicines approved internationally as of 2020 — the most recently-launched cohort — less than 12% have full or partial public availability across the region. This represents the extreme leading-edge lag: nearly 9 in 10 recently approved innovative drugs are not yet publicly accessible in any of the 10 countries surveyed.
+
+Oncology and orphan disease:
+- Of treatments for orphan and oncological diseases, 87% had no progress in either regulatory approval or public access in the 2023–2024 measurement year — the most acutely affected therapeutic area alongside rare diseases.
+- This 87% no-progress rate for oncology/orphan drugs implies that for the vast majority of cancer patients requiring innovative therapies in Latin America, the de facto access mechanism is judicial (tutela in Colombia, amparo de salud in Argentina) or private out-of-pocket purchase, not formal public procurement.
+
+Systemic causes identified by FIFARMA WAIT:
+(1) Regulatory approval delays after FDA/EMA — local submissions often filed years after initial global approval.
+(2) Health Technology Assessment (HTA) processes adding additional months to years between registration and formulary listing.
+(3) Reimbursement listing delays — formulary update cycles occur annually or less frequently in many countries.
+(4) Budget impact assessments and price negotiation cycles adding time.
+(5) Country-specific differences in HTA institutional maturity and budget constraints.
+
+Note on source reliability: FIFARMA is an industry association and IQVIA is a pharmaceutical market intelligence company — both have commercial interests in demonstrating access delays. The methodology (modeled on EFPIA WAIT) is technically rigorous, but the sample and definitions should be triangulated with PAHO and government data for the specific drugs and countries in this project. The directional finding (multi-year delay, minimal public availability for recent oncology approvals) is consistent with independently documented evidence from Colombia tutela volumes, Argentina amparo volumes, and Venezuela availability surveys.
+
+PAHO RESPONSE: FEBRUARY 2025 CANCER MEDICINES CALL
+
+On February 3, 2025, PAHO issued a formal call to Latin American and Caribbean governments to improve access to essential cancer medicines and supplies, accompanied by a companion editorial in The Lancet Oncology (DOI 10.1016/S1470-2045(25)00081-6). The regional burden: more than 1.4 million people die from cancer annually in the Americas; more than 4 million new cancer cases are diagnosed per year. In children and adolescents under 19, approximately 30,000 are diagnosed with cancer annually in Latin America and the Caribbean, and approximately 10,000 die per year — a childhood cancer mortality rate substantially higher than in high-income countries where survival rates exceed 80%.
+
+PAHO's February 2025 call identified three primary barriers to access: (1) high costs of patented and off-patent oncology drugs relative to limited public budgets; (2) inefficient procurement systems — slow tendering, highly fragmented purchasing at national and sub-national levels; (3) limited distribution networks, particularly in rural areas and small island states. PAHO specifically called for expanded utilization of the PAHO Strategic Fund and participation in the Global Platform for Access to Childhood Cancer Medicines.
+
+GLOBAL PLATFORM FOR CHILDHOOD CANCER MEDICINES
+
+On February 11, 2025, PAHO, WHO, St. Jude Children's Research Hospital (Memphis, TN), and UNICEF Supply Division launched the Global Platform for Access to Childhood Cancer Medicines. Under a 4-year cooperation framework signed February 15, 2024, St. Jude provides medicines, technical expertise, and training. Initial rollout: 6 high-priced oncology products + 5 additional cancer medicines + 3 essential medical devices, with pilot hospitals in Ecuador and El Salvador. By 2026, coverage is expected to reach 70+ different medicines and formulations for chemotherapy and supportive care. The platform addresses documented shortages of childhood cancer medicines (vincristine, asparaginase, methotrexate, and others) across LATAM LMICs that have caused childhood cancer programs to reduce or suspend treatment.
+
+PAHO STRATEGIC FUND: POOLED REGIONAL PROCUREMENT
+
+The PAHO Strategic Fund is the primary cross-regional pooled procurement mechanism for essential medicines and health supplies in the Americas, operating as a Revolving Fund since 2000. It serves 33 PAHO member states plus approximately 32 territories through related revolving fund arrangements. The Fund aggregates national demand, conducts international tenders, contracts WHO-prequalified manufacturers, and manages logistics including last-mile delivery options. Member countries pay PAHO in local currency or USD; PAHO pays manufacturers in USD, providing currency-volatility protection for participating countries.
+
+Total Regional Revolving Funds procurement in 2024: over USD 800 million in vaccines, medicines, and health technologies (PAHO, February 24, 2025). This combined figure includes the Expanded Program on Immunization (EPI) Revolving Fund (which handles vaccines) and the Strategic Fund (medicines/health technologies). 2024 highlights included 224 million vaccine doses, 10+ million diagnostic tests, and treatments for hepatitis, tuberculosis, diabetes, and cancer.
+
+Essential cancer medicines: The Strategic Fund product list includes essential cancer medicines aligned with the WHO Model List of Essential Medicines (EML), plus HPV tests for cervical cancer screening and cervical pre-cancer treatment devices. The Fund expanded oncology coverage in 2024–2025 through the PAHO-St. Jude partnership.
+
+Key 2024–2025 developments:
+- PAHO-Argentina strategic alliance (November 12, 2024): Argentina's Ministry of Health formalized partnership with PAHO to promote access to medicines and health technologies, including Strategic Fund participation.
+- PAHO-EMRO partnership (December 17, 2024): Partnership with WHO Eastern Mediterranean Regional Office to expand pooled procurement collaboration across regions.
+- HTA-driven list updating (February 27, 2025): PAHO published new Health Technology Assessment methodology for updating the Strategic Fund product list, ensuring evidence-based inclusion decisions.
+
+Strategic Fund mechanisms for country access: Countries submit annual procurement requirements; PAHO issues international tenders; countries receive WHO-prequalified products and are billed through the revolving fund mechanism. Documented price reductions vs. national bilateral procurement range from 20–60% for specific essential medicines (PAHO leishmaniasis case study, July 2024). The Fund partially mitigates national registration backlog by providing WHO-prequalified alternatives that some countries accept through facilitated regulatory pathways.
+
+Limitations of pooled procurement: The PAHO Strategic Fund addresses buying-power fragmentation, quality assurance, and currency risk but does not address national distribution last-mile failures, payer arrears (the primary problem in Colombia), or sub-national fragmentation within federal systems (the primary problem in Argentina). Some countries, including Venezuela, are technically eligible but procurement volumes have collapsed due to payment arrears to PAHO.
+
+JUDICIAL ACCESS AS DE FACTO MECHANISM FOR THE ACCESS GAP
+
+The 87% no-progress rate for oncology/orphan drugs in FIFARMA WAIT 2024 implies a structural access gap that judicial mechanisms partially fill. In Colombia, tutela volumes grew from approximately 265,000 (2024) to 312,500 (2025), with approximately 34% health-related and approximately 24% of health tutelas medication-related — a direct proxy for the formal access failure rate. In Argentina, approximately 405 high-cost drug amparo cases were documented in a 2017–2020 sample, with 30.6% filed for drugs that were not yet ANMAT-registered at the time of ruling. The FIFARMA WAIT finding that less than 12% of recently approved drugs have public availability in Latin America explains structurally why both Colombia and Argentina maintain high-volume judicial access mechanisms as their primary route for innovative oncology drugs outside the basic chemotherapy formulary.
+
+For doxorubicin, cisplatin, carboplatin, and trastuzumab — the drugs directly modeled in this project — these are all established therapies well within both the PBS (Colombia) and PMO/BNDE (Argentina) formularies, and are therefore less affected by the FIFARMA WAIT gap than newer targeted therapies and immunotherapies. However, the debt-driven de-facto shortage in Colombia and the obras sociales financial fragility in Argentina demonstrate that formal coverage does not guarantee physical access even for established chemotherapy drugs. The FIFARMA WAIT indicator captures the regulatory/formulary delay dimension of the access problem; the EPS-IPS debt cascade and payer insolvency capture the financial-blockade dimension — these are two independent, additive access barriers.

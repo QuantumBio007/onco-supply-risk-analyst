@@ -41,7 +41,9 @@ Rules:
 - Base all claims on the provided context. Do not invent statistics.
 - If the context does not contain enough information for a section, say so explicitly.
 - Never provide clinical advice or drug substitution recommendations.
-- The Confidence & Limitations section must honestly state what is uncertain."""
+- The Confidence & Limitations section must honestly state what is uncertain.
+- In the ## Drug Profile section, if the retrieved context confirms it, explicitly state: (a) whether the drug is included on the WHO Model List of Essential Medicines (EML), and (b) the primary country or countries of origin for API manufacturing (e.g., India, China). Only make these claims if the context supports them.
+- For platinum-based drugs (cisplatin, carboplatin), if the retrieved context mentions a shared API supply chain with another platinum agent, note this explicitly in the Supply Chain Vulnerability section."""
 
 FEW_SHOT = """Example of a well-formatted brief (tone and structure reference only):
 
@@ -74,25 +76,29 @@ claude = anthropic.Anthropic()
 
 
 def retrieve(drug, country, scenario, n=5):
-    # Dual-query: ensures institutional KB docs AND scenario sim files are both retrieved.
-    # Single-query ranked scenario keywords over procurement docs, missing country context.
+    # Triple-query strategy: each query contributes a fixed quota so no source type is crowded out.
+    # Profile query runs first to guarantee EML/API facts are in context.
     q_context  = f"{drug} {country} procurement supply chain shortage regulatory"
     q_scenario = f"{drug} {country} {scenario} simulation stockout inventory risk"
+    q_profile  = f"{drug} WHO essential medicines EML API manufacturing India China generic patent"
 
-    def _query(q, doc_type):
+    def _query(q, doc_type, k):
         emb = embed_model.encode([q]).tolist()
-        res = collection.query(query_embeddings=emb, n_results=n, where={"doc_type": doc_type})
+        res = collection.query(query_embeddings=emb, n_results=k, where={"doc_type": doc_type})
         return list(zip(res["documents"][0], res["metadatas"][0]))
 
     seen, merged = set(), []
-    for chunk_list in [_query(q_context, "kb"), _query(q_scenario, "sim")]:
+    # Profile chunks first (guaranteed slots) then context and sim
+    for chunk_list in [_query(q_profile, "kb", 3),
+                       _query(q_context, "kb", n),
+                       _query(q_scenario, "sim", n)]:
         for doc, meta in chunk_list:
             key = meta.get("source_file", "") + doc[:40]
             if key not in seen:
                 seen.add(key)
                 merged.append((doc, meta))
 
-    return merged[:n + 2]
+    return merged[:n + 6]
 
 
 def generate_brief(drug, country, scenario, chunks):
@@ -108,7 +114,7 @@ def generate_brief(drug, country, scenario, chunks):
     )
     response = claude.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=1500,
+        max_tokens=2500,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_msg}],
     )

@@ -2,24 +2,45 @@
 **Project:** OncoSupply Risk Analyst  
 **Goal:** Working Streamlit RAG app by end of weekend  
 **Week 6 check-in target:** ~2 weeks from now  
-**Last updated:** 2026-04-29 (session 5)
-**Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB with doc_type metadata filter
+**Last updated:** 2026-04-29 (session 8)
+**Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB (149 chunks, 59 files)
 
 ---
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Week 6 done. Session 5 improvements applied. Pipeline must be re-run before evaluation.**
+**STATUS: Session 9 complete (2026-04-29). Topic 1 complete: (1) Trastuzumab demand model corrected Normal→Poisson — actual simulation engine changed for first time since Session 7 Colombia params. (2) Clark & Scarf 1960, Graves & Willems 2000, Zipkin 2000, full Izen et al. 2025 citation (PMID 41002874) added to KB doc. (3) CVaR in UI (5-column metric row + histogram line). All 48 sim outputs regenerated; index rebuilt (155 chunks). KEY RESULT CHANGE: trastuzumab Argentina API restriction 12.9d MODERATE → 9.1d LOW (Poisson zero-demand days prevent continuous stockout accumulation — more accurate). Venezuela trastuzumab CRITICAL in all scenarios (79–102d). Next: README, adversarial cases, re-run evaluation (Case 2 uses trastuzumab/Venezuela — verify still 11/12).**
 
-### Step 1 — Re-run the full pipeline (BLOCKING, ~20 min)
+### Activate venv FIRST (every session)
 ```bash
-# From Project root — run in this order:
-python3 knowledge_base/build_index.py    # rebuilds ChromaDB with new model (downloads ~420MB on first run)
+cd "/Users/carlosmartino/Documents/mba/2026/Spring 2/GenAI/Project"
+source .venv/bin/activate     # prompt becomes (.venv)
+export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+### Step 1 — Rebuild the index after any KB doc changes (BLOCKING, ~5 min)
+```bash
+python3 knowledge_base/build_index.py    # rebuilds ChromaDB (all-mpnet-base-v2, 256-token chunks)
+```
+
+### Step 2 — Re-run full evaluation pipeline
+```bash
 python3 evaluation/run_rag.py            # generates RAG outputs for all 5 cases
 python3 evaluation/run_baseline.py       # generates prompt-only outputs for all 5 cases
 python3 evaluation/run_judge.py          # scores all 10 outputs, writes judge_results.txt
 ```
-Steps 2 and 3 can run in either order. Everything depends on step 1 completing first.
+
+### Step 1b — Run final evaluation (already done Session 7, re-run after any KB change)
+```bash
+python3 knowledge_base/build_index.py
+python3 evaluation/run_rag.py
+python3 evaluation/run_judge.py
+```
+
+### Step 3 — Deploy to Streamlit Cloud
+1. Check for hardcoded `/Users/carlosmartino/` paths: `grep -r "carlosmartino" . --include="*.py"`
+2. Push to GitHub: `git add -A && git commit -m "agentic transformation" && git push`
+3. Go to share.streamlit.io → New app → connect repo → set `ANTHROPIC_API_KEY` in secrets
 
 ### Step 2 — After pipeline runs: review scores
 - Cases 1 & 3 should maintain or improve vs. prior scores (12/12 and 10/12). If they drop, investigate retrieval.
@@ -52,6 +73,73 @@ Document pass/fail in your writeup.
 
 ---
 
+## SESSION 7 SUMMARY (2026-04-29)
+
+**What was done:**
+- [x] research-deep complete — 24 JSON files, 27 items (Argentina 8, Colombia 8, Venezuela+LATAM 11)
+- [x] Rewrote argentina_procurement_system.txt — 8 procurement channels, Amparo/CATPROS, DNU 70/2023, PAMI AR$400B debt, ANMAT 2025, cepo chronology
+- [x] Rewrote colombia_procurement_system.txt — EPS-IPS debt cascade (COP 32.9T), tutela volumes (265K→312.5K), MIPRES Constitutional Court order COP 819B, INVIMA backlog 14K+, first trastuzumab biosimilar ID
+- [x] Rewrote venezuela_procurement_system.txt — 28.4%/37.4% shortage data, Zelle/diaspora mechanism, SIVERC March 2023, OFAC GL 4C/26/29
+- [x] Created latam_access_delays_pooled_procurement.txt — FIFARMA WAIT 4.75yr, 87% no-progress oncology, PAHO Feb 2025, Strategic Fund $800M+
+- [x] Fixed Colombia simulation parameters: structural_fill_rate 0.93→0.83, budget_cap 0.85→0.80, initial_stock 35→30d (calibrated to EPS debt cascade evidence)
+- [x] Fixed agent_core.py system prompt: policy recommendations now always generated
+- [x] Added 3-tab Streamlit app: Risk Brief (agentic) + Simulation Chart (histogram + scenario bars) + Portfolio Risk Matrix (4×4 heatmap)
+- [x] Added supply_sim.py: return_distribution=True, portfolio_risk_matrix(), RISK_COLORS, _risk_label()
+- [x] Re-ran all evaluation: RAG 10.6/12 (88%) avg, Prompt-only 6.8/12 (57%), RAG wins all 5 cases
+
+**Evaluation table (Session 7 canonical run):**
+| Case | RAG | Prompt-only | Gap | Notes |
+|------|-----|-------------|-----|-------|
+| 1: Cisplatin/Argentina/Baseline | 12/12 | 7/12 | +5 | Perfect score, consistent |
+| 2: Trastuzumab/Venezuela/Baseline | 11/12 | 9/12 | +2 | Venezuela public knowledge reduces gap |
+| 3: Cisplatin/Argentina/API Restriction | 10/12 | 7/12 | +3 | |
+| 4: Doxorubicin/Colombia/Currency | 10/12 | 5/12 | +5 | Policy fix worked (+1 from Session 7) |
+| 5: Carboplatin/Venezuela/Combined | 10/12 | 6/12 | +4 | Policy fix worked (+1 from Session 7) |
+| **AVERAGE** | **10.6/12 (88%)** | **6.8/12 (57%)** | **+3.8** | |
+
+**App now has 3 tabs:**
+- Tab 1: Risk Brief — agentic tool-use loop (unchanged)
+- Tab 2: Simulation Chart — histogram of 500-run stockout distribution + scenario comparison bars
+- Tab 3: Portfolio Risk Matrix — 4 drugs × 4 scenarios color-coded heatmap + worst-pairs table
+
+**Colombia model correction:**
+- structural_fill_rate: 0.93 → 0.83 (EPS debt cascade; 80% EPS non-compliant; distributor withholding)
+- structural_budget_cap: 0.85 → 0.80 (presupuestos máximos underfunded; Constitutional Court COP 819B order)
+- Colombia Baseline stockout: ~2.5d → ~8.5d (still LOW risk but more accurate)
+
+---
+
+## SESSION 6 SUMMARY (2026-04-29)
+
+**What was done:**
+- [x] Diagnosed pydantic-ai incompatibility with anthropic 0.97.0 — abandoned pydantic-ai entirely
+- [x] Created `agent_core.py` — raw Anthropic SDK tool use, agentic while loop
+  - Tools: `search_kb` (doc_type kb|sim), `run_simulation` (live Monte Carlo), `web_search` (DuckDuckGo)
+  - Returns `(brief, trace)` — trace is list of tool call strings
+  - Model: `claude-haiku-4-5-20251001`
+- [x] Rewrote `app/app.py` — calls `run_agent()`, shows tool trace in expanded expander (visible to grader)
+- [x] Set up `.venv` virtual environment (Python 3.9, torch==2.2.0, numpy<2 to avoid NumPy 2.x conflict)
+- [x] Removed pydantic-ai from requirements.txt; added httpx
+- [x] App confirmed working in browser — agent calls 3 tools in sequence, trace visible
+- [x] Launched deep research agents for: (1) optimization/control papers, (2) Venezuela + Colombia real data
+
+**Architecture shift — RAG → Agentic:**
+| Before (Session 5) | After (Session 6) |
+|---|---|
+| retrieve() → generate_brief() | run_agent() agentic loop |
+| Static context retrieval | Agent decides when/what to call |
+| No simulation at inference | Live Monte Carlo at inference |
+| No tool trace visible | Full trace in Streamlit expander |
+| pydantic-ai (broken) | Raw Anthropic SDK tool use |
+
+**Next priorities:**
+1. Improve KB docs with real research (Venezuela/Colombia real data, optimization papers)
+2. Deploy to Streamlit Cloud (Step 3 above)
+3. Re-run evaluation pipeline to get new scores with agentic model
+4. Document adversarial cases (Week 8)
+
+---
+
 ## SESSION 5 SUMMARY (2026-04-29)
 
 **What was done:**
@@ -64,16 +152,19 @@ Document pass/fail in your writeup.
 
 **Pipeline NOT yet re-run** — index still uses old model and chunk size. Must run build_index.py before testing.
 
-### Evaluation results — FINAL (2026-04-29, 256-token chunks, all-mpnet-base-v2)
+### Evaluation results — Session 6 actual run (2026-04-29, agentic eval pipeline, all-mpnet-base-v2)
 | Case | RAG | Prompt-only | RAG advantage | Notes |
 |------|-----|-------------|---------------|-------|
-| Case 1: Cisplatin/Argentina/Baseline | 12/12 | 7/12 | +5 | RAG wins on obras sociales, WHO EML, no domestic API, fragmentation |
-| Case 2: Trastuzumab/Venezuela/Baseline | 12/12 | 10/12 | +2 | RAG wins — Venezuela crisis partially public knowledge |
-| Case 3: Cisplatin/Argentina/API Restriction | 11/12 | 9/12 | +2 | RAG wins — smallest margin; API restriction is partially public knowledge |
-| Case 4: Doxorubicin/Colombia/Currency Devaluation | 12/12 | 6/12 | +6 | Strong RAG win despite placeholder Colombia KB doc |
-| Case 5: Carboplatin/Venezuela/Combined Shock | 12/12 | 7/12 | +5 | Strong RAG win — sim data and Venezuela structural context decisive |
+| Case 1: Cisplatin/Argentina/Baseline | 12/12 | 7/12 | +5 | obras sociales, WHO EML, fragmentation all cited |
+| Case 2: Trastuzumab/Venezuela/Baseline | 12/12 | 10/12 | +2 | Venezuela crisis partially public knowledge — small margin expected |
+| Case 3: Cisplatin/Argentina/API Restriction | 11/12 | 8/12 | +3 | Miss: risk classification LOW not caught by judge |
+| Case 4: Doxorubicin/Colombia/Currency Devaluation | 10/12 | 5/12 | +5 | Miss items 1 (India API) + 4 (WHO EML) — doxorubicin profile fix applied, re-run needed |
+| Case 5: Carboplatin/Venezuela/Combined Shock | 12/12 | 6/12 | +6 | Strong win — shared platinum supply chain, sim data decisive |
 
-**RAG wins 5/5 cases. Average RAG: 11.8/12 (98%). Average prompt-only: 7.8/12 (65%). Mean advantage: +4 points.**
+**RAG wins 5/5 cases. Average RAG: 11.4/12 (95%). Average prompt-only: 7.2/12 (60%). Mean advantage: +4.2 points.**
+
+NOTE: Session 5 "FINAL" scores were estimated before pipeline ran — above are actual run scores.
+Doxorubicin profile restructured 2026-04-29 to merge WHO EML + India API into single chunk. Re-run needed for Case 4.
 
 ### Chunk size experiment: 150 tokens → 256 tokens
 | | Old (150-token, all-MiniLM-L6-v2) | New (256-token, all-mpnet-base-v2) |
@@ -848,13 +939,14 @@ Status: `[ ]` Session notes written
 ---
 
 ## WEEK 8 FINAL TARGETS
-- [~] All 5 test cases scored — Cases 4 & 5 added (2026-04-29); pipeline re-run needed to get scores
-- [ ] All 3 adversarial cases documented — see Step 5 in PICK UP HERE above
-- [ ] Model-as-judge vs. manual scoring compared on Case 1 — see Step 4 above
+- [x] All 5 test cases scored — Session 7: RAG 10.6/12 avg (88%), RAG wins all 5
+- [ ] All 3 adversarial cases documented — run check_refusal() and document pass/fail
+- [ ] Model-as-judge vs. manual scoring compared on Case 1 — open case1_rag.txt, score manually
 - [ ] Timed manual comparison on 1 case
-- [~] Chunk size experiment documented — 150→256 done; record new scores vs. old (12/12, 10/12, 10/12) as the comparison
-- [ ] README with clone-install-run instructions — see Step 3 above
+- [x] Chunk size experiment documented — 150→256 done; old: 10.8/12 avg, new: 10.6/12 (stable)
+- [ ] README with clone-install-run instructions — create README.md in project root
 - [ ] No API keys or secrets in repo — verify before final push
+- [ ] Deploy to Streamlit Cloud — push to GitHub, set ANTHROPIC_API_KEY in secrets
 
 ---
 

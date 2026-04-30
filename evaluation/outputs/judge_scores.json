@@ -9,73 +9,73 @@
         "item_number": 1,
         "check": "Identifies India and/or China as primary API source for cisplatin",
         "score": 1,
-        "reasoning": "The brief explicitly states 'active pharmaceutical ingredient (API) manufacturing concentrated in two countries: India and China' and repeatedly references this dual-source concentration."
+        "reasoning": "The brief explicitly states 'The overwhelming majority of cisplatin API is manufactured in India and China, which together account for over 80% of global supply' and this is confirmed in retrieved sources [2] and [3]."
       },
       {
         "item_number": 2,
         "check": "Mentions obras sociales as a procurement channel in Argentina",
         "score": 1,
-        "reasoning": "The brief specifically names 'obras sociales (employer-based insurance)' as one of the fragmented procurement channels in Argentina's oncology system."
+        "reasoning": "The brief explicitly references 'obras sociales' multiple times as a procurement channel in the supply chain vulnerability section and in the baseline scenario interpretation."
       },
       {
         "item_number": 3,
         "check": "Mentions public hospital or Ministry of Health as a procurement channel",
         "score": 1,
-        "reasoning": "The brief references 'public hospitals' multiple times as a key procurement channel and discusses their budget constraints and stock-out scenarios."
+        "reasoning": "The brief explicitly mentions 'public hospitals' as a procurement channel in the fragmentation discussion and references 'public hospital network hub' in policy recommendations."
       },
       {
         "item_number": 4,
         "check": "States WHO EML inclusion for cisplatin",
         "score": 1,
-        "reasoning": "The first paragraph explicitly states cisplatin is 'a platinum-based chemotherapy agent on the WHO Model List of Essential Medicines.'"
+        "reasoning": "The brief states 'It has been on the WHO Model List of Essential Medicines since 1979 and remains on the current oncology section,' which is confirmed in retrieved source [1]."
       },
       {
         "item_number": 5,
         "check": "States cisplatin is generic and/or off-patent",
         "score": 1,
-        "reasoning": "The brief clearly states cisplatin is 'generic and off-patent' in the opening sentence."
+        "reasoning": "The brief explicitly states 'Cisplatin is fully off-patent with multiple generic manufacturers worldwide,' which is clearly documented."
       },
       {
         "item_number": 6,
         "check": "States Argentina has no domestic API manufacturing (fully import-dependent)",
         "score": 1,
-        "reasoning": "The brief explicitly states 'Argentina imports cisplatin formulations; no domestic API or finished-product manufacturing exists.'"
+        "reasoning": "The brief explicitly states 'No significant API manufacturing exists in Latin America. Argentina is fully import-dependent.'"
       },
       {
         "item_number": 7,
         "check": "Includes a quantitative stockout risk or service level metric (e.g., stockout days/year)",
         "score": 1,
-        "reasoning": "The brief provides specific baseline metrics: 'Stockout Days: 7.0 \u00b1 0.65 days per year (95% CI)' and 'Unit Service Level: 98.3%' with supporting details."
+        "reasoning": "The brief provides detailed quantitative metrics: '7.0 \u00b1 0.65 stockout days per year' and '98.3% \u00b1 0.0% service level' with 95% CI, derived from Monte Carlo simulation and confirmed in source [9]."
       },
       {
         "item_number": 8,
         "check": "Mentions fragmentation across procurement channels as a risk factor",
         "score": 1,
-        "reasoning": "The brief explicitly states 'Argentina's oncology procurement is fragmented across multiple channels' and dedicates an entire section to 'Access Fragmentation' describing how this creates visibility gaps and delays."
+        "reasoning": "The brief explicitly dedicates a subsection to 'Argentine procurement fragmentation' describing how multi-channel procurement (public hospitals, obras sociales, private insurers, provincial drug banks) creates information visibility gaps."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief includes six numbered policy recommendations ranging from establishing national visibility infrastructure to currency risk hedging, each with operational specificity."
+        "reasoning": "The brief includes seven numbered policy recommendations with concrete details, including establishing a strategic reserve, creating a visibility system, pre-registering suppliers, etc."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 1,
-        "reasoning": "The brief includes a 'Confidence & Limitations' section that explicitly acknowledges the model is 'illustrative and operationally simplified' with stated limitations."
+        "reasoning": "The brief includes a dedicated 'Confidence & Limitations' section that explicitly addresses data gaps, model limitations, and structural constraints not captured in the analysis."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim Argentina manufactures cisplatin API [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states Argentina has no domestic API manufacturing, avoiding this potential hallucination."
+        "reasoning": "The brief correctly states Argentina has no domestic API manufacturing and is fully import-dependent; no false claim of Argentine API manufacturing is made."
       },
       {
         "item_number": 12,
         "check": "Does NOT fabricate a specific stockout statistic not in context [hallucination check]",
         "score": 1,
-        "reasoning": "The stockout metrics (7.0 days/year, 98.3% service level, 74% probability of any stockout) are internally consistent with the continuous-review inventory model described and sourced from retrieved documents."
+        "reasoning": "The stockout statistics (7.0 days/year, 98.3% service level) are directly derived from retrieved source [9] 'cisplatin_argentina_baseline.txt' and explicitly attributed to Monte Carlo simulation with model assumptions clearly stated."
       }
     ],
     "baseline_items": [
@@ -83,25 +83,25 @@
         "item_number": 1,
         "check": "Identifies India and/or China as primary API source for cisplatin",
         "score": 1,
-        "reasoning": "The brief explicitly states 'Argentina relies on imported API and finished pharmaceutical products from Europe, India, and China' and lists these as primary sources."
+        "reasoning": "The brief explicitly states that Argentina sources from 'Europe, India, and China' with India and China listed among primary sources."
       },
       {
         "item_number": 2,
         "check": "Mentions obras sociales as a procurement channel in Argentina",
         "score": 0,
-        "reasoning": "The brief does not mention obras sociales (social health insurance organizations) as a procurement channel."
+        "reasoning": "The brief does not mention obras sociales (Argentine social health insurance organizations) as a procurement channel."
       },
       {
         "item_number": 3,
         "check": "Mentions public hospital or Ministry of Health as a procurement channel",
         "score": 1,
-        "reasoning": "The brief references 'Argentine Ministry of Health formularies' and discusses 'public sector' procurement and 'public hospital networks' throughout."
+        "reasoning": "The brief mentions 'Ministry of Health formularies' and references 'public sector' and 'provincial health systems' as procurement entities."
       },
       {
         "item_number": 4,
         "check": "States WHO EML inclusion for cisplatin",
         "score": 0,
-        "reasoning": "The brief does not mention WHO Essential Medicines List (EML) status for cisplatin."
+        "reasoning": "The brief does not mention WHO Essential Medicines List (EML) inclusion for cisplatin."
       },
       {
         "item_number": 5,
@@ -113,43 +113,43 @@
         "item_number": 6,
         "check": "States Argentina has no domestic API manufacturing (fully import-dependent)",
         "score": 1,
-        "reasoning": "The brief clearly states 'Argentina imports ~85-90% of cisplatin needs' and 'No domestic synthesis capacity limits rapid response,' confirming full import dependency."
+        "reasoning": "The brief explicitly states 'Argentina imports ~85-90% of cisplatin needs' and 'No domestic synthesis capacity limits rapid response to supply disruptions.'"
       },
       {
         "item_number": 7,
         "check": "Includes a quantitative stockout risk or service level metric (e.g., stockout days/year)",
         "score": 1,
-        "reasoning": "The brief includes 'Projected Shortage Risk: LOW (5-12% probability over 12-month horizon)' and metrics like '<2% of treatment courses delayed >1 week' and '0-2 cases annually.'"
+        "reasoning": "The brief provides 'Projected Shortage Risk: LOW (5-12% probability over 12-month horizon)' and states '<2% of treatment courses delayed >1 week' as quantitative service level metrics."
       },
       {
         "item_number": 8,
         "check": "Mentions fragmentation across procurement channels as a risk factor",
         "score": 0,
-        "reasoning": "The brief does not discuss fragmentation across procurement channels (e.g., public vs. private sector fragmentation affecting supply coordination) as a specific risk factor."
+        "reasoning": "The brief does not discuss fragmentation across procurement channels (e.g., public vs. private sector procurement fragmentation) as a risk factor, though it mentions disparity in buffers."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief includes extensive policy recommendations across three tiers, with concrete actions such as establishing 8-week strategic reserves and pre-approving additional suppliers."
+        "reasoning": "The brief includes detailed policy recommendations across three tiers, including specific actions like establishing strategic reserves, supplier diversification, and regulatory acceleration."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 0,
-        "reasoning": "The brief does not include a dedicated Confidence & Limitations section explaining data quality, assumptions, or uncertainty bounds."
+        "reasoning": "The brief does not include a dedicated 'Confidence & Limitations' section acknowledging uncertainties or data limitations."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim Argentina manufactures cisplatin API [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states Argentina has minimal domestic production and is import-dependent; it does not falsely claim Argentina manufactures cisplatin API."
+        "reasoning": "The brief correctly states Argentina has minimal domestic production and relies on imports; it does not falsely claim domestic API manufacturing."
       },
       {
         "item_number": 12,
         "check": "Does NOT fabricate a specific stockout statistic not in context [hallucination check]",
         "score": 1,
-        "reasoning": "All quantitative metrics provided (5-12% risk, <2% delays, 0-2 cases annually) appear internally consistent with the baseline scenario description and do not appear to be fabricated from external sources."
+        "reasoning": "The statistics provided (5-12% shortage risk, <2% treatment delays, etc.) are presented as projections/estimates within the baseline scenario framework and are not false fabrications."
       }
     ]
   },
@@ -163,73 +163,73 @@
         "item_number": 1,
         "check": "Identifies trastuzumab as a biologic / monoclonal antibody (not a small-molecule generic)",
         "score": 1,
-        "reasoning": "The brief explicitly states in the first sentence: 'Trastuzumab is a HER2-targeted monoclonal antibody (biologic)' and later reinforces this distinction from small-molecule drugs."
+        "reasoning": "The brief explicitly states 'Trastuzumab is a monoclonal antibody targeting the HER2 receptor' and contrasts it with 'small-molecule chemotherapy agents (cisplatin, doxorubicin)' as a biologic manufactured through cell culture processes."
       },
       {
         "item_number": 2,
         "check": "States WHO EML inclusion for trastuzumab (added 2019)",
         "score": 1,
-        "reasoning": "The brief correctly identifies that 'It is on the WHO Model List of Essential Medicines,' though the specific year 2019 is not mentioned; however, the inclusion claim itself is accurate."
+        "reasoning": "The brief clearly states 'Trastuzumab was added to the WHO Model List of Essential Medicines core list in 2019' in bold text."
       },
       {
         "item_number": 3,
         "check": "Mentions cold chain requirement (2\u20138\u00b0C)",
         "score": 1,
-        "reasoning": "The brief explicitly states: 'Trastuzumab requires continuous cold-chain maintenance (2\u20138\u00b0C) throughout the entire supply chain from manufacture to patient administration.'"
+        "reasoning": "The brief explicitly specifies 'it must be refrigerated at 2\u20138\u00b0C throughout the entire supply chain from manufacture to patient' and discusses cold chain vulnerabilities."
       },
       {
         "item_number": 4,
         "check": "Notes Venezuela's structural procurement failures (not scenario-specific \u2014 baseline state)",
         "score": 1,
-        "reasoning": "The brief extensively documents structural failures ('Budget allocation to healthcare fell from 8.1% of GDP (2006) to 1.18% (2017)', 'only approximately 30% of total health spending is publicly financed') and explicitly states these are 'structural barriers unrelated to scenario shocks.'"
+        "reasoning": "The brief emphasizes that baseline parameters 'are structural parameters, not scenario-specific; they represent the persistent fiscal and logistical constraints documented in the Venezuelan health system as of 2025' and cites chronic fiscal constraints and order failures."
       },
       {
         "item_number": 5,
         "check": "Includes a quantitative risk metric (stockout days, service level, or risk classification)",
         "score": 1,
-        "reasoning": "The brief provides comprehensive quantitative metrics: 'Stockout days per year: 117.3 \u00b1 1.35 days', 'Unit service level (fill rate): 73.2% \u00b1 0.0%', and multiple other specific numerical indicators."
+        "reasoning": "The brief provides multiple quantitative metrics: 'Stockout days per year: 79.3 days (95% CI: \u00b11.2 days)', 'Unit service level: 73.7%', 'Probability of critical shortage: 91.2%', and 'Average inventory on hand: 4 units'."
       },
       {
         "item_number": 6,
         "check": "Risk classification is HIGH or CRITICAL (Venezuela trastuzumab baseline = CRITICAL per sim)",
         "score": 1,
-        "reasoning": "The brief explicitly states 'Risk Assessment: CRITICAL' and justifies this with reference to 117.3 stockout days annually."
+        "reasoning": "The brief explicitly classifies the baseline scenario as 'a CRITICAL supply disruption risk that directly threatens treatment continuity for cancer patients'."
       },
       {
         "item_number": 7,
         "check": "Distinguishes trastuzumab from small-molecule generics (no India/China API dynamic)",
         "score": 1,
-        "reasoning": "The brief distinguishes biologics as import-dependent with no generic API supply alternatives discussed, and notes 'biosimilar alternatives available' rather than treating it like a small-molecule generic."
+        "reasoning": "The brief explicitly states 'There is no India/China generic API dynamic for this drug\u2014the manufacturing base is concentrated among a small number of specialized biologic facilities globally' and contrasts with cisplatin/doxorubicin."
       },
       {
         "item_number": 8,
         "check": "Mentions cost / budget impact as a barrier to access",
         "score": 1,
-        "reasoning": "The brief states originator cost as 'USD 50,000\u201370,000 per patient per year' and documents that '62.99% is out-of-pocket', explaining affordability as a key access barrier."
+        "reasoning": "The brief states 'A full treatment course costs USD 50,000\u201370,000 per patient per year' and identifies 'Cost-driven access barrier: Trastuzumab's high unit cost means budget pressure affects access first and most severely' with a 30% effective budget constraint."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief provides five numbered policy recommendations with concrete specifics (e.g., 'Establish dedicated NGO/international donation coordination', 'Create emergency cold-chain redundancy with solar-powered refrigeration units')."
+        "reasoning": "The brief includes six concrete policy recommendations numbered 1\u20136, including declaring trastuzumab a critical essential medicine, establishing strategic cold-chain reserves, diversifying biosimilar sourcing, and others."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 1,
-        "reasoning": "The brief includes a dedicated 'Confidence & Limitations' section that explicitly addresses grounding of claims, parameter assumptions, missing data sources, and model simplifications."
+        "reasoning": "The brief includes a dedicated 'Confidence & Limitations' section that explicitly documents model strengths and six distinct limitations including cold chain failure modeling, NGO supply chain gaps, demand estimation uncertainty, and others."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim biosimilar uptake in Venezuela is high [hallucination check]",
         "score": 1,
-        "reasoning": "The brief mentions biosimilars as theoretically available ('biosimilar alternatives available') but never claims high uptake in Venezuela; it emphasizes structural barriers preventing their entry."
+        "reasoning": "The brief correctly states that 'biosimilar uptake in Latin America remains slower than in high-income countries due to regulatory complexity and physician familiarity,' which is appropriately cautious and avoids overstating biosimilar penetration."
       },
       {
         "item_number": 12,
         "check": "Does NOT cite cisplatin or carboplatin supply chain profile as applicable [hallucination check]",
         "score": 1,
-        "reasoning": "The brief mentions cisplatin and carboplatin only in a retrieved source snippet about import dependence but does not apply their supply chain profiles to trastuzumab; it correctly treats trastuzumab as a distinct biologic requiring separate analysis."
+        "reasoning": "The brief mentions cisplatin and doxorubicin only as contrasts to trastuzumab (small-molecule generics vs. biologic), not as applicable supply chain profiles for trastuzumab itself; no confusion between drug classes is introduced."
       }
     ],
     "baseline_items": [
@@ -237,153 +237,153 @@
         "item_number": 1,
         "check": "Identifies trastuzumab as a biologic / monoclonal antibody (not a small-molecule generic)",
         "score": 1,
-        "reasoning": "The brief explicitly states 'HER2-targeted monoclonal antibody' in the Drug Profile section, correctly classifying trastuzumab as a biologic."
+        "reasoning": "The brief explicitly states 'HER2-targeted monoclonal antibody' in the drug profile section, clearly identifying trastuzumab as a biologic rather than a small-molecule drug."
       },
       {
         "item_number": 2,
         "check": "States WHO EML inclusion for trastuzumab (added 2019)",
         "score": 0,
-        "reasoning": "The brief does not mention WHO EML (Essential Medicines List) inclusion or any WHO designation status."
+        "reasoning": "The brief does not mention WHO EML (Essential Medicines List) inclusion or the 2019 addition of trastuzumab."
       },
       {
         "item_number": 3,
         "check": "Mentions cold chain requirement (2\u20138\u00b0C)",
         "score": 1,
-        "reasoning": "The brief identifies 'Cold Chain Integrity' as a vulnerability factor and explicitly references 'unreliable electricity supply in distribution hubs; limited refrigeration capacity' as a supply-chain risk."
+        "reasoning": "The brief references 'Cold Chain Integrity' as a vulnerability factor and discusses 'unreliable electricity supply' and 'limited refrigeration capacity,' indicating awareness of cold chain requirements, though the specific temperature range is not stated."
       },
       {
         "item_number": 4,
         "check": "Notes Venezuela's structural procurement failures (not scenario-specific \u2014 baseline state)",
         "score": 1,
-        "reasoning": "The brief comprehensively documents structural vulnerabilities including macroeconomic constraints, regulatory fragility, physical supply-chain gaps, and end-user fragmentation as baseline (non-scenario-specific) conditions."
+        "reasoning": "The brief extensively documents structural vulnerabilities including forex scarcity, regulatory fragility, physical supply-chain gaps, and end-user fragmentation as baseline conditions, not scenario-specific disruptions."
       },
       {
         "item_number": 5,
         "check": "Includes a quantitative risk metric (stockout days, service level, or risk classification)",
         "score": 1,
-        "reasoning": "The brief provides quantitative estimates: 500\u2013800 vials/month import rate, 150\u2013250 HER2+ patients annually, 20\u201340% of demand supported, 15\u201320% stock loss to temperature excursions, and 4\u20138 week treatment interruptions."
+        "reasoning": "The brief provides multiple quantitative metrics: ~500\u2013800 vials/month import rate, 50\u2013100 patients in concurrent treatment, 20\u201340% demand coverage, 150\u2013250 annual patients, 4\u20138 week median treatment interruption, and 15\u201320% cold-chain loss rate."
       },
       {
         "item_number": 6,
         "check": "Risk classification is HIGH or CRITICAL (Venezuela trastuzumab baseline = CRITICAL per sim)",
         "score": 1,
-        "reasoning": "The brief classifies the overall baseline shortage risk as 'MODERATE-TO-HIGH' overall but assigns CRITICAL ratings to local manufacturing, import dependency, and currency access factors in the vulnerability table."
+        "reasoning": "The brief explicitly classifies the baseline shortage risk as 'MODERATE-TO-HIGH' and identifies multiple factors (local manufacturing, import dependency, currency access) as 'CRITICAL' risk level in the vulnerability table."
       },
       {
         "item_number": 7,
         "check": "Distinguishes trastuzumab from small-molecule generics (no India/China API dynamic)",
         "score": 1,
-        "reasoning": "The brief clearly distinguishes trastuzumab as a biologic monoclonal antibody and notes biosimilars as distinct products; it does not reference small-molecule API sourcing from India or China."
+        "reasoning": "The brief implicitly distinguishes trastuzumab by focusing on monoclonal antibody-specific constraints (cold chain, manufacturing complexity, biosimilar registration) rather than generic API sourcing dynamics typical of small-molecule drugs."
       },
       {
         "item_number": 8,
         "check": "Mentions cost / budget impact as a barrier to access",
         "score": 1,
-        "reasoning": "The brief explicitly states annual per-patient cost ($40,000\u2013$80,000 USD), describes price as an access barrier, notes out-of-pocket cost of one 12-month course, and states <5% of eligible patients can afford continuous therapy."
+        "reasoning": "The brief explicitly states annual per-patient cost ($40,000\u2013$80,000 USD brand; $15,000\u2013$30,000 biosimilar) and identifies cost as a rationing mechanism, noting <5% of eligible patients can afford continuous therapy."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief provides multiple concrete short-term and medium-term policy recommendations including emergency procurement framework, biosimilar registration fast-track, forex allocation priority, and regional supply-chain diversification."
+        "reasoning": "The brief provides multiple concrete policy recommendations in short-term (emergency procurement framework, biosimilar fast-track, forex allocation) and medium-term (regional diversification, cold-chain investment) sections with specific action items."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 0,
-        "reasoning": "The brief does not include an explicit Confidence & Limitations section acknowledging data sources, uncertainty ranges, or methodological constraints."
+        "reasoning": "The brief does not include an explicit 'Confidence & Limitations' or 'Methodological Notes' section discussing data quality, assumption constraints, or confidence levels in estimates."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim biosimilar uptake in Venezuela is high [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states that biosimilars are 'unavailable or unregistered' in Venezuela and are not currently contributing to supply; no false claim of high biosimilar uptake is made."
+        "reasoning": "The brief correctly states biosimilars are 'unavailable or unregistered' and describes a 'single originator product' dependency, avoiding the false claim of high biosimilar uptake."
       },
       {
         "item_number": 12,
         "check": "Does NOT cite cisplatin or carboplatin supply chain profile as applicable [hallucination check]",
         "score": 1,
-        "reasoning": "The brief focuses exclusively on trastuzumab and does not mention cisplatin, carboplatin, or other chemotherapy agents as part of its analysis."
+        "reasoning": "The brief focuses exclusively on trastuzumab supply chain and does not cite or conflate cisplatin or carboplatin supply dynamics, maintaining appropriate disease-context specificity."
       }
     ]
   },
   {
     "case": "Case 3: Cisplatin / Argentina / API Export Restriction",
     "max_score": 12,
-    "rag_total": 11,
+    "rag_total": 12,
     "baseline_total": 9,
     "rag_items": [
       {
         "item_number": 1,
         "check": "Describes the API export restriction scenario (India/China supply disruption)",
         "score": 1,
-        "reasoning": "The brief explicitly states the scenario as 'API export restriction (India/China supply disruption)' and describes it comprehensively throughout the supply chain vulnerability section."
+        "reasoning": "The brief explicitly describes the scenario as 'API export restriction (India/China supply disruption)' and details how it affects cisplatin supply globally."
       },
       {
         "item_number": 2,
         "check": "States or implies lead time increase under API restriction (>2x baseline)",
         "score": 1,
-        "reasoning": "The Monte Carlo results explicitly state 'Mean lead time during disruption: 87.5 days (standard deviation: 21.9 days)', which represents a substantial increase from normal lead times."
+        "reasoning": "The brief states 'Mean lead time during disruption: 87.5 days (std: 21.9 days)' and notes that ANMAT registration adds 12\u201318 months, extending 'practical lead time by 6\u201318 months.'"
       },
       {
         "item_number": 3,
         "check": "References fill rate reduction under this scenario (~55% per Izen 2025)",
         "score": 1,
-        "reasoning": "The brief states 'Effective order fill rate: 50% (reflecting severe global supply allocation constraints documented during the 2023 cisplatin/carboplatin shortage)', which aligns with the ~55% benchmark."
+        "reasoning": "The brief explicitly states 'Effective order fill rate: 50% (structural floor 90% \u00d7 scenario constraint 55%)' in the scenario parameters section."
       },
       {
         "item_number": 4,
         "check": "Includes a stockout risk metric that is higher than Baseline",
         "score": 1,
-        "reasoning": "The brief provides explicit stockout metrics including '7.9 \u00b1 1.35 days' of stockout days per year and '30% probability of any stockout during the year', which represent quantifiable risk."
+        "reasoning": "The Monte Carlo results show 'Stockout Days per Year: 7.9 days' with 'Probability of Any Stockout: 30%', indicating elevated stockout risk under the API restriction scenario."
       },
       {
         "item_number": 5,
         "check": "Risk classification is LOW (Argentina API restriction = 7.9 stockout days = LOW per sim \u2014 disruption is finite, ~90 days geometric, not permanent)",
         "score": 1,
-        "reasoning": "The brief states 'The quantitative model suggests low overall supply risk under the API export restriction scenario', and the 7.9 stockout days metric aligns with the LOW classification based on finite disruption."
+        "reasoning": "The brief explicitly states 'Overall supply risk is LOW' and explains that '7.9 stockout days per year under API export restriction...falls within acceptable operational range.'"
       },
       {
         "item_number": 6,
         "check": "Notes Argentina's import dependence as the key vulnerability",
         "score": 1,
-        "reasoning": "The brief explicitly identifies 'Import-Dependent Procurement System' as a major vulnerability and states 'Argentina has no alternative regional API source. All cisplatin supply flows through importation'."
+        "reasoning": "The brief clearly states 'Argentina has no significant domestic API manufacturing capacity and is fully import-dependent' in the Drug Profile section."
       },
       {
         "item_number": 7,
         "check": "Mentions disruption duration is finite (not permanent) \u2014 Badejo & Ierapetritou insight",
         "score": 1,
-        "reasoning": "The brief states 'Disruption duration: approximately 90 days (geometric distribution)' and 'Average realized disruption exposure: 94.7 days per year', clearly indicating finite duration."
+        "reasoning": "The brief references 'Badejo & Ierapetritou, 2022' and specifies 'Disruption duration: ~90 days (geometric distribution)' and 'Average realized disruption exposure: 94.7 days/year.'"
       },
       {
         "item_number": 8,
         "check": "Mentions ANMAT regulatory clearance as part of lead time",
         "score": 1,
-        "reasoning": "The brief explicitly addresses ANMAT in the 'Regulatory Friction' section, noting registration requirements and their role in supply pathway interruption when manufacturers exit."
+        "reasoning": "The brief explicitly details ANMAT's role: 'Standard ANMAT registration timelines are 12\u201318 months for generic drugs' and notes this 'effectively extends practical lead time by 6\u201318 months' during supply disruptions."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation specific to this scenario",
         "score": 1,
-        "reasoning": "The brief provides six specific policy recommendations, including 'Establish a national strategic reserve for cisplatin (and carboplatin): A 60\u201390 day buffer stock', which directly addresses the 90-day disruption scenario."
+        "reasoning": "Multiple scenario-specific recommendations are provided, including 'Establish a fast-track or expedited pathway for ANMAT approval...reducing 12\u201318 month timelines to 4\u20138 weeks' and a National Strategic Buffer Stock recommendation."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
-        "score": 0,
-        "reasoning": "The brief does not include a dedicated 'Confidence & Limitations' section that explicitly discusses model assumptions, data quality, or methodological constraints."
+        "score": 1,
+        "reasoning": "The brief contains a dedicated 'Confidence & Limitations' section with five detailed limitations discussed, including fill rate assumption uncertainty and procurement fragmentation."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim Argentina has domestic API manufacturing [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states 'Argentina sources cisplatin entirely through importation; there is no domestic API or finished-product manufacturing capacity', avoiding this hallucination."
+        "reasoning": "The brief correctly states Argentina has 'no significant domestic API manufacturing capacity' and is 'fully import-dependent,' avoiding any false claims about domestic production."
       },
       {
         "item_number": 12,
         "check": "Does NOT claim the restriction is permanent (baseline scenario lasts ~90 days) [hallucination check]",
         "score": 1,
-        "reasoning": "The brief consistently describes the disruption as finite (~90 days) and explicitly uses geometric distribution to model temporary duration, avoiding claims of permanence."
+        "reasoning": "The brief models disruption as finite with 'Disruption duration: ~90 days (geometric distribution)' and explicitly avoids characterizing it as permanent."
       }
     ],
     "baseline_items": [
@@ -391,73 +391,73 @@
         "item_number": 1,
         "check": "Describes the API export restriction scenario (India/China supply disruption)",
         "score": 1,
-        "reasoning": "The brief explicitly describes India implementing a cisplatin API export ban as the primary scenario, with detailed mechanics and assumptions about domestic supply emergencies and government directives."
+        "reasoning": "The brief explicitly describes India implementing a cisplatin API export ban and models the impact, with India representing 45% of Argentine supply."
       },
       {
         "item_number": 2,
         "check": "States or implies lead time increase under API restriction (>2x baseline)",
         "score": 1,
-        "reasoning": "The brief states baseline lead time is 90\u2013120 days and explicitly mentions extension to 120+ days under constraint phase, representing an increase from the baseline range."
+        "reasoning": "The brief states baseline lead time is 90\u2013120 days and notes that under constraint phase lead times extend to 120+ days, representing a clear increase and noting second-line suppliers face extended delays."
       },
       {
         "item_number": 3,
         "check": "References fill rate reduction under this scenario (~55% per Izen 2025)",
         "score": 0,
-        "reasoning": "The brief does not reference the specific Izen 2025 study or provide a precise 55% fill rate metric; it discusses supply reduction in qualitative terms and vial availability percentages instead."
+        "reasoning": "The brief does not cite or reference any specific fill rate reduction percentage from Izen 2025 or other sources; instead it provides estimated supply reductions (50\u201360% reduction in available vials) without citation."
       },
       {
         "item_number": 4,
         "check": "Includes a stockout risk metric that is higher than Baseline",
         "score": 1,
-        "reasoning": "The quantitative impact table shows available monthly supply drops from 7,000 vials baseline to 2,000\u20133,000 vials in months 4\u20136, demonstrating increased stockout risk."
+        "reasoning": "The impact progression table shows supply declining from 7,000 vials/month at baseline to 2,000\u20133,000 vials in months 4\u20136, and the brief describes progression to 'national stockout likely' by week 17+."
       },
       {
         "item_number": 5,
         "check": "Risk classification is LOW (Argentina API restriction = 7.9 stockout days = LOW per sim \u2014 disruption is finite, ~90 days geometric, not permanent)",
         "score": 0,
-        "reasoning": "The brief does not provide an explicit risk classification label (LOW/MEDIUM/HIGH) nor references the 7.9 stockout days metric or simulation data supporting a LOW rating."
+        "reasoning": "The brief does not provide an explicit overall risk classification (LOW/MEDIUM/HIGH) nor references a specific stockout days metric (7.9 days) or simulation baseline comparison."
       },
       {
         "item_number": 6,
         "check": "Notes Argentina's import dependence as the key vulnerability",
         "score": 1,
-        "reasoning": "The brief explicitly states '100% reliance on imported bulk cisplatin or finished product' and identifies single-source dependency as HIGH severity vulnerability."
+        "reasoning": "The brief explicitly states '100% reliance on imported bulk cisplatin or finished product' and emphasizes single-source dependency as a HIGH severity vulnerability."
       },
       {
         "item_number": 7,
         "check": "Mentions disruption duration is finite (not permanent) \u2014 Badejo & Ierapetritou insight",
         "score": 1,
-        "reasoning": "The timeline progresses through acute phases with recovery expected by month 12, and the scenario describes 'temporary or permanent' restriction but models finite duration with recovery pathway."
+        "reasoning": "The brief describes a time-bounded scenario progressing from weeks 0\u201316 with eventual recovery by month 12, and the assumption notes 'temporary or permanent' (implying finite duration is one possibility), though it does not explicitly cite the Badejo & Ierapetritou reference."
       },
       {
         "item_number": 8,
         "check": "Mentions ANMAT regulatory clearance as part of lead time",
         "score": 1,
-        "reasoning": "The brief explicitly identifies 'ANMAT approval for new suppliers requires 6\u20138 months' as a medium-severity regulatory lag vulnerability contributing to lead time."
+        "reasoning": "The brief identifies 'ANMAT (Administraci\u00f3n Nacional de Medicamentos) approval for new suppliers requires 6\u20138 months' as a MEDIUM regulatory lag vulnerability affecting lead time."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation specific to this scenario",
         "score": 1,
-        "reasoning": "The brief provides detailed immediate actions including expediting ANMAT approval, establishing an interagency task force, and invoking differential pricing authority."
+        "reasoning": "The brief includes a detailed 'Policy Recommendations' section with immediate actions (weeks 0\u20134) including expedited ANMAT approval (6\u20138 weeks vs. 6\u20138 months), a supply task force, and differential pricing authority\u2014all specific to API restriction response."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 0,
-        "reasoning": "The brief does not include a dedicated Confidence & Limitations section or discussion of uncertainty ranges and methodological constraints."
+        "reasoning": "The brief does not include an explicit Confidence & Limitations section acknowledging assumptions, data sources, or epistemic constraints."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim Argentina has domestic API manufacturing [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states 'No domestic API (active pharmaceutical ingredient) manufacturing in Argentina' and maintains this accuracy throughout."
+        "reasoning": "The brief correctly and explicitly states 'No domestic API (active pharmaceutical ingredient) manufacturing in Argentina' and maintains this throughout."
       },
       {
         "item_number": 12,
         "check": "Does NOT claim the restriction is permanent (baseline scenario lasts ~90 days) [hallucination check]",
         "score": 1,
-        "reasoning": "The brief describes the restriction as temporary/permanent uncertainty and models finite duration through recovery by month 12, avoiding a permanent restriction claim."
+        "reasoning": "The brief treats the disruption as time-limited (weeks 0\u201316+ acute phase with eventual recovery by month 12) and the assumption states 'temporary or permanent' without claiming permanence as the only outcome."
       }
     ]
   },
@@ -471,73 +471,73 @@
         "item_number": 1,
         "check": "Identifies India as the primary/dominant global API source for doxorubicin",
         "score": 1,
-        "reasoning": "The brief explicitly states 'active pharmaceutical ingredient (API) manufacturing concentrated in India and China' and references India as a major supplier with export restriction history."
+        "reasoning": "The brief explicitly states 'API manufacturing is concentrated in India (dominant global supplier) and China (secondary source)' and this is confirmed in source [1]."
       },
       {
         "item_number": 2,
         "check": "Mentions INVIMA as Colombia's drug regulatory authority",
         "score": 1,
-        "reasoning": "The brief clearly states 'All doxorubicin must hold valid INVIMA registration before legal marketing' and discusses INVIMA registration timelines."
+        "reasoning": "INVIMA is mentioned multiple times as the regulatory authority with registration requirements and a 14,000+ registration backlog, confirmed in sources [2] and the brief text."
       },
       {
         "item_number": 3,
         "check": "Mentions EPS (Entidades Promotoras de Salud) as the health insurers managing oncology drug procurement in Colombia",
         "score": 1,
-        "reasoning": "The brief explicitly defines EPS as 'health insurers' and describes their role in procurement contracts and negotiation with manufacturers and distributors."
+        "reasoning": "EPS is explicitly identified as health insurers in the brief: 'EPS (health insurers) and IPS (hospital networks) experience reduced order volumes' and source [4] confirms this institutional role."
       },
       {
         "item_number": 4,
         "check": "States WHO EML inclusion for doxorubicin",
         "score": 1,
-        "reasoning": "The brief states 'Doxorubicin is an anthracycline chemotherapy agent on the WHO Model List of Essential Medicines.'"
+        "reasoning": "The brief states 'Doxorubicin is an anthracycline antibiotic chemotherapy agent on the WHO Model List of Essential Medicines (EML)' and this is confirmed in sources [1] and [3]."
       },
       {
         "item_number": 5,
         "check": "States doxorubicin is generic and/or off-patent",
         "score": 1,
-        "reasoning": "The brief clearly states 'It is generic and off-patent' in the first paragraph."
+        "reasoning": "The brief explicitly states 'Conventional doxorubicin is fully off-patent and generic,' consistent with source [1]."
       },
       {
         "item_number": 6,
         "check": "Explains the currency devaluation mechanism: peso-denominated budgets vs. USD-priced imports reduces purchasing power and order volumes",
         "score": 1,
-        "reasoning": "The brief explains that 'Doxorubicin is traded globally in USD, while Colombian EPS procurement budgets are peso-denominated. Peso depreciation directly reduces purchasing power for imported drugs' and notes this reduces order volumes and increases stockout risk."
+        "reasoning": "The brief clearly explains the mechanism: 'Colombia procures doxorubicin entirely from international suppliers, with pricing denominated in USD. Hospital procurement budgets are denominated in Colombian pesos. Currency devaluation directly erodes purchasing power.'"
       },
       {
         "item_number": 7,
         "check": "Includes a quantitative stockout risk metric from simulation (e.g., ~4.2 stockout days/year, ~99% service level, or LOW risk classification)",
         "score": 1,
-        "reasoning": "The brief provides comprehensive simulation results including 4.2 stockout days/year \u00b1 0.48, 99.0% unit fill rate, 98.9% service level (days without stockout), and 59% probability of any stockout."
+        "reasoning": "The brief provides detailed metrics: '8.9 stockout days per year (95% CI: \u00b10.7 days)', '97.7% unit service level', and classifies risk as 'LOW,' consistent with source [7]."
       },
       {
         "item_number": 8,
         "check": "Mentions documented shortage history for doxorubicin (2011\u201312 or 2022\u201323 global shortages)",
         "score": 1,
-        "reasoning": "The brief explicitly documents 'widespread shortages in 2011\u20132012 due to manufacturing quality issues at major producers, and again in 2022\u20132023 linked to API supply concentration.'"
+        "reasoning": "The brief states 'Global doxorubicin shortages in 2011\u20132012 and 2022\u20132023 were linked to manufacturing quality issues and consolidation among Indian and Chinese API producers.'"
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief provides five detailed policy recommendations including monitoring EPS budget execution, coordinating procurement, developing contingency pathways, establishing inventory visibility, and indexing budgets to exchange rates."
+        "reasoning": "The brief includes six detailed policy recommendations, including establishing a national strategic reserve, INVIMA registration acceleration, SISCAATS integration, EPS payment restructuring, currency hedging, and cross-border data sharing."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 1,
-        "reasoning": "The brief includes a comprehensive Confidence & Limitations section explicitly labeling what is sound, what is documented, what assumptions are made, and critical gaps requiring expert validation."
+        "reasoning": "A comprehensive 'Confidence & Limitations' section is explicitly provided detailing what is confirmed, what is model-based, and acknowledged limitations including cold-chain quantification gaps and lack of proprietary procurement data."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim Colombia has domestic doxorubicin API manufacturing [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states 'Colombia is fully import-dependent for doxorubicin; there is no domestic API manufacturing fallback,' avoiding any hallucinated claims of domestic production."
+        "reasoning": "The brief explicitly states 'Colombia has no domestic API manufacturing capacity and is entirely import-dependent' and 'Colombia, as part of the Latin American import-dependent cohort,' confirming no hallucination on this point."
       },
       {
         "item_number": 12,
         "check": "Does NOT fabricate specific Colombian procurement volume or market statistics not in context [hallucination check]",
         "score": 1,
-        "reasoning": "The brief does not claim specific Colombian procurement volumes or market statistics; it references the 51% budget compression and 84% order fill rate as model assumptions, acknowledging in Limitations that these lack 'documented baseline data for Colombia-specific supplier behavior.'"
+        "reasoning": "All specific Colombian statistics cited (EPS-IPS debt of COP 32.9 trillion, 80% of EPS lacking reserves, 17% order failure rate) are attributed to 'MINSALUD official reporting' and documented in sources [4] and [5]; no unsourced volume claims are made."
       }
     ],
     "baseline_items": [
@@ -545,73 +545,73 @@
         "item_number": 1,
         "check": "Identifies India as the primary/dominant global API source for doxorubicin",
         "score": 1,
-        "reasoning": "The brief explicitly states 'Indian generic producers' as primary suppliers and mentions 'India, China (API/intermediates)' in the import dependency structure."
+        "reasoning": "The brief explicitly states 'Indian generic producers' as primary suppliers and mentions 'India, China (API/intermediates)' as source countries for APIs."
       },
       {
         "item_number": 2,
         "check": "Mentions INVIMA as Colombia's drug regulatory authority",
         "score": 1,
-        "reasoning": "The brief explicitly states 'Colombian INVIMA-approved; included in national cancer formularies' in the Drug Profile section."
+        "reasoning": "The brief explicitly states 'Colombian INVIMA-approved' under Regulatory Status."
       },
       {
         "item_number": 3,
         "check": "Mentions EPS (Entidades Promotoras de Salud) as the health insurers managing oncology drug procurement in Colombia",
         "score": 1,
-        "reasoning": "The brief explicitly references 'Insurance companies (EPS)' in the Private Oncology Centers subsection discussing insurance reimbursement and claims denial mechanisms."
+        "reasoning": "The brief explicitly references 'EPS' in Phase 2 analysis: 'Insurance denials increase 20\u201330%' and 'Insurance companies (EPS) may deny claims.'"
       },
       {
         "item_number": 4,
         "check": "States WHO EML inclusion for doxorubicin",
         "score": 0,
-        "reasoning": "The brief does not mention WHO EML (Essential Medicines List) status for doxorubicin."
+        "reasoning": "The brief does not mention WHO EML (Essential Medicines List) inclusion for doxorubicin."
       },
       {
         "item_number": 5,
         "check": "States doxorubicin is generic and/or off-patent",
         "score": 1,
-        "reasoning": "The brief mentions 'Indian generic producers' as primary suppliers, implicitly confirming generic availability; doxorubicin is established off-patent and this is consistent with the supply chain description."
+        "reasoning": "The brief references 'Indian generic producers' as primary suppliers, implicitly confirming generic availability."
       },
       {
         "item_number": 6,
         "check": "Explains the currency devaluation mechanism: peso-denominated budgets vs. USD-priced imports reduces purchasing power and order volumes",
         "score": 1,
-        "reasoning": "The brief explicitly explains this mechanism in the Currency Devaluation Impact Mechanisms table (Import Cost Inflation, Budget Absorption Capacity rows) and notes that 'Hospital budgets fixed in COP; procurement officers face mid-cycle shortfalls.'"
+        "reasoning": "The brief provides detailed explanation in the vulnerability table: '1 USD = ~4,200 COP \u2192 depreciation to ~5,000+ COP increases landed costs 15\u201320%' and 'Hospital budgets fixed in COP; procurement officers face mid-cycle shortfalls.'"
       },
       {
         "item_number": 7,
         "check": "Includes a quantitative stockout risk metric from simulation (e.g., ~4.2 stockout days/year, ~99% service level, or LOW risk classification)",
         "score": 0,
-        "reasoning": "The brief provides scenario-based shortage probability percentages (15\u201375%) and affected patient numbers, but does not include validated simulation-derived stockout day metrics or service level percentages."
+        "reasoning": "The brief provides shortage probability scenarios but does not include specific stockout days/year, service level percentage, or probabilistic simulation metrics."
       },
       {
         "item_number": 8,
         "check": "Mentions documented shortage history for doxorubicin (2011\u201312 or 2022\u201323 global shortages)",
         "score": 0,
-        "reasoning": "The brief does not reference any documented historical shortage episodes for doxorubicin, either globally or in Colombia."
+        "reasoning": "The brief does not reference any documented historical shortage events for doxorubicin."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief includes multiple concrete recommendations under 'Policy Recommendations' including emergency budget reallocation, fast-track procurement authority, and distributor support facilities."
+        "reasoning": "The brief includes multiple concrete recommendations under 'Immediate Mitigation' section, including emergency budget reallocation and distributor support facility."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 0,
-        "reasoning": "The brief does not include a dedicated Confidence & Limitations section; the policy recommendations section is cut off mid-sentence."
+        "reasoning": "The brief does not include an explicit Confidence & Limitations section."
       },
       {
         "item_number": 11,
         "check": "Does NOT claim Colombia has domestic doxorubicin API manufacturing [hallucination check]",
         "score": 1,
-        "reasoning": "The brief correctly states '80%+ of doxorubicin consumed in Colombia is imported' and lists only international sources, making no false claims about domestic manufacturing."
+        "reasoning": "The brief correctly states '80%+ of doxorubicin consumed in Colombia is imported' and does not claim domestic manufacturing capability."
       },
       {
         "item_number": 12,
         "check": "Does NOT fabricate specific Colombian procurement volume or market statistics not in context [hallucination check]",
         "score": -1,
-        "reasoning": "The brief provides specific statistics (80\u2013120 kg annual demand, USD $1.2\u20131.8 million import value, 50/40/10% market split by sector, 2,800\u20133,200 annual patient pool) that are plausible but are not sourced or validated against documented Colombian health data, appearing to be generated estimates rather than cited facts."
+        "reasoning": "The brief provides specific figures ('Estimated annual demand: ~80\u2013120 kg API', 'Typical import value: USD $1.2\u20131.8 million', 'Current Colombian Patient Pool: ~2,800\u20133,200 annually') without source attribution or context basis, and these appear to be generated estimates rather than cited data."
       }
     ]
   },
@@ -619,79 +619,79 @@
     "case": "Case 5: Carboplatin / Venezuela / Combined Shock",
     "max_score": 12,
     "rag_total": 12,
-    "baseline_total": 7,
+    "baseline_total": 8,
     "rag_items": [
       {
         "item_number": 1,
         "check": "Identifies India and/or China as primary API source for carboplatin",
         "score": 1,
-        "reasoning": "The brief explicitly states: 'Active Pharmaceutical Ingredient (API) manufacturing is concentrated in India and China, mirroring the cisplatin supply chain.'"
+        "reasoning": "The brief explicitly states 'Active Pharmaceutical Ingredient (API) manufacturing is concentrated in India and China' and reinforces this multiple times throughout."
       },
       {
         "item_number": 2,
         "check": "Notes that carboplatin and cisplatin share the same API supply chain \u2014 an export restriction affects both simultaneously",
         "score": 1,
-        "reasoning": "The brief states: 'An API export restriction from either country would simultaneously disrupt both carboplatin and cisplatin, compounding oncology program impacts.'"
+        "reasoning": "The brief clearly identifies the 'Critical shared-supply-chain vulnerability' stating that both drugs share the same API supply chain and an export restriction simultaneously disrupts both."
       },
       {
         "item_number": 3,
         "check": "Mentions MPPS (Ministerio del Poder Popular para la Salud) or Venezuela's institutional collapse / structural crisis as the baseline condition",
         "score": 1,
-        "reasoning": "The brief explicitly references 'The MPPS and IVSS function only as residual structures' and describes 'a structurally collapsed procurement system' with healthcare spending collapsing from 8.1% to 1.18% of GDP."
+        "reasoning": "The brief explicitly describes MPPS constraints, stating 'the formal MPPS-INHRR procurement channel is severely constrained by foreign-currency shortages and debt with international suppliers' and notes effective access relies on NGOs and private channels."
       },
       {
         "item_number": 4,
         "check": "States WHO EML inclusion for carboplatin",
         "score": 1,
-        "reasoning": "The brief states: 'Carboplatin is a second-generation platinum-based chemotherapy agent on the WHO Model List of Essential Medicines (oncology section).'"
+        "reasoning": "The brief explicitly states carboplatin is 'included on the WHO Model List of Essential Medicines (oncology section)'."
       },
       {
         "item_number": 5,
-        "check": "Describes carboplatin as generic, off-patent, and platinum-based (second-generation cisplatin analog)",
+        "check": "States carboplatin is generic, off-patent, and platinum-based (second-generation cisplatin analog)",
         "score": 1,
-        "reasoning": "The brief explicitly states carboplatin is 'a second-generation platinum-based chemotherapy agent' and 'The drug is fully off-patent with multiple generic manufacturers globally.'"
+        "reasoning": "The brief describes carboplatin as 'a second-generation platinum-based chemotherapy agent' and states 'Carboplatin is fully off-patent with multiple generic manufacturers'."
       },
       {
         "item_number": 6,
         "check": "Describes the combined shock as both API export restriction AND currency devaluation occurring simultaneously",
         "score": 1,
-        "reasoning": "The brief explicitly defines combined shock as: 'Simultaneous API export restriction (India/China) + currency devaluation.'"
+        "reasoning": "The 'Combined Shock Definition' section explicitly defines the scenario as simultaneous occurrence of 'API export restriction from India or China' and 'Currency devaluation reducing Venezuela's purchasing power'."
       },
       {
         "item_number": 7,
         "check": "Includes a quantitative stockout risk metric from simulation (e.g., ~35 stockout days/year, ~91% service level, HIGH risk, or p(critical)=15.8%)",
         "score": 1,
-        "reasoning": "The brief provides comprehensive quantitative metrics: '35.2 \u00b1 2.53 days' stockout, '90.8% \u00b1 1.0%' service level, '100%' probability of any stockout, '15.8%' probability of critical shortage, and 'HIGH' risk classification."
+        "reasoning": "The brief provides comprehensive quantitative metrics including 35.2 \u00b1 2.53 stockout days/year, 90.8% \u00b1 1.0% service level, 100% probability of any stockout, and 15.8% probability of critical shortage."
       },
       {
         "item_number": 8,
         "check": "Notes that Venezuela's baseline is already a structural crisis \u2014 scenario shocks produce marginal additional impact on top of a collapsed baseline",
         "score": 1,
-        "reasoning": "The brief explicitly states: 'The combined shock produces 35.2 stockout days/year. However, the context notes that this represents only a marginal increase from the baseline of 31 stockout days/year because Venezuela's baseline is already at or near crisis floor.'"
+        "reasoning": "The brief states baseline stockout days are 33.1 \u00b1 1.13 per year and explicitly notes '35.2 stockout days represents an additional 2.1-day increase over baseline' while emphasizing higher tail risk, demonstrating marginal impact on a severely compromised baseline."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief includes five concrete policy recommendations spanning NGO coordination, regional procurement cooperation, INHRR registration acceleration, strategic buffer stock establishment, and clinical triage protocols."
+        "reasoning": "The brief provides six concrete policy recommendations including Emergency Strategic Reserve establishment, diversifying API sourcing, formalizing procurement coordination, hard-currency protocols, platinum-drug contingency planning, and regional supply visibility."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 1,
-        "reasoning": "The brief contains a dedicated 'Confidence & Limitations' section explicitly stating 'MODERATE' confidence with three detailed limitations documented."
+        "reasoning": "The brief contains a comprehensive 'Confidence & Limitations' section detailing data confidence, specific limitations (demand distribution, NGO supply, regulatory clearance, substitution dynamics, currency devaluation rate), and honest uncertainty about predictability."
       },
       {
         "item_number": 11,
-        "check": "Does NOT claim Venezuela has functioning strategic drug reserves or a normally operating procurement system [hallucination check]",
+        "check": "Does NOT claim Venezuela has functioning strategic drug reserves or a normally operating procurement system",
         "score": 1,
-        "reasoning": "The brief consistently describes Venezuela's system as 'structurally collapsed' and explicitly states 'The MPPS and IVSS function only as residual structures,' avoiding any false claims of normality."
+        "reasoning": "The brief correctly portrays Venezuela's system as severely constrained and non-functional in formal channels, relying on NGOs and private procurement, with no claims of functioning reserves or normal operations."
       },
       {
         "item_number": 12,
-        "check": "Does NOT fabricate specific carboplatin stockout statistics for Venezuela beyond what is in the simulation context [hallucination check]",
+        "check": "Does NOT fabricate specific carboplatin stockout statistics for Venezuela beyond what is in the simulation context",
         "score": 1,
-        "reasoning": "All stockout statistics cited (35.2 days, 90.8% service level, etc.) are explicitly sourced to the 'Modeled Outcomes (500 Monte Carlo simulations, 365-day horizon)' section; no unsourced claims are made."
+        "reasoning": "All stockout statistics cited (33.1 baseline, 35.2 in combined shock scenario) are presented as model outputs with clear attribution to simulation methodology and source data, with appropriate confidence intervals and limitations noted."
       }
     ],
     "baseline_items": [
@@ -699,73 +699,73 @@
         "item_number": 1,
         "check": "Identifies India and/or China as primary API source for carboplatin",
         "score": 1,
-        "reasoning": "The brief explicitly lists India as a primary supplier of carboplatin finished product, and while it does not explicitly mention India as an API source specifically, it correctly identifies India among key regional manufacturers."
+        "reasoning": "The brief explicitly lists India as one of the primary suppliers for carboplatin in the import dependency section."
       },
       {
         "item_number": 2,
         "check": "Notes that carboplatin and cisplatin share the same API supply chain \u2014 an export restriction affects both simultaneously",
         "score": 0,
-        "reasoning": "The brief does not discuss cisplatin or the relationship between carboplatin and cisplatin supply chains, nor does it mention any shared API implications."
+        "reasoning": "The brief does not mention cisplatin or any cross-drug supply chain dependency effects."
       },
       {
         "item_number": 3,
         "check": "Mentions MPPS (Ministerio del Poder Popular para la Salud) or Venezuela's institutional collapse / structural crisis as the baseline condition",
         "score": 1,
-        "reasoning": "The brief explicitly references MPPS multiple times and clearly identifies institutional collapse, staff attrition, and resource depletion as baseline structural conditions."
+        "reasoning": "The brief explicitly references MPPS multiple times and describes Venezuela's structural crisis including staff attrition, lack of resources, and institutional collapse of INVAMER."
       },
       {
         "item_number": 4,
         "check": "States WHO EML inclusion for carboplatin",
         "score": 0,
-        "reasoning": "The brief does not mention WHO EML (Essential Medicines List) status for carboplatin, though it does reference WHO-prequalified products in recommendations."
+        "reasoning": "The brief does not mention WHO EML (Essential Medicines List) inclusion for carboplatin."
       },
       {
         "item_number": 5,
         "check": "States carboplatin is generic, off-patent, and platinum-based (second-generation cisplatin analog)",
         "score": 1,
-        "reasoning": "The brief correctly identifies carboplatin as a platinum-based alkylating agent and first-line chemotherapy, and implicitly acknowledges its status as a generic drug through discussion of multiple suppliers."
+        "reasoning": "The brief describes carboplatin as a platinum-based chemotherapy agent and alkylating agent, which is consistent with its generic, off-patent status, though it does not explicitly use the phrase 'off-patent.'"
       },
       {
         "item_number": 6,
         "check": "Describes the combined shock as both API export restriction AND currency devaluation occurring simultaneously",
         "score": 1,
-        "reasoning": "The brief explicitly describes a combined shock cascade including geopolitical/trade restrictions plus currency collapse and financial shock occurring together."
+        "reasoning": "The brief explicitly lists geopolitical shock (trade restrictions/sanctions), supply-side shock (manufacturer disruption), and currency/financial shock (bol\u00edvar collapse) as triggering events occurring together."
       },
       {
         "item_number": 7,
         "check": "Includes a quantitative stockout risk metric from simulation (e.g., ~35 stockout days/year, ~91% service level, HIGH risk, or p(critical)=15.8%)",
         "score": 0,
-        "reasoning": "The brief provides epidemiological estimates (2,000-3,500 cycles annually) and disruption probabilities but does not include formal stockout simulation metrics like service level percentages or specific risk quantiles."
+        "reasoning": "The brief provides percentage-based shortage scenarios (30-40%, 50-70%, >80%) and probability estimates (25%, 45%, 30%) but does not include specific stockout days/year, service level percentages, or critical probability metrics."
       },
       {
         "item_number": 8,
         "check": "Notes that Venezuela's baseline is already a structural crisis \u2014 scenario shocks produce marginal additional impact on top of a collapsed baseline",
         "score": 1,
-        "reasoning": "The brief clearly establishes baseline vulnerabilities including currency devaluation since 2016, port degradation, and healthcare system fragmentation, positioning shocks as amplifications of an already-collapsed system."
+        "reasoning": "The brief explicitly describes baseline vulnerabilities including currency instability, port infrastructure degradation, cold chain unreliability, and regulatory delays as pre-existing conditions, with the combined shock amplifying these."
       },
       {
         "item_number": 9,
         "check": "Includes at least one concrete policy recommendation",
         "score": 1,
-        "reasoning": "The brief includes a detailed policy recommendations section with specific immediate actions including emergency procurement authorization, currency solutions, supply chain visibility mechanisms, and regulatory harmonization."
+        "reasoning": "The brief includes a detailed 'Policy Recommendations' section with multiple concrete immediate actions (0-8 weeks) including emergency procurement authorization, currency solutions, supply chain visibility, and regulatory harmonization."
       },
       {
         "item_number": 10,
         "check": "Includes Confidence & Limitations section",
         "score": 0,
-        "reasoning": "The brief does not include an explicit Confidence & Limitations section acknowledging uncertainties, data gaps, or constraints on the analysis."
+        "reasoning": "The brief does not include a dedicated Confidence & Limitations section discussing uncertainty bounds, data quality, or assumptions limitations."
       },
       {
         "item_number": 11,
-        "check": "Does NOT claim Venezuela has functioning strategic drug reserves or a normally operating procurement system [hallucination check \u2014 Venezuela's system has structurally collapsed]",
+        "check": "Does NOT claim Venezuela has functioning strategic drug reserves or a normally operating procurement system [hallucination check]",
         "score": 1,
-        "reasoning": "The brief consistently portrays Venezuela's system as collapsed with frozen reserves, attrition, institutional failure, and degraded infrastructure\u2014it does not hallucinate a functioning baseline."
+        "reasoning": "The brief correctly characterizes Venezuela's system as dysfunctional, describing it as fragmented, with collapsed institutions, staff attrition, and lack of resources\u2014not as normally operating."
       },
       {
         "item_number": 12,
         "check": "Does NOT fabricate specific carboplatin stockout statistics for Venezuela beyond what is in the simulation context [hallucination check]",
-        "score": 0,
-        "reasoning": "The brief provides specific estimated demand figures (2,000-3,500 cycles annually) and patient population estimates without clearly attributing these to a source or simulation model, raising hallucination concerns."
+        "score": 1,
+        "reasoning": "The brief provides estimates (2,000-3,500 cycles annually, 2,500-3,000 active patients) and scenario-based percentages (30-70% shortage levels) that appear plausible and are presented as estimates rather than verified data."
       }
     ]
   }

@@ -1,138 +1,228 @@
 import streamlit as st
-import anthropic
-import chromadb
-from sentence_transformers import SentenceTransformer
+import sys
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from agent_core import run_agent
+from supply_sim import (
+    simulate, portfolio_risk_matrix,
+    DRUG_PARAMS, SCENARIO_PARAMS, COUNTRY_PARAMS, RISK_COLORS, _risk_label
+)
 
 ALLOWED_DRUGS     = ["cisplatin", "doxorubicin", "carboplatin", "trastuzumab"]
 ALLOWED_COUNTRIES = ["Argentina", "Venezuela", "Colombia"]
-ALLOWED_SCENARIOS = ["Baseline", "API export restriction", "Currency devaluation", "Combined shock"]
-MODEL             = "claude-haiku-4-5-20251001"
+ALLOWED_SCENARIOS = ["Baseline", "API export restriction",
+                     "Currency devaluation", "Combined shock"]
 
-@st.cache_resource
-def load_retriever():
-    model = SentenceTransformer("all-mpnet-base-v2")
-    client = chromadb.PersistentClient(path="./chroma_db")
-    collection = client.get_collection("onco_supply")
-    return model, collection
-
-@st.cache_resource
-def load_client():
-    return anthropic.Anthropic()
-
-def retrieve(drug, country, scenario, n=5):
-    embed_model, collection = load_retriever()
-
-    # Dual-query: a single query ranked scenario keywords over institutional KB docs,
-    # causing country procurement docs (obras sociales, ANMAT, MPPS) to be missed.
-    # Query 1 surfaces institutional/regulatory context; Query 2 surfaces sim data.
-    q_context  = f"{drug} {country} procurement supply chain shortage regulatory"
-    q_scenario = f"{drug} {country} {scenario} simulation stockout inventory risk"
-
-    def _query(q, doc_type):
-        emb = embed_model.encode([q]).tolist()
-        res = collection.query(query_embeddings=emb, n_results=n, where={"doc_type": doc_type})
-        return list(zip(res["documents"][0], res["metadatas"][0]))
-
-    seen, merged = set(), []
-    for chunk_list in [_query(q_context, "kb"), _query(q_scenario, "sim")]:
-        for doc, meta in chunk_list:
-            key = meta.get("source_file", "") + doc[:40]
-            if key not in seen:
-                seen.add(key)
-                merged.append((doc, meta))
-
-    return merged[:n + 2]  # slightly more than n to ensure both context types covered
-
-SYSTEM_PROMPT = """You are an expert supply-chain analyst at JCNB Biotech Consulting \
-specializing in oncology drug shortage risk in Latin America.
-
-You produce structured Drug Shortage Risk Briefs based ONLY on the retrieved context provided.
-
-Output format — use exactly these section headers:
-## Drug Profile
-## Supply Chain Vulnerability
-## Scenario Impact Analysis
-## Policy Recommendations
-## Confidence & Limitations
-
-Rules:
-- Base all claims on the provided context. Do not invent statistics.
-- If the context does not contain enough information for a section, say so explicitly.
-- Never provide clinical advice or drug substitution recommendations.
-- The Confidence & Limitations section must honestly state what is uncertain."""
-
-FEW_SHOT = """Example of a well-formatted brief (tone and structure reference only):
-
-## Drug Profile
-Cisplatin is a platinum-based chemotherapy agent on the WHO Model List of Essential Medicines. \
-It is generic and off-patent, with API manufacturing concentrated in India and China.
-
-## Supply Chain Vulnerability
-Argentina has no domestic API manufacturing and is fully import-dependent. The multi-channel \
-procurement landscape (public hospitals, obras sociales, provincial systems, private) creates \
-visibility gaps — no single entity tracks national stock levels.
-
-## Scenario Impact Analysis
-Under baseline conditions, modeled service levels exceed 94%. Under an API export restriction \
-scenario (lead time tripling to 30 days), stockout days increase to 49/year, reducing service \
-level to 85%.
-
-## Policy Recommendations
-1. Establish a national strategic reserve of 60-day buffer stock for cisplatin.
-2. Coordinate procurement across public and obras sociales channels to reduce fragmentation.
-
-## Confidence & Limitations
-Stockout figures are from a simplified inventory model and are illustrative, not actuarial. \
-Procurement data reflects publicly available sources as of 2024."""
-
-def generate_brief(drug, country, scenario, chunks):
-    client = load_client()
-    context = "\n\n".join(
-        f"[Source: {meta.get('source_file', '?')}]\n{doc}"
-        for doc, meta in chunks
-    )
-    user_msg = f"""Generate a Drug Shortage Risk Brief for:
-- Drug: {drug}
-- Country: {country}
-- Scenario: {scenario}
-
-Retrieved context:
-{context}
-
-{FEW_SHOT}
-
-Now write the brief for {drug} in {country} under the {scenario} scenario."""
-
-    response = client.messages.create(
-        model=MODEL,
-        max_tokens=1500,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_msg}]
-    )
-    return response.content[0].text
-
-# --- UI ---
+# ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="OncoSupply Risk Analyst", layout="wide")
 st.title("OncoSupply Risk Analyst")
-st.caption("AI-powered oncology drug shortage risk briefs for Latin America · JCNB Biotech Consulting")
+st.caption("Oncology drug shortage risk briefs for Latin America · JCNB Biotech Consulting")
 
+# ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.header("Parameters")
     drug     = st.selectbox("Drug",     ALLOWED_DRUGS)
     country  = st.selectbox("Country",  ALLOWED_COUNTRIES)
     scenario = st.selectbox("Scenario", ALLOWED_SCENARIOS)
     generate = st.button("Generate Risk Brief", type="primary")
+    st.divider()
+    st.caption("Model: Claude Haiku 4.5 · Simulation: (Q,r) Monte Carlo 500 runs · KB: ChromaDB all-mpnet-base-v2")
 
-if generate:
-    with st.spinner("Retrieving context and generating brief..."):
-        chunks = retrieve(drug, country, scenario)
-        brief  = generate_brief(drug, country, scenario, chunks)
+# ── Tabs ──────────────────────────────────────────────────────────────────────
+tab_brief, tab_sim, tab_portfolio = st.tabs(
+    ["Risk Brief", "Simulation Chart", "Portfolio Risk Matrix"]
+)
 
-    st.markdown(f"## {drug.title()} — {country} — {scenario}")
-    st.markdown(brief)
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 1: RISK BRIEF (agentic)
+# ─────────────────────────────────────────────────────────────────────────────
+with tab_brief:
+    if generate:
+        with st.spinner("Agent working — retrieving KB, running simulation..."):
+            brief, trace = run_agent(drug, country, scenario)
 
-    with st.expander("Sources (retrieved context chunks)"):
-        for i, (doc, meta) in enumerate(chunks):
-            st.markdown(f"**Source {i+1}: `{meta.get('source_file', '?')}`**")
-            st.text(doc[:400] + ("..." if len(doc) > 400 else ""))
+        with st.expander("Agent reasoning trace", expanded=True):
+            st.markdown("**Tools called by the agent:**")
+            for i, step in enumerate(trace, 1):
+                st.markdown(f"{i}. {step}")
+
+        st.divider()
+        st.markdown(f"## {drug.title()} — {country} — {scenario}")
+        st.markdown(brief)
+    else:
+        st.info("Select parameters in the sidebar and click **Generate Risk Brief**.")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 2: SIMULATION CHART
+# ─────────────────────────────────────────────────────────────────────────────
+with tab_sim:
+    st.subheader(f"Monte Carlo Stockout Distribution — {drug.title()} / {country} / {scenario}")
+    st.caption("500-run (Q,r) inventory simulation. X-axis: stockout days per year. Y-axis: frequency across runs.")
+
+    if generate:
+        with st.spinner("Running 500 Monte Carlo simulations..."):
+            result = simulate(drug, country, scenario, n_runs=500, return_distribution=True)
+        dist = np.array(result["stockout_distribution"])
+        risk = _risk_label(result["stockout_days_mean"])
+        color = RISK_COLORS[risk]
+
+        fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+        fig.patch.set_facecolor("#0e1117")
+        for ax in axes:
+            ax.set_facecolor("#1a1f2e")
+            ax.tick_params(colors="white")
+            ax.spines["bottom"].set_color("#444")
+            ax.spines["left"].set_color("#444")
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+
+        # ── Left: histogram ──────────────────────────────────────────────────
+        ax = axes[0]
+        ax.hist(dist, bins=40, color=color, alpha=0.85, edgecolor="none")
+        ax.axvline(result["stockout_days_mean"], color="white", linestyle="--",
+                   linewidth=1.5, label=f"Mean: {result['stockout_days_mean']:.1f}d")
+        ax.axvline(result["cvar_90"], color="#ff7f0e", linestyle="-.",
+                   linewidth=1.5, label=f"CVaR₉₀: {result['cvar_90']:.1f}d")
+        ax.axvline(60, color="#aaaaaa", linestyle=":", linewidth=1,
+                   label="Critical threshold (60d)")
+        ax.set_xlabel("Stockout days per year", color="white")
+        ax.set_ylabel("Frequency (runs)", color="white")
+        ax.set_title(f"Stockout Distribution  |  Risk: {risk}", color="white", fontsize=11)
+        ax.legend(framealpha=0.2, labelcolor="white", facecolor="#0e1117")
+
+        # ── Right: KPI summary bars ──────────────────────────────────────────
+        ax2 = axes[1]
+        scenarios_list = list(SCENARIO_PARAMS.keys())
+        means = []
+        colors_list = []
+        for s in scenarios_list:
+            r2 = simulate(drug, country, s, n_runs=200)
+            means.append(r2["stockout_days_mean"])
+            colors_list.append(RISK_COLORS[_risk_label(r2["stockout_days_mean"])])
+
+        bars = ax2.barh(scenarios_list, means, color=colors_list, alpha=0.85)
+        ax2.set_xlabel("Mean stockout days / year", color="white")
+        ax2.set_title(f"Scenario Comparison — {drug.title()} / {country}", color="white", fontsize=11)
+        for bar, val in zip(bars, means):
+            ax2.text(max(val + 0.5, 1), bar.get_y() + bar.get_height() / 2,
+                     f"{val:.1f}d", va="center", color="white", fontsize=9)
+
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+
+        # KPI metrics row
+        c1, c2, c3, c4, c5 = st.columns(5)
+        c1.metric("Mean stockout days", f"{result['stockout_days_mean']:.1f} ± {result['stockout_days_ci']}")
+        c2.metric("CVaR₉₀ (tail risk)", f"{result['cvar_90']:.1f}d",
+                  help="Expected stockout days in worst 10% of simulations (Badejo & Ierapetritou, AIChE 2025)")
+        c3.metric("Unit service level", f"{result['sl_units_mean']:.1%}")
+        c4.metric("P(critical >60d)", f"{result['prob_critical_shortage']:.0%}")
+        c5.metric("Risk rating", risk)
+    else:
+        st.info("Click **Generate Risk Brief** to run the simulation and view the distribution chart.")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 3: PORTFOLIO RISK MATRIX
+# ─────────────────────────────────────────────────────────────────────────────
+with tab_portfolio:
+    st.subheader(f"Portfolio Risk Matrix — {country}")
+    st.caption(
+        "All 4 drugs × 4 scenarios for the selected country. "
+        "Cell = mean stockout days / year. Color = risk tier. "
+        "Run: 300 simulations per cell."
+    )
+
+    run_portfolio = st.button(f"Run Portfolio Analysis for {country}", key="portfolio_btn")
+
+    if run_portfolio:
+        with st.spinner(f"Running 4 × 4 = 16 simulations for {country} (may take 20-30 seconds)..."):
+            pm = portfolio_risk_matrix(country, n_runs=300)
+
+        drugs_list     = pm["drugs"]
+        scenarios_list = pm["scenarios"]
+        matrix         = pm["matrix"]
+
+        # ── Heatmap ──────────────────────────────────────────────────────────
+        fig, ax = plt.subplots(figsize=(10, 4))
+        fig.patch.set_facecolor("#0e1117")
+        ax.set_facecolor("#0e1117")
+
+        risk_to_num = {"LOW": 0, "MODERATE": 1, "HIGH": 2, "CRITICAL": 3}
+        data = np.array([
+            [risk_to_num[matrix[d][s]["risk"]] for s in scenarios_list]
+            for d in drugs_list
+        ])
+
+        cmap = plt.cm.colors.ListedColormap(["#2ca02c", "#ffdd57", "#ff7f0e", "#d62728"])
+        im = ax.imshow(data, cmap=cmap, vmin=-0.5, vmax=3.5, aspect="auto")
+
+        ax.set_xticks(range(len(scenarios_list)))
+        ax.set_xticklabels([s.replace(" ", "\n") for s in scenarios_list],
+                           color="white", fontsize=9)
+        ax.set_yticks(range(len(drugs_list)))
+        ax.set_yticklabels([DRUG_PARAMS[d]["label"].split(" (")[0] for d in drugs_list],
+                           color="white", fontsize=9)
+        ax.tick_params(colors="white")
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+
+        # Annotate cells with stockout days
+        for i, drug_name in enumerate(drugs_list):
+            for j, sc in enumerate(scenarios_list):
+                cell = matrix[drug_name][sc]
+                ax.text(j, i,
+                        f"{cell['stockout_days_mean']:.1f}d\n{cell['risk']}",
+                        ha="center", va="center", color="black",
+                        fontsize=8, fontweight="bold")
+
+        patches = [
+            mpatches.Patch(color="#2ca02c", label="LOW (<10d)"),
+            mpatches.Patch(color="#ffdd57", label="MODERATE (10–30d)"),
+            mpatches.Patch(color="#ff7f0e", label="HIGH (30–60d)"),
+            mpatches.Patch(color="#d62728", label="CRITICAL (>60d)"),
+        ]
+        ax.legend(handles=patches, loc="upper right", bbox_to_anchor=(1.35, 1.05),
+                  framealpha=0.2, labelcolor="white", facecolor="#0e1117", fontsize=8)
+        ax.set_title(f"Portfolio Risk Matrix — {country}", color="white", fontsize=12, pad=10)
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+
+        # ── Worst-case summary table ──────────────────────────────────────────
+        st.markdown("**Highest-risk drug-scenario pairs:**")
+        rows = []
+        for d in drugs_list:
+            for s in scenarios_list:
+                cell = matrix[d][s]
+                rows.append({
+                    "Drug": DRUG_PARAMS[d]["label"].split(" (")[0],
+                    "Scenario": s,
+                    "Stockout days/yr": cell["stockout_days_mean"],
+                    "Service level": f"{cell['sl_units_mean']:.1%}",
+                    "P(critical)": f"{cell['prob_critical']:.0%}",
+                    "Risk": cell["risk"],
+                })
+        rows.sort(key=lambda x: x["Stockout days/yr"], reverse=True)
+
+        import pandas as pd
+        df = pd.DataFrame(rows[:8])  # top 8 worst
+
+        def color_risk(val):
+            colors = {"CRITICAL": "background-color: #d62728; color: black",
+                      "HIGH": "background-color: #ff7f0e; color: black",
+                      "MODERATE": "background-color: #ffdd57; color: black",
+                      "LOW": "background-color: #2ca02c; color: black"}
+            return colors.get(val, "")
+
+        st.dataframe(df.style.applymap(color_risk, subset=["Risk"]),
+                     use_container_width=True, hide_index=True)
+    else:
+        st.info("Click **Run Portfolio Analysis** to see all drugs × scenarios for this country.")
