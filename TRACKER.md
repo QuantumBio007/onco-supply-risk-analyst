@@ -9,7 +9,10 @@
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Session 9 complete (2026-04-29). Topic 1 complete: (1) Trastuzumab demand model corrected Normal→Poisson — actual simulation engine changed for first time since Session 7 Colombia params. (2) Clark & Scarf 1960, Graves & Willems 2000, Zipkin 2000, full Izen et al. 2025 citation (PMID 41002874) added to KB doc. (3) CVaR in UI (5-column metric row + histogram line). All 48 sim outputs regenerated; index rebuilt (155 chunks). KEY RESULT CHANGE: trastuzumab Argentina API restriction 12.9d MODERATE → 9.1d LOW (Poisson zero-demand days prevent continuous stockout accumulation — more accurate). Venezuela trastuzumab CRITICAL in all scenarios (79–102d). Next: README, adversarial cases, re-run evaluation (Case 2 uses trastuzumab/Venezuela — verify still 11/12).**
+**STATUS: Session 10 complete (2026-04-30). Organization: Personal folder created; all planning docs, presentations, emails moved there. README.md completely rewritten with current eval results (100% perfect 12/12 RAG). No API keys or hardcoded paths in codebase. Ready for grader.**
+
+Previous:
+**Session 9 complete (2026-04-29). Topic 1 complete: (1) Trastuzumab demand model corrected Normal→Poisson — actual simulation engine changed for first time since Session 7 Colombia params. (2) Clark & Scarf 1960, Graves & Willems 2000, Zipkin 2000, full Izen et al. 2025 citation (PMID 41002874) added to KB doc. (3) CVaR in UI (5-column metric row + histogram line). All 48 sim outputs regenerated; index rebuilt (155 chunks). KEY RESULT CHANGE: trastuzumab Argentina API restriction 12.9d MODERATE → 9.1d LOW (Poisson zero-demand days prevent continuous stockout accumulation — more accurate). Venezuela trastuzumab CRITICAL in all scenarios (79–102d). Next: README, adversarial cases, re-run evaluation (Case 2 uses trastuzumab/Venezuela — verify still 11/12).**
 
 ### Activate venv FIRST (every session)
 ```bash
