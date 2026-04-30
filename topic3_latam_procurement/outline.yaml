@@ -1,0 +1,217 @@
+topic: Latin America Pharmaceutical Procurement Systems
+description: >
+  Structured research into oncology drug procurement, regulatory registration,
+  shortage dynamics, and financial vulnerability across Argentina, Colombia, and Venezuela.
+  Outputs feed directly into ChromaDB knowledge base documents for OncoSupply Risk Analyst.
+time_range: since 2016
+
+items:
+  # ── ARGENTINA (Agent 1) ───────────────────────────────────────────────────
+  - id: 1
+    name: "Argentina: PAMI oncology drug procurement"
+    country: Argentina
+    institution: insurer
+    kb_file: argentina_procurement_system.txt
+    priority: high
+
+  - id: 2
+    name: "Argentina: ANMAT registration timelines (generics and biologics)"
+    country: Argentina
+    institution: regulatory
+    kb_file: argentina_procurement_system.txt
+    priority: high
+
+  - id: 3
+    name: "Argentina: obras sociales coordination failures and fragmentation"
+    country: Argentina
+    institution: insurer
+    kb_file: argentina_procurement_system.txt
+    priority: medium
+
+  - id: 4
+    name: "Argentina: currency controls and pharma import restrictions (2016–2025)"
+    country: Argentina
+    institution: ministry
+    kb_file: argentina_procurement_system.txt
+    priority: high
+    notes: "Includes Milei 2024 deregulation (SIRA→SEDI→removed); post-Milei state is very different from 2019-2023"
+
+  - id: 5
+    name: "Argentina: provincial health systems and oncology drug access disparities"
+    country: Argentina
+    institution: ministry
+    kb_file: argentina_procurement_system.txt
+    priority: medium
+
+  - id: 17
+    name: "Argentina: Banco Nacional de Drogas Especiales (BNDE) oncology distribution"
+    country: Argentina
+    institution: ministry
+    kb_file: argentina_procurement_system.txt
+    priority: high
+    notes: "Federal channel providing 100+ oncology drugs to uninsured public-hospital patients; NOT in current KB"
+    source_hint: "https://www.argentina.gob.ar/servicio/banco-de-drogas"
+
+  - id: 18
+    name: "Argentina: Amparo de Salud judicial proceedings for high-cost drugs (2016–2025)"
+    country: Argentina
+    institution: judiciary
+    kb_file: argentina_procurement_system.txt
+    priority: high
+    notes: "De-facto primary access route for orphan/oncology drugs; 2023 CATPROS advisory body created"
+    source_hint: "https://www.researchgate.net/publication/381637544"
+
+  - id: 19
+    name: "Argentina: DNU 70/2023 Mega Decree obras sociales and price deregulation"
+    country: Argentina
+    institution: ministry
+    kb_file: argentina_procurement_system.txt
+    priority: high
+    notes: "Structural deregulation event; changes obras sociales competition and drug price dynamics"
+
+  # ── COLOMBIA (Agent 2) ────────────────────────────────────────────────────
+  - id: 6
+    name: "Colombia: INVIMA registration timelines and 2025 backlog resolution plan"
+    country: Colombia
+    institution: regulatory
+    kb_file: colombia_procurement_system.txt
+    priority: high
+    notes: "INVIMA Resolution 2025010547 specifically addresses 14,000+ pending registrations"
+    source_hint: "https://resource.ddregpharma.com/insights/new-invima-plan-aims-to-streamline-regulatory-processes/"
+
+  - id: 7
+    name: "Colombia: EPS oncology procurement and EPS-IPS pharmaceutical debt crisis"
+    country: Colombia
+    institution: insurer
+    kb_file: colombia_procurement_system.txt
+    priority: high
+    notes: "EPS-IPS debt > COP 24 trillion total, 4.2 trillion pharma — root cause of de-facto shortages"
+
+  - id: 8
+    name: "Colombia: PBS/POS list oncology drug coverage and exclusions"
+    country: Colombia
+    institution: ministry
+    kb_file: colombia_procurement_system.txt
+    priority: medium
+
+  - id: 9
+    name: "Colombia: MINSALUD shortage monitoring system and 2023–2025 alerts"
+    country: Colombia
+    institution: ministry
+    kb_file: colombia_procurement_system.txt
+    priority: medium
+
+  - id: 10
+    name: "Colombia: Decree 1782 biosimilar approval pathway (trastuzumab outcomes)"
+    country: Colombia
+    institution: regulatory
+    kb_file: colombia_procurement_system.txt
+    priority: medium
+
+  - id: 20
+    name: "Colombia: MIPRES system for non-PBS drug prescribing (2019–2025)"
+    country: Colombia
+    institution: ministry
+    kb_file: colombia_procurement_system.txt
+    priority: high
+    notes: "~5% of health budget; primary channel for high-cost oncology drugs NOT on PBS"
+    source_hint: "https://link.springer.com/article/10.1186/s12913-023-10155-w"
+
+  - id: 21
+    name: "Colombia: Tutela (writ of protection) for drug access 2024–2025"
+    country: Colombia
+    institution: judiciary
+    kb_file: colombia_procurement_system.txt
+    priority: high
+    notes: "265K (2024) → 312.5K (2025) tutelas filed; ~34% health-related. THIS is the real oncology access mechanism for non-PBS drugs"
+    source_hint: "https://colombiaone.com/2026/04/23/tutela-access-health-increases-colombia/"
+
+  - id: 22
+    name: "Colombia: EPS-IPS pharmaceutical debt cascade effect on drug availability"
+    country: Colombia
+    institution: insurer
+    kb_file: colombia_procurement_system.txt
+    priority: high
+    notes: "COP 4.2 trillion pharma debt causes distributors to restrict supply to EPS entities — de-facto shortage trigger"
+
+  # ── VENEZUELA (Agent 3) ───────────────────────────────────────────────────
+  - id: 11
+    name: "Venezuela: MPPS residual procurement channels and NGO pipelines (2020–2025)"
+    country: Venezuela
+    institution: ministry
+    kb_file: venezuela_procurement_system.txt
+    priority: high
+
+  - id: 12
+    name: "Venezuela: INHRR registration process and special-import authorization"
+    country: Venezuela
+    institution: regulatory
+    kb_file: venezuela_procurement_system.txt
+    priority: medium
+    notes: "6-month windows for special-import of non-registered drugs — key exception mechanism"
+
+  - id: 13
+    name: "Venezuela: oncology drug availability update (2020–2025, post-Lancet 2017)"
+    country: Venezuela
+    institution: ngo
+    kb_file: venezuela_procurement_system.txt
+    priority: high
+    notes: "Convite March 2024: 28.4% overall medicine shortage. Current KB has 26.3% (HRW 2024) — update needed"
+    source_hint: "https://ballardbrief.byu.edu/issue-briefs/public-healthcare-crisis-in-venezuela"
+
+  - id: 23
+    name: "Venezuela: Diaspora-driven medication procurement (Zelle, digital remittances)"
+    country: Venezuela
+    institution: informal
+    kb_file: venezuela_procurement_system.txt
+    priority: high
+    notes: "De-facto procurement system replacing collapsed MPPS; dollarized private market + diaspora supply"
+    source_hint: "https://www.tandfonline.com/doi/full/10.1080/2833115X.2025.2609191"
+
+  - id: 24
+    name: "Venezuela: OFAC sanctions and humanitarian general licenses (GL 4C, GL 26, GL 29)"
+    country: Venezuela
+    institution: multilateral
+    kb_file: venezuela_procurement_system.txt
+    priority: medium
+    notes: "Sanctions framework that shapes what pharmaceutical importers can legally do"
+    source_hint: "https://ofac.treasury.gov/sanctions-programs-and-country-information/venezuela-related-sanctions"
+
+  # ── LATAM-WIDE (Agent 3, continued) ───────────────────────────────────────
+  - id: 14
+    name: "FIFARMA WAIT indicator Latin America 2024 — quantitative access data"
+    country: LATAM
+    institution: multilateral
+    kb_file: new_latam_access.txt
+    priority: high
+    notes: "4.75-year mean delay to access innovative treatments; 87% no progress for orphan/oncology 2023-2024. IQVIA/FIFARMA source."
+    source_hint: "https://gabionline.net/reports/latin-american-patients-face-4.7-year-wait-for-innovative-treatments"
+
+  - id: 15
+    name: "PAHO essential medicines availability and 2025 cancer medicines call"
+    country: LATAM
+    institution: multilateral
+    kb_file: new_latam_access.txt
+    priority: high
+    notes: "PAHO February 2025 call identifies specific gaps in essential cancer medicines across LAC"
+    source_hint: "https://www.paho.org/en/news/3-2-2025-paho-calls-latin-american-and-caribbean-countries-improve-access-essential-cancer"
+
+  - id: 16
+    name: "PAHO Strategic Fund pooled procurement for essential medicines"
+    country: LATAM
+    institution: multilateral
+    kb_file: new_latam_access.txt
+    priority: medium
+    source_hint: "https://www.paho.org/en/paho-strategic-fund"
+
+execution:
+  batch_size: 3
+  items_per_agent: 9
+  output_dir: ./topic3_latam_procurement/results
+  total_items: 27
+  agent_assignments:
+    agent_1_argentina: [1, 2, 3, 4, 5, 17, 18, 19]        # 8 items — Argentina
+    agent_2_colombia:  [6, 7, 8, 9, 10, 20, 21, 22]        # 8 items — Colombia
+    agent_3_venezuela: [11, 12, 13, 23, 24, 14, 15, 16]    # 8 items — Venezuela + LATAM
+  note: "items_per_agent increased from 5→9 after Step 2 expanded from 16→27 items"
+  status: ready_for_deep_research

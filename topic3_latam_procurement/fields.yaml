@@ -1,0 +1,191 @@
+topic: Latin America Pharmaceutical Procurement Systems
+version: 2.0
+created: 2026-04-29
+updated: 2026-04-29
+note: v2 merges Step 1 framework with Step 2 web-search supplementary fields
+
+fields:
+  basic_info:
+    - name: country
+      description: "Argentina / Colombia / Venezuela / LATAM-wide"
+      detail_level: brief
+
+    - name: institution_type
+      description: "regulatory / insurer / ministry / judiciary / NGO / multilateral / informal"
+      detail_level: brief
+      note: "judiciary added — tutela/amparo are dominant real access mechanisms in both Colombia and Argentina"
+
+    - name: year_range
+      description: "Year(s) the data covers — must be within 2016–2025"
+      detail_level: brief
+
+    - name: access_mechanism_type
+      description: >
+        How patients ACTUALLY access oncology drugs in practice:
+        formal_procurement (EPS/PAMI/MPPS) / judicial (tutela/amparo) /
+        pooled_regional (PAHO Strategic Fund) / informal (diaspora/Zelle/black market) /
+        NGO_humanitarian (MSF/Convite/donations).
+        CRITICAL: in LATAM, judicial and informal channels often dominate formal procurement.
+      detail_level: detailed
+
+  procurement:
+    - name: procurement_channels
+      description: >
+        Named channels through which oncology drugs are procured, including non-formal channels.
+        Include % of patients served per channel if available.
+        Argentina: PAMI, BNDE, obras sociales, provincial, private, amparo.
+        Colombia: EPS-PBS, MIPRES/non-PBS, tutela, private.
+        Venezuela: MPPS (residual), dollarized private, diaspora/Zelle, NGO pipelines.
+      detail_level: detailed
+
+    - name: key_actors
+      description: >
+        Named institutions and their specific roles. Distinguish budget authority, ordering
+        authority, and distribution authority. Include new actors: BNDE (Argentina), MIPRES
+        administrating entities (Colombia), Convite/MSF (Venezuela).
+      detail_level: moderate
+
+    - name: formulary_coverage
+      description: >
+        Whether cisplatin, doxorubicin, carboplatin, trastuzumab are on the national formulary
+        (PBS/POS for Colombia). Note drugs requiring tutela/amparo to access — this signals
+        chronic shortage or access gap more reliably than formal shortage lists.
+      detail_level: detailed
+
+    - name: judicial_access_volume
+      description: >
+        Annual volume of tutela (Colombia) or amparo de salud (Argentina) filings for drug access.
+        Colombia 2025: ~312,500 tutelas total, ~34% health-related.
+        Quantifies the gap between formal coverage and real access.
+      detail_level: detailed
+
+  regulatory:
+    - name: registration_timeline_generic
+      description: >
+        Months to approval for conventional generic oncology drug. Source the number.
+        Note if INVIMA/ANMAT backlog extends beyond official target timeline.
+        INVIMA 2025: 14,000+ pending registrations; Resolution 2025010547 contingency plan.
+      detail_level: detailed
+
+    - name: registration_timeline_biologic
+      description: >
+        Months to approval for biologic/biosimilar. Distinguish full dossier vs. abbreviated.
+        Colombia Decree 1782 (2014): avg 28 months (2020 data). Argentina: ANMAT biologics pathway.
+      detail_level: detailed
+
+    - name: registration_authority
+      description: "Name, legal basis, reporting ministry."
+      detail_level: brief
+
+    - name: biosimilar_pathway
+      description: >
+        Specific pathway for biosimilar approval: decree name, number of pathways,
+        comparability requirements, approved trastuzumab biosimilars if any.
+      detail_level: detailed
+
+    - name: registration_backlog
+      description: >
+        Documented backlog at the regulatory authority. Quantify: # applications pending,
+        months of delay beyond official timeline. Source required.
+        INVIMA 2025: 14,000+ pending (Resolution 2025010547).
+      detail_level: moderate
+
+    - name: reform_status
+      description: >
+        Current status of any ongoing regulatory reform relevant to this item:
+        proposed / enacted / suspended / repealed / in_litigation.
+        Key 2024-2025 reforms: Argentina DNU 70/2023, Argentina ANMAT Res 754/2025,
+        Argentina patent guidelines repeal 2026, Colombia INVIMA Res 2025010547,
+        Colombia ADRES Decree 0858/2025 (Council of State suspended).
+      detail_level: moderate
+
+  financial:
+    - name: currency_mechanism
+      description: >
+        The specific currency control in effect 2016–2025.
+        Argentina: CEPO phases → SIRA → SEDI → post-Milei deregulation (2024).
+        Venezuela: CADIVI → CENCOEX → DICOM/SIMADI → current dollarization.
+        Colombia: floating COP (no formal controls). Include current 2024-2025 state.
+      detail_level: detailed
+
+    - name: pharma_import_cost_impact
+      description: >
+        Documented impact of currency depreciation on pharmaceutical import costs.
+        Quantify as % budget erosion or purchasing power loss if available.
+      detail_level: detailed
+
+    - name: financial_mechanism
+      description: >
+        How drugs are paid for: direct_budget / reimbursement_recobro_MIPRES /
+        co_payment / out_of_pocket / pooled_procurement / compulsory_license.
+        Distinguishes who pays and how — not just procurement channel.
+        Colombia: recobro/MIPRES for non-PBS; EPS-IPS debt (COP 4.2T pharma) blocks payment.
+      detail_level: moderate
+
+    - name: payer_debt_crisis
+      description: >
+        Documented arrears or debt from insurer/government to pharmaceutical distributors.
+        Colombia: EPS-IPS total debt >COP 24 trillion, pharma portion ~4.2 trillion.
+        This is a root cause of de-facto shortages distinct from formal shortage declarations.
+      detail_level: detailed
+
+    - name: health_budget_pct_gdp
+      description: >
+        Health expenditure as % of GDP, with year.
+        Venezuela: ~1.18% (2017) — structural parameter in simulation.
+      detail_level: moderate
+
+  shortage:
+    - name: shortage_rate
+      description: >
+        Quantitative shortage rate with source and year.
+        Venezuela: 10% oncology availability (Lancet 2017), 26.3% overall (HRW/Convite 2023),
+        28.4% overall (Convite March 2024). Update if newer data found.
+      detail_level: detailed
+
+    - name: shortage_causes
+      description: >
+        Primary documented causes. Distinguish structural (always present) vs. scenario (shock-driven).
+        Colombia: EPS financial fragility + INVIMA backlog + manufacturer contract restrictions.
+        Venezuela: currency collapse + budget failure + MPPS institutional degradation.
+        Argentina: fragmentation + currency controls + delayed payments.
+      detail_level: detailed
+
+    - name: shortage_monitoring_system
+      description: >
+        How shortages are tracked and reported. Who reports, to whom, on what timeline.
+        INVIMA (Colombia): centralized system, Resolution 2025010547 adds mandatory reporting.
+        ANMAT (Argentina): Resolution 754/2025 new mandatory MA-holder notification regime.
+        Venezuela: no functional government system; Convite NGO fills gap.
+      detail_level: moderate
+
+    - name: oncology_specific_shortage_events
+      description: >
+        Documented shortage events for cisplatin, doxorubicin, carboplatin, or trastuzumab
+        in this country since 2016. Include dates and sources.
+      detail_level: detailed
+
+  source_quality:
+    - name: source_citation
+      description: "Full citation: authors, title, publisher/journal, year, URL or DOI."
+      detail_level: detailed
+
+    - name: source_type_granular
+      description: >
+        government_primary / multilateral_PAHO_WHO / industry_association_FIFARMA /
+        NGO_MSF_Convite / academic_peer_reviewed / legal_regulatory_tracker / investigative_news.
+        More precise than primary/secondary/tertiary.
+      detail_level: brief
+
+    - name: data_reliability
+      description: "high (primary official) / medium (academic with methodology) / low (estimate, news, single source)"
+      detail_level: brief
+
+    - name: kb_action
+      description: >
+        confirms_existing / new_fact_add_to_doc / replaces_stale_update_doc / new_doc_needed.
+        Flag 'new_doc_needed' for LATAM-wide items (items 14-16) — these feed new_latam_access.txt.
+      detail_level: brief
+
+# ── UNCERTAIN FIELDS ────────────────────────────────────────────────────────
+uncertain: []

@@ -1,0 +1,33 @@
+{
+  "country": "Colombia",
+  "institution_type": "judiciary",
+  "year_range": "2023-2025",
+  "access_mechanism_type": "judicial (tutela) — constitutional writ of protection under Article 86 of Colombian Constitution; primary real-world access mechanism for non-PBS oncology drugs and for PBS drugs delayed by EPS",
+  "procurement_channels": "Tutela orders are addressed to EPS (and occasionally to MINSALUD/ADRES); courts compel delivery within 48 hours typically; once granted, drugs are dispensed via the same EPS/IPS/distributor chain as formal procurement. Tutela bridges PBS, MIPRES non-PBS, and even excluded technologies in some cases.",
+  "key_actors": "Defensoría del Pueblo (Public Defender) — accompanies and files tutelas; reports volumes (~18,451 health tutelas accompanied Jan-Aug 2025). Corte Constitucional — interprets right to health (Law 1751 of 2015 statutory health right, Sentencia T-760/2008 framework, Sentencia T-377/2024 oncology). Jueces de tutela (any judge of first instance) — decide cases in 10-day urgency procedure. EPS — respondents and providers ordered to comply. MINSALUD — sometimes co-respondent. SuperSalud — sanctions for non-compliance.",
+  "formulary_coverage": "Tutelas cover any drug a patient cannot access through formal channels — including PBS-covered drugs delayed by EPS, MIPRES non-PBS drugs denied or unfunded, and even excluded technologies when life-threatening. Oncology drugs commonly tutela-claimed: high-cost immunotherapies (pembrolizumab, nivolumab), targeted therapies (trastuzumab subcutaneous, T-DM1, CDK4/6 inhibitors), orphan oncology drugs, novel hormonal agents.",
+  "judicial_access_volume": "Tutelas filed (all types): ~265,000 (2024) → ~312,500 (2025); +47,500 / +17.92%. Health-related: 34% of total = ~106,250 (2025) using overall percentage; Defensoría tracks ~106,000-107,000 health complaints/tutelas across 2022-2025 with 35,000 in 2024 alone (+32% vs 2023). 2023 baseline: ~198,000 health tutelas (Defensoría figure). Of Defensoría-accompanied health tutelas in 2025 (18,451 Jan-Aug), ~24% related to denial of medication delivery → roughly 4,400 medication-specific tutelas accompanied by Defensoría in that 8-month window. Note: differing universes (filed vs Defensoría-accompanied) explain numerical differences.",
+  "registration_timeline_generic": "Not applicable.",
+  "registration_timeline_biologic": "Not applicable.",
+  "registration_authority": "Not applicable.",
+  "biosimilar_pathway": "Not applicable to tutela directly.",
+  "registration_backlog": "Not applicable.",
+  "reform_status": "Constitutional foundation stable. Article 86 + Law 1751/2015 (statutory right to health) define framework. Sentencia T-377/2024 reinforces oncology access. Law 2360 of 2024 (June 14, 2024) reinforces special protection for cancer patients, modifying Sandra Ceballos Law 1384/2010. Petro government health reform attempts (Decree 0858/2025 suspended Oct 23, 2025; congressional reform blocked Dec 2025) leave tutela framework intact.",
+  "currency_mechanism": "Not applicable.",
+  "pharma_import_cost_impact": "Not directly applicable; rising COP-priced imported oncology drugs increase tutela claims for high-cost therapies.",
+  "financial_mechanism": "Tutela-ordered drugs paid through normal channels: PBS-covered → UPC; non-PBS → presupuestos máximos via MIPRES. EPS recover through ADRES recobro for excluded items in some cases.",
+  "payer_debt_crisis": "Tutela is direct symptom of EPS-IPS-distributor debt cascade (>COP 24 trillion total; COP 4.2 trillion pharma). When financial blockade prevents medicine flow, patients escalate to tutela. Defensoría warned that some users would need to spend up to 90% of income to cover medications not delivered, demonstrating the access gap that tutela aims to close.",
+  "health_budget_pct_gdp": "[uncertain]",
+  "shortage_rate": "Tutela volume itself is the de-facto shortage indicator: ~312,500 tutelas in 2025, 34% health, ~24% of those medication-related signals chronic supply gaps not captured in INVIMA's 8 declared shortages (Dec 2024).",
+  "shortage_causes": "Tutela demand driven by: EPS denials, EPS financial collapse, MIPRES non-PBS funding gap, INVIMA registration delays, distributor supply restriction due to debt, and PBS exclusions. ~100 specific treatments moved from PBS to exclusion list under 2026 reform are projected to further increase tutela volume.",
+  "shortage_monitoring_system": "Defensoría del Pueblo annual reports; CENDOJ judicial database (Centro de Documentación Judicial); SuperSalud PQRS (685,000 medication-related complaints cumulative; 52,655 in Jan 2025 monthly peak); Defensoría received ~107,000 complaints 2022-2025, 35,000 in 2024.",
+  "oncology_specific_shortage_events": "[uncertain on individual cisplatin/doxorubicin/carboplatin/trastuzumab tutela counts]. Sentencia T-377/2024 specifically addresses oncology drug access via tutela. Patient testimonies from People's Health Movement, ColombiaOne, El Colombiano, Defensoría reports describe cancer chemotherapy disruptions during 2024-2025 driving tutelas.",
+  "source_citation": "1) ColombiaOne, 'Use of Tutela to Access Health Increases in Colombia,' April 23, 2026, https://colombiaone.com/2026/04/23/tutela-access-health-increases-colombia/. 2) Defensoría del Pueblo, 'Por vulneración del derecho a la salud, los colombianos presentaron cerca de 198.000 tutelas durante el 2023.' 3) Defensoría del Pueblo, 'Defensoría alerta crisis acceso medicamentos Colombia,' 2025. 4) Semana, 'Defensoría del Pueblo alerta sobre el aumento de 18% de las tutelas por salud en Colombia,' 2026. 5) Infobae, 'Defensoría del Pueblo reportó incremento de 18% en tutelas para acceder a la salud,' April 23, 2026. 6) ConsultorSalud, 'Defensoría alerta por aumento de tutelas en salud: más de 312.000 en 2025.' 7) Corte Constitucional, Sentencia T-377/2024, https://www.corteconstitucional.gov.co/relatoria/2024/T-377-24.htm. 8) Ley 2360 de 2024 (cancer protection statute). 9) Ley 1751 de 2015 (statutory right to health).",
+  "source_type_granular": "government_primary (Defensoría del Pueblo, Corte Constitucional) + investigative_news (ColombiaOne, Semana, Infobae, El Colombiano) + legal_regulatory_tracker (ConsultorSalud)",
+  "data_reliability": "high for aggregate tutela counts (Defensoría primary); medium for medication subsegment breakdowns",
+  "kb_action": "new_fact_add_to_doc",
+  "uncertain": [
+    "health_budget_pct_gdp",
+    "oncology_specific_shortage_events"
+  ]
+}
