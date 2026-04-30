@@ -1,7 +1,8 @@
 anthropic
 streamlit
-chromadb
+chromadb==0.4.24
 sentence-transformers
 numpy
 matplotlib
 httpx
+protobuf==4.24.0
