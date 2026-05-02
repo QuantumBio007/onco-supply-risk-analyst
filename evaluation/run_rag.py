@@ -13,8 +13,11 @@ Outputs:
 import anthropic
 import chromadb
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 
+load_dotenv(Path(__file__).parent.parent / ".env")
 os.makedirs("evaluation/outputs", exist_ok=True)
 
 CASES = [

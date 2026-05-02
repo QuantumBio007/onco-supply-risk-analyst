@@ -56,6 +56,35 @@
 2. Deploy to Streamlit Cloud (10 min)
 3. Final commit + push
 
+---
+
+## Future Enhancement: Dynamic External Shocks & Geopolitical Events (2026-05 Session)
+
+**Vision:** Extend supply_sim.py to model cascading effects of global events (geopolitical, environmental) on LATAM cancer drug supply.
+
+**Specific challenges to model:**
+- Geopolitical shocks (Iran-US tensions → Strait of Hormuz disruption → shipping delays)
+- Environmental shocks (heat waves → cold-chain failures for biologics; monsoons → port bottlenecks)
+- Multi-hop dependencies (API sourcing country → shipping route → transit hub → distributor → hospital)
+- Real-time correlation between news events and supply chain impacts
+
+**Architectural approach (recommended: hybrid):**
+1. **Phase 1 (Scenario-based):** Add `scenarios.json` with curated events (Suez blockade, Hormuz closure, heat wave 38°C, port congestion)
+2. **Phase 2 (Real-time alerts):** Ingest news via API, filter for known events, trigger pre-defined scenarios
+3. **Phase 3 (Learned causality):** ML classifier to map novel events to supply chain impact estimates
+
+**Research value:**
+- Answer: "Which cancer drugs in LATAM are most vulnerable to geopolitical/climate shocks?"
+- Distinguish: APIs sourced via Hormuz (cisplatin, doxorubicin) vs. EU/US manufacturing (trastuzumab)
+- Heat sensitivity: biologics vs. stable small molecules
+- Infrastructure gap: countries with poor cold-chain vs. robust logistics
+
+**Deliverables (if pursued):**
+- `scenarios.json` (5-10 realistic scenarios with impact estimates)
+- `supply_sim.py` enhancements (scenario input, route-specific delays, cold-chain failure rates)
+- Validation against historical case studies (Suez 2021, Pakistan floods 2022, etc.)
+- Publication-ready: "Supply Chain Fragility in Oncology: Geopolitical Shocks & LATAM Access"
+
 Previous:
 **Session 9 complete (2026-04-29). Topic 1 complete: (1) Trastuzumab demand model corrected Normal→Poisson — actual simulation engine changed for first time since Session 7 Colombia params. (2) Clark & Scarf 1960, Graves & Willems 2000, Zipkin 2000, full Izen et al. 2025 citation (PMID 41002874) added to KB doc. (3) CVaR in UI (5-column metric row + histogram line). All 48 sim outputs regenerated; index rebuilt (155 chunks). KEY RESULT CHANGE: trastuzumab Argentina API restriction 12.9d MODERATE → 9.1d LOW (Poisson zero-demand days prevent continuous stockout accumulation — more accurate). Venezuela trastuzumab CRITICAL in all scenarios (79–102d). Next: README, adversarial cases, re-run evaluation (Case 2 uses trastuzumab/Venezuela — verify still 11/12).**
 

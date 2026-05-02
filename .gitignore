@@ -5,6 +5,7 @@ __pycache__/
 *.pyc
 .DS_Store
 knowledge_base/sim_outputs/
+.venv/
 
 # Course and personal documents — not part of the public project
 Personal/

@@ -15,8 +15,12 @@ import json
 import httpx
 import anthropic
 import chromadb
+from pathlib import Path
 from sentence_transformers import SentenceTransformer
 from supply_sim import simulate, result_to_text
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / ".env")
 
 MODEL = "claude-haiku-4-5-20251001"
 

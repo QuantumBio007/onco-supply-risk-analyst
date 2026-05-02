@@ -4,75 +4,70 @@ SOURCE: RAG (ChromaDB retrieval + Claude generation)
 
 ## Drug Profile
 
-Doxorubicin is an anthracycline antibiotic chemotherapy agent on the WHO Model List of Essential Medicines (EML). It is used to treat breast cancer, leukemia, lymphoma, and sarcomas, and is one of the most broadly used oncology drugs globally. Conventional doxorubicin is fully off-patent and generic.
-
-API manufacturing is concentrated in India (dominant global supplier) and China (secondary source). Colombia has no domestic API manufacturing capacity and is entirely import-dependent on Indian and Chinese suppliers. Doxorubicin is available as an injectable solution and powder for reconstitution, requiring refrigeration at 2–8°C and protection from light. This cold-chain requirement means logistics disruptions — port delays, customs holds, power outages — directly threaten product integrity in addition to supply availability.
+Doxorubicin is an anthracycline antibiotic chemotherapy agent used to treat breast cancer, leukemia, lymphoma, and sarcomas. It is on the WHO Model List of Essential Medicines (EML, oncology section). Conventional doxorubicin is fully off-patent and generic. India is the dominant global supplier of doxorubicin API, with a smaller contribution from China. Colombia has no domestic API manufacturing capacity and is fully import-dependent on India and China. Doxorubicin is available as injectable solution and powder for reconstitution, requiring refrigeration at 2–8°C and protection from light, making it vulnerable to logistics disruptions that threaten both product integrity and supply availability.
 
 ## Supply Chain Vulnerability
 
-**Regulatory bottleneck:** Doxorubicin must have an active INVIMA (Instituto Nacional de Vigilancia de Medicamentos y Alimentos) sanitary registration before legal distribution in Colombia. As of 2024, INVIMA maintains a backlog of over 14,000 pending registrations across all product categories. During supply disruptions, alternative suppliers without INVIMA registration cannot rapidly substitute, eliminating a critical mitigation pathway.
+**Import dependency and API concentration:** Colombia relies entirely on Indian and Chinese API imports for doxorubicin. Global API supply is dominated by Indian manufacturers; a 2011–2012 manufacturing quality crisis at major Indian and Chinese suppliers caused widespread shortages that cascaded into Latin American markets. Subsequent shortages occurred in 2022–2023, again linked to API supply concentration.
 
-**Import dependence and currency exposure:** Colombia procures doxorubicin entirely from international suppliers, with pricing denominated in USD. Hospital procurement budgets are denominated in Colombian pesos. Currency devaluation directly erodes purchasing power: EPS (health insurers) and IPS (hospital networks) experience reduced order volumes and increased likelihood of deferred purchases and stockouts.
+**Regulatory gate:** Doxorubicin must have an active INVIMA (Instituto Nacional de Vigilancia de Medicamentos y Alimentos) sanitary registration before commercial distribution in Colombia. Alternative suppliers without INVIMA registration cannot rapidly substitute during supply disruptions. As of 2024, INVIMA maintained a backlog of over 14,000 pending registrations across all product categories, creating a regulatory bottleneck.
 
-**Structural procurement fragmentation:** The EPS-IPS-distributor pharmaceutical debt cascade creates a de facto financial blockade independent of physical supply availability. As of July 2025, EPS-IPS debt reached COP 32.9 trillion, with the pharmaceutical component at COP 4.2 trillion. Approximately 80% of EPS lack legally required financial reserves. Payment cycles extend 180–365+ days in practice, and distributors (Audifarma, Cruz Verde, Cafam, etc.) restrict shipments to entities in arrears. This fragmentation reduces visibility of aggregate national stock levels.
+**Financial procurement failure:** Colombia's EPS-IPS-distributor system faces systemic financial fragility. Total EPS-IPS debt reached approximately COP 32.9 trillion in 2024 (up from COP 25 trillion in 2023). Approximately 80% of EPS lack legally required reserves. Distributors restrict drug shipments to EPS in arrears, creating de-facto shortages at point of care. This financial blockade persists despite government payment of 90.3% of pharmaceutical invoices in 2024, indicating intermediation friction as the root cause.
 
-**API supply concentration:** Global doxorubicin shortages in 2011–2012 and 2022–2023 were linked to manufacturing quality issues and consolidation among Indian and Chinese API producers. Colombia, as part of the Latin American import-dependent cohort, is exposed to the same API supply shocks that affect developed markets.
+**Cold chain vulnerability:** Refrigeration requirements (2–8°C) mean that port delays, customs holds, or power outages directly threaten product integrity independent of supply availability.
 
 ## Scenario Impact Analysis
 
-**Modeled supply performance under currency devaluation:**
+Under currency devaluation (peso depreciation, budget compression) conditions, doxorubicin supply in Colombia is modeled using a continuous-review (Q, r) inventory system with stochastic lead times and dynamic disruption dynamics:
 
-Under currency crisis (peso devaluation, budget compression) conditions:
+| **Metric** | **Value** |
+|---|---|
+| Stockout days per year | 8.9 ± 0.7 (95% CI) |
+| Unit service level (fill rate) | 97.7% ± 0.0% (95% CI) |
+| Days without stockout | 97.6% |
+| Probability of any stockout during year | 80% |
+| Probability of critical shortage (>60 days) | 0.0% |
+| CVaR_90 (worst-10% mean stockout days) | 24.8 days |
+| Average realized disruption exposure | 163.0 days/year |
 
-- **Projected stockout days per year:** 8.9 days (95% CI: ±0.7 days)
-- **Unit service level:** 97.7% (95% CI: ±0.0%)
-- **Days without stockout:** 97.6%
-- **Average inventory on hand:** 124 units
-- **Probability of any stockout during the year:** 80%
-- **Probability of critical shortage (>60 stockout days):** 0.0%
+**Key parameters:**
+- Mean lead time during disruption: 28.0 days (std: 7.8 days)
+- Effective order fill rate: 75% (reflecting 17% structural procurement failure rate)
+- Effective budget multiplier: 48% (currency devaluation reduces purchasing power)
+- Disruption duration: ~180 days (geometric distribution)
+- Optimal reorder point: 237 units; Economic Order Quantity: 241 units
 
-**Modeling assumptions:**
-- Effective order fill rate: 75% (reflecting chronic structural procurement failures; approximately 17% of orders fail or arrive severely short due to fiscal constraints and informal supply chains)
-- Effective budget multiplier: 48% (structural cap 80% × scenario 60%), reducing effective order quantities by half
-- Mean lead time during disruption: 28.0 days (std: 7.8 days, log-normal)
-- Disruption duration: approximately 180 days (geometric distribution, mean)
-- Realized disruption exposure: 163.0 days/year
-- Safety stock requirement: 76 units; Reorder point: 237 units; Economic Order Quantity: 241 units
-
-**Assessment:** Supply risk is LOW. The 8.9 stockout days per year is within acceptable operational range, though monitoring is warranted. The scenario assumes recovery within the year; sustained devaluation lasting >180 days would extend disruption exposure and elevate risk.
-
-**Contextual note:** Colombia's doxorubicin risk profile is more favorable than Venezuela (28.8 projected stockout days/year under the same scenario, classified as MODERATE risk) and comparable to Argentina (5.8 projected stockout days/year). The difference reflects Colombia's higher baseline fill rate (75% vs. Venezuela's 54%) and stronger but still strained EPS financial position relative to Venezuelan counterparts.
+**Interpretation:** The 8.9 stockout days per year falls within acceptable operational range under current modeling assumptions. However, this baseline assumes Colombia's 80% probability of experiencing any stockout during the year persists. The 48% budget multiplier directly reflects currency devaluation's impact on hospital procurement budgets denominated in Colombian pesos, reducing effective order quantities. The 75% fill rate reflects chronic structural procurement failures (~17% order failure or severe shortfall due to fiscal constraints), not scenario-specific supply constraints.
 
 ## Policy Recommendations
 
-1. **Establish a national strategic reserve for doxorubicin:** Procure and maintain a 60–90-day buffer stock (approximately 900–1,350 units based on average inventory modeling) held at a centralized cold-chain facility under MINSALUD or a designated gestión centralizada. This buffer decouples procurement timing from currency fluctuations and distributor payment cycles.
+1. **Establish INVIMA fast-track pathway:** Expedite sanitary registration for secondary doxorubicin suppliers (particularly Chinese manufacturers) to reduce regulatory bottleneck during supply disruptions. Current 14,000+ registration backlog must be cleared or triaged by product criticality.
 
-2. **Implement INVIMA registration acceleration pathway:** Develop an expedited registration track for doxorubicin suppliers currently approved in WHO-recognized regulatory systems (FDA, EMA, Health Canada) to reduce regulatory bottleneck during supply disruptions. Target: approve alternative suppliers within 30 days rather than months.
+2. **Currency-hedged procurement contracts:** EPS and hospital networks should negotiate fixed-USD pricing with distributors or establish currency hedge agreements to decouple procurement from peso depreciation shocks, preserving effective budget purchasing power.
 
-3. **Integrate doxorubicin into SISCAATS early:** Ensure doxorubicin is prioritized in MINSALUD's new Sistema de Información para la Centralización de Alertas de Abastecimiento (SISCAATS) monitoring system. Real-time visibility of EPS-IPS stock levels will enable early detection of procurement friction and allow corrective action before patient-level shortages occur.
+3. **Central strategic reserve:** MINSALUD should establish a 30–60 day centralized buffer stock of doxorubicin (conventional formulation) managed through SISCAATS (the new integrated shortage monitoring system under development). This reserve should be pre-positioned in climate-controlled regional distribution hubs to protect against simultaneous cold-chain and financial disruption.
 
-4. **Restructure EPS payment timelines for oncology drugs:** Amend UPC capitation and presupuestos máximos administration to guarantee payment to pharmaceutical distributors within 30 days for PBS-covered oncology drugs (including doxorubicin), decoupling supplier risk from EPS financial solvency. Consider escrow or automated clearing house (ACH) settlement.
+4. **EPS financial restructuring:** Address the root cause of de-facto shortages—the EPS debt cascade (COP 32.9 trillion in 2024)—through mandatory financial reconciliation and payment cycle compression. The fact that government paid 90.3% of invoices in 2024 yet supply failures persisted confirms that intermediation friction, not absolute funding, is the bottleneck.
 
-5. **Hedge currency exposure in procurement contracts:** Negotiate USD-denominated purchase commitments with quarterly price adjustments tied to official exchange rates, with a contractual cap on peso devaluation pass-through (e.g., limit to 80% of devaluation impact) to stabilize budget predictability.
+5. **Tutela volume monitoring:** Approximately 4,400 medication-specific tutelas were filed in the first 8 months of 2025 (per Defensoría del Pueblo accompaniment data). Track doxorubicin-specific tutelas as a real-time shortage signal independent of INVIMA's formal shortage classification, since tutela volume often precedes official shortage declaration.
 
-6. **Coordinate cross-border procurement data:** Establish information-sharing agreements with Argentina and Ecuador on doxorubicin availability and lead times from shared Indian and Chinese suppliers. Aggregate demand signals may improve negotiating leverage and early-warning capability.
+6. **API diversification:** Work with MINSALUD and pharmaceutical importers to evaluate feasibility of API sourcing from secondary suppliers (e.g., diversification within India's second-tier producers or evaluation of South Korean or European API sources) to reduce concentration risk in three to five primary Indian manufacturers.
 
 ## Confidence & Limitations
 
 **Confidence:**
-- The WHO EML status for doxorubicin is confirmed in the retrieved context.
-- India and China as dominant API sources are explicitly documented.
-- Colombia's 100% import dependence and lack of domestic API manufacturing are confirmed.
-- The regulatory role of INVIMA and the existence of a registration backlog are documented.
-- The EPS-IPS debt cascade and its magnitude (COP 32.9 trillion as of July 2025) are sourced from MINSALUD official reporting.
+- The currency devaluation scenario parameters (60% budget compression scenario factor, 48% effective budget multiplier) are grounded in the retrieved modeling context.
+- Stockout days (8.9 ± 0.7 days/year) are derived from 500 Monte Carlo simulations using established inventory theory (Warren OM textbook continuous-review (Q, r) model).
+- The 17% structural procurement failure rate in Colombia is documented in the retrieved context as "chronic structural procurement failures (~17% of orders fail or arrive severely short)."
+- The EPS debt cascade and INVIMA regulatory backlog are documented as of 2024–2025.
 
 **Limitations:**
-- **Stockout projections are model-based estimates, not historical actuals.** The Monte Carlo simulation (500 runs, 365-day horizon) is illustrative and depends heavily on assumed demand distributions (normal, truncated), fill rates (75%), and lead-time parameters (28 days mean). Real-world variability may differ substantially.
-- **The 75% fill rate assumption reflects "chronic structural procurement failures (~17% order failure rate)" but does not isolate the currency devaluation scenario effect from baseline fragmentation.** The modeled budget multiplier of 48% is a scenario-specific allocation, not an empirically validated elasticity for Colombian hospital purchasing under peso devaluation.
-- **Cold-chain integrity is not quantified.** Refrigeration failures, storage losses, and logistics delays during disruptions are acknowledged as threats but are not incorporated into the stockout model. Actual shortage duration and severity may be underestimated.
-- **Tumor burden and patient-level impact are outside the scope of this brief.** Supply risk is measured in inventory days and service level; clinical consequences (treatment delay, disease progression) are not assessed.
-- **No proprietary procurement data from Colombian EPS, IPS, or distributors are included.** Visibility is limited to published MINSALUD, SuperSalud, and Defensoría del Pueblo reporting. Actual inventory positions and order patterns are not directly observed.
-- **SISCAATS is a proposed system not yet fully implemented.** The recommendation to integrate doxorubicin early assumes enactment and operational capability by late 2025–2026.
+- The stockout model is illustrative, not actuarial. Real-world doxorubicin stockout duration and frequency depend on granular hospital-level procurement data, which is not fully transparent in Colombia's fragmented EPS-IPS-distributor system.
+- The 75% fill rate assumption reflects "structural floor 83% × scenario 90%" but the derivation of these floor and scenario multipliers is not fully traced in the retrieved context.
+- The model does not capture the risk that currency devaluation may trigger simultaneous balance-of-payments constraints that force import restrictions (not just budget compression), which could sharply increase lead times beyond the modeled 28.0-day mean.
+- INVIMA registration backlog (14,000+ pending) is noted as of 2024, but the specific breakdown by oncology products is not provided. Actual regulatory unblocking speed is uncertain.
+- Tutela volume (4,400 medication tutelas in 8 months of 2025) is a proxy for real-world access failure but does not directly measure doxorubicin stockout frequency. Tutelas are filed for multiple reasons (denial, delay, unavailability); the proportion attributable to supply shortage vs. financial denial is not isolated in the retrieved data.
+- The cold-chain integrity risk (refrigeration disruption) is qualitatively noted but not quantified in the modeling. A power outage or logistics delay in ports could compromise doxorubicin batches without triggering a counted "stockout day" if physical units remain on shelves but are unusable.
 
 ============================================================
 RETRIEVED SOURCES:
