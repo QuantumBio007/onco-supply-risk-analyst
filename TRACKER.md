@@ -2,12 +2,158 @@
 **Project:** OncoSupply Risk Analyst  
 **Goal:** Working Streamlit RAG app by end of weekend  
 **Week 6 check-in target:** ~2 weeks from now  
-**Last updated:** 2026-04-29 (session 8)
+**Last updated:** 2026-05-02 (session 12 — Phase 2 v3 critical review)
 **Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB (149 chunks, 59 files)
 
 ---
 
 ## ▶ PICK UP HERE — NEXT SESSION
+
+**STATUS: Session 12 complete (2026-05-02). PHASE 2 v3 BUILT, REVIEWED, AND COMMITTED.**
+
+---
+
+## PHASE 2 — Real-Time Shock Detection (branch: phase-2-realtime-news)
+
+### Architecture
+```
+NewsAPI → news_listener.py → event_classifier.py (Claude) → shock_mapper.py → alert_engine.py
+              (8 LATAM queries)    (classification + shock_type)   (SCENARIO_MAP)     (alerts)
+                                                                ↕
+                                                        supply_sim.py (Monte Carlo)
+```
+
+### What Is Built (Phase 2 v3 — 2026-05-02)
+
+| File | Status | What It Does |
+|------|--------|-------------|
+| `phase2_realtime/news_listener.py` | ✅ Done | 8 LATAM-specific query topics (manufacturing, logistics, political, regulatory, currency, demand, climate, company) |
+| `phase2_realtime/event_classifier.py` | ✅ Done | Claude classifies articles → IRRELEVANT/MINOR/MODERATE/CRITICAL + shock_type + impact params |
+| `phase2_realtime/shock_mapper.py` | ✅ Done | (shock_type, severity) → scenario; runs supply_sim.py twice (baseline + shocked) |
+| `phase2_realtime/alert_engine.py` | ✅ Done | Evaluates risk delta; >25%=MODERATE, >50%=HIGH, >100%=CRITICAL alert |
+| `phase2_realtime/scheduler.py` | ✅ Done | Orchestrates full pipeline; returns alerts_triggered[] with shock_type |
+| `phase2_realtime/__init__.py` | ✅ Done | Module marker |
+
+### Scenario Mapping Logic (shock_mapper.py SCENARIO_MAP)
+| Shock Type | CRITICAL | MODERATE | MINOR |
+|-----------|----------|----------|-------|
+| manufacturing | API export restriction | API export restriction | Baseline |
+| logistics | Combined shock | API export restriction | Baseline |
+| regulatory | Combined shock | API export restriction | Baseline |
+| demand | Combined shock | Baseline* | Baseline |
+| currency | Combined shock | Currency devaluation | Baseline |
+| political | Combined shock | API export restriction | Baseline |
+| climate | Combined shock | API export restriction | Baseline |
+| company | API export restriction | Baseline | Baseline |
+
+*demand MODERATE → Baseline is a known modeling limitation: supply_sim.py has no pure demand-surge scenario. Acceptable for v3; addressed in Phase 2c.
+
+### Critical Issues Found and Fixed (2026-05-02)
+- [x] **KeyError bug**: `QUERIES["geopolitical"]` removed in v3 but still referenced in `news_listener.py` __main__ and `scheduler.py` default — fixed
+- [x] **Currency MODERATE wrong**: was mapped to Baseline; corrected to "Currency devaluation"
+- [x] **Dead code**: unused `import sys` and `_debug` flag in event_classifier.py — cleaned
+- [x] **API key loading**: `override=True` required in load_dotenv — fixed
+
+### Known Limitations (Phase 2c Backlog)
+1. **Impact parameters ignored**: `event_classifier.py` computes `lead_time_multiplier`, `demand_multiplier`, `fill_rate` via Claude — but `shock_mapper.py` ignores them, selecting a fixed scenario instead. Phase 2c will wire these parameters directly into `supply_sim.py`.
+2. **No demand-surge scenario**: `supply_sim.py` has no standalone demand-spike scenario; demand MODERATE/MINOR defaults to Baseline. Need new `SCENARIO_PARAMS["Demand surge"]` entry.
+3. **PROCESSED_ARTICLES in-memory only**: deduplication resets on restart; needs file/DB persistence for production use.
+4. **Free tier NewsAPI**: 100 req/day limit; 8 query categories = 8 requests/cycle; max ~12 cycles/day before rate limit hit.
+5. **Regulatory CRITICAL → Combined shock**: debatable mapping; regulatory pricing caps behave more like a budget shock (Currency devaluation) than an API disruption + budget shock.
+
+### Phase 2 Commits
+- `145c5787` — Phase 2 v3: Expand news topics + differentiate shock scenarios by type
+- `473f090b` — Phase 2 v3 bug fixes from critical code review
+
+### How to Run
+```bash
+cd "/Users/carlosmartino/Documents/MBA/2026/Spring 2/GenAI/Project"
+source .venv/bin/activate
+# Single cycle — latam_politics topic
+python3 -m phase2_realtime.scheduler
+# Custom topic
+python3 -c "from phase2_realtime.scheduler import run_cycle; import json; print(json.dumps(run_cycle('manufacturing', limit_articles=5), indent=2))"
+```
+
+---
+
+## PHASE 2b — Remaining Work (before May 15 capstone, if time permits)
+
+**Goal:** Validate classification quality with real articles; improve test coverage.
+
+- [ ] **Classification quality test**: Run all 8 query categories, print titles + classifications. Verify that manufacturing articles → shock_type="manufacturing", not generic IRRELEVANT. Identify misclassification patterns.
+- [ ] **Alert integration test**: Manually inject a CRITICAL/MODERATE event and verify the full alert path: classification → scenario → simulation → alert message is correctly formatted.
+- [ ] **Regulatory CRITICAL mapping fix**: Consider changing `("regulatory", "CRITICAL")` from "Combined shock" to "Currency devaluation" — regulatory pricing controls act like a budget cap, not an API disruption. Needs expert judgment.
+- [ ] **news_listener.py load_dotenv**: Add `override=True` to match event_classifier.py pattern (NEWSAPI_KEY currently loaded at module level — may silently fail if .env not loaded before import).
+
+---
+
+## PHASE 2c — Post-Capstone Redesign (after May 15)
+
+**Goal:** Wire Claude-extracted impact parameters directly into supply_sim.py so each news event produces a custom simulation — not a fixed scenario proxy.
+
+### Step 1: Add dynamic scenario support to supply_sim.py
+Add new function accepting raw shock parameters:
+```python
+def simulate_dynamic(drug: str, country: str,
+                     lead_time_multiplier: float = 1.0,
+                     demand_multiplier: float = 1.0,
+                     fill_rate: float = 0.95,
+                     budget_multiplier: float = 1.0,
+                     disruption_duration_mean: int = 90,
+                     n_runs: int = 500) -> dict:
+    """Parameterized simulation — no named scenario required."""
+```
+This preserves backward compatibility (existing `simulate()` stays unchanged) while enabling dynamic shocks.
+
+### Step 2: Rebuild shock_mapper.py to pass parameters
+Replace SCENARIO_MAP lookup with direct parameter extraction:
+```python
+impact = event_classification.get("impact", {})
+shocked_result = simulate_dynamic(
+    drug=drug, country=country,
+    lead_time_multiplier=impact.get("lead_time_multiplier", 1.0),
+    demand_multiplier=impact.get("demand_multiplier", 1.0),
+    fill_rate=impact.get("fill_rate", 0.95),
+    n_runs=500
+)
+```
+
+### Step 3: Add missing scenario types to SCENARIO_PARAMS (for legacy compatibility)
+```python
+"Demand surge": {
+    "lead_time_multiplier": 1.0,
+    "demand_multiplier": 1.3,   # +30% demand (cancer incidence surge or treatment guideline change)
+    "fill_rate": 0.90,
+    "budget_multiplier": 1.0,
+    "disruption_duration_mean": 180,
+    "label": "Demand surge (disease outbreak or guideline change)",
+},
+"Regulatory squeeze": {
+    "lead_time_multiplier": 1.2,
+    "demand_multiplier": 1.0,
+    "fill_rate": 0.80,
+    "budget_multiplier": 0.75,  # pricing controls compress effective procurement
+    "disruption_duration_mean": 365,
+    "label": "Regulatory shock (pricing controls, budget cuts)",
+},
+```
+
+### Step 4: Add article persistence
+Replace in-memory `PROCESSED_ARTICLES` set with SQLite or JSON file:
+```python
+# scheduler.py
+import sqlite3
+def _load_processed() -> set:
+    # load article hashes from ./phase2_data/processed.db
+def _save_processed(article_id: int):
+    # persist article hash
+```
+
+### Step 5: MAB system (multi-armed bandit for signal learning)
+After 3+ months of operation, add bandit to learn which news query categories most reliably predict real supply disruptions. Requires ground truth labels (did a real shortage occur?).
+
+---
 
 **STATUS: Session 11 complete (2026-04-30). WEEK 8 FULLY COMPLETE.**
 
