@@ -5,3 +5,6 @@ sentence-transformers
 numpy
 matplotlib
 httpx
+python-dotenv
+newsapi
+apscheduler
