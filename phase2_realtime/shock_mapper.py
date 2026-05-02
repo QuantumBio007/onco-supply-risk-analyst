@@ -39,9 +39,10 @@ SCENARIO_MAP = {
     ("demand", "MODERATE"): "Baseline",  # Demand alone doesn't break supply
     ("demand", "MINOR"): "Baseline",
 
-    # Currency shocks: FX volatility affecting procurement
+    # Currency shocks: FX volatility affecting procurement budgets
+    # MODERATE: peso/bolivar devaluation compresses budgets → Currency devaluation scenario
     ("currency", "CRITICAL"): "Combined shock",
-    ("currency", "MODERATE"): "Baseline",
+    ("currency", "MODERATE"): "Currency devaluation",
     ("currency", "MINOR"): "Baseline",
 
     # Political instability: Trade wars, sanctions, border closures

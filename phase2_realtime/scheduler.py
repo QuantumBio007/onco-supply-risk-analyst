@@ -21,12 +21,14 @@ TARGETS = {
 PROCESSED_ARTICLES = set()
 
 
-def run_cycle(query_category: str = "geopolitical", limit_articles: int = 10) -> dict:
+def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) -> dict:
     """
     Run one complete Phase 2 cycle: fetch → classify → simulate → alert.
 
     Args:
-        query_category: "geopolitical" / "logistics" / "currency" / "environmental"
+        query_category: one of the QUERIES keys: manufacturing / logistics_latam /
+                        latam_politics / regulatory / currency / healthcare_demand /
+                        climate_latam / company_events
         limit_articles: Max articles to process per cycle (simulation is slow)
 
     Returns:
@@ -128,5 +130,5 @@ def run_cycle(query_category: str = "geopolitical", limit_articles: int = 10) ->
 if __name__ == "__main__":
     # Test run
     print("[scheduler] Starting Phase 2 cycle...")
-    result = run_cycle(query_category="geopolitical")
+    result = run_cycle(query_category="latam_politics")
     print(json.dumps(result, indent=2))

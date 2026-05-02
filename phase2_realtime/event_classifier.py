@@ -12,26 +12,14 @@ Returns: classification + affected drugs/countries + impact estimate
 
 import anthropic
 import os
-import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load API key from project root (.env should be in same directory as phase2_realtime/)
-# Find .env by traversing up from this module
-module_dir = Path(__file__).resolve().parent  # phase2_realtime/
-project_dir = module_dir.parent  # Project/
-env_path = project_dir / ".env"
-
-# Debug: print paths
-_debug = False  # Set to True for debugging
-if _debug:
-    print(f"[event_classifier DEBUG] module_dir: {module_dir}")
-    print(f"[event_classifier DEBUG] project_dir: {project_dir}")
-    print(f"[event_classifier DEBUG] env_path: {env_path}")
-    print(f"[event_classifier DEBUG] env_path.exists(): {env_path.exists()}")
-
-# Load API key from .env using load_dotenv
-load_dotenv(str(env_path), override=True, verbose=False)
+# Load API key — resolve absolute path from this file's location to handle
+# any calling context (direct run, module import, -m invocation).
+# override=True ensures we always use .env values even if shell env differs.
+_project_dir = Path(__file__).resolve().parent.parent  # phase2_realtime/ → Project/
+load_dotenv(str(_project_dir / ".env"), override=True)
 
 SYSTEM_PROMPT = """You are a supply chain risk analyst evaluating pharmaceutical news for oncology drugs in LATAM.
 

@@ -97,10 +97,11 @@ def fetch_news(query: str = None, days_back: int = 1) -> list:
 
 
 if __name__ == "__main__":
-    # Test fetch
+    # Test fetch — use first available query key
     try:
-        articles = fetch_news(query=QUERIES["geopolitical"])
-        print(f"Fetched {len(articles)} articles")
+        first_category = next(iter(QUERIES))
+        articles = fetch_news(query=QUERIES[first_category])
+        print(f"Fetched {len(articles)} articles for category: {first_category}")
         for a in articles[:3]:
             print(f"  - {a.get('title', 'N/A')}")
     except Exception as e:
