@@ -47,14 +47,31 @@ def fetch_news(query: str = None, days_back: int = 1) -> list:
 
     articles = []
 
-    # For now: placeholder. After newsapi install, use:
-    # from newsapi import NewsApiClient
-    # client = NewsApiClient(api_key=NEWSAPI_KEY)
-    # response = client.get_everything(q=query, sort_by="recency", language="en", ...)
-    # articles = response['articles']
+    try:
+        import requests
+        from datetime import datetime, timedelta
 
-    print(f"[news_listener] Would fetch: {query}")
-    print(f"[news_listener] Placeholder: install 'pip install newsapi' to enable real fetching")
+        from_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
+
+        url = "https://newsapi.org/v2/everything"
+        params = {
+            "q": query or "pharma supply chain",
+            "sortBy": "recency",
+            "language": "en",
+            "from": from_date,
+            "apiKey": NEWSAPI_KEY,
+        }
+
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+        articles = data.get("articles", [])
+        print(f"[news_listener] Fetched {len(articles)} articles for: {query}")
+
+    except Exception as e:
+        print(f"[news_listener] Error: {str(e)}")
+        articles = []
 
     return articles
 
