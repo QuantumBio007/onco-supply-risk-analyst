@@ -11,35 +11,59 @@ Returns: classification + affected drugs/countries + impact estimate
 """
 
 import anthropic
+import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load API key
-load_dotenv(Path(__file__).parent.parent / ".env")
+# Load API key from project root (.env should be in same directory as phase2_realtime/)
+# Find .env by traversing up from this module
+module_dir = Path(__file__).resolve().parent  # phase2_realtime/
+project_dir = module_dir.parent  # Project/
+env_path = project_dir / ".env"
 
-SYSTEM_PROMPT = """You are a supply chain risk analyst evaluating pharmaceutical news.
+# Debug: print paths
+_debug = False  # Set to True for debugging
+if _debug:
+    print(f"[event_classifier DEBUG] module_dir: {module_dir}")
+    print(f"[event_classifier DEBUG] project_dir: {project_dir}")
+    print(f"[event_classifier DEBUG] env_path: {env_path}")
+    print(f"[event_classifier DEBUG] env_path.exists(): {env_path.exists()}")
 
-Classify each article as: IRRELEVANT / MINOR / MODERATE / CRITICAL
+# Load API key from .env using load_dotenv
+load_dotenv(str(env_path), override=True, verbose=False)
 
-If CRITICAL or MODERATE:
-  - Identify affected drugs (cisplatin, trastuzumab, doxorubicin, carboplatin, or "unknown")
-  - Identify affected countries (Argentina, Colombia, Venezuela, or "unknown")
-  - Estimate impact: which supply chain parameter changes?
-    * lead_time_multiplier (e.g., "1.5x" if delays expected)
-    * demand_multiplier (e.g., "1.2x" if hoarding expected)
-    * fill_rate (e.g., "0.7" if partial fulfillment expected)
+SYSTEM_PROMPT = """You are a supply chain risk analyst evaluating pharmaceutical news for oncology drugs in LATAM.
+
+CLASSIFICATION: Assign IRRELEVANT / MINOR / MODERATE / CRITICAL based on impact severity.
+
+SHOCK TYPE: Identify the nature of the shock:
+  - "manufacturing" - API factory disruption, labor strike, recall, quality issue in source countries (India, China)
+  - "logistics" - Port congestion, shipping delays, road closures, border restrictions affecting LATAM
+  - "regulatory" - Drug pricing policy, patent changes, approval delays, healthcare budget cuts
+  - "demand" - Disease outbreak, hospital shortages, treatment guideline changes affecting patient volume
+  - "currency" - FX volatility, devaluation affecting procurement costs
+  - "political" - Government instability, trade war, sanctions, border closure
+  - "climate" - Weather, flooding, landslides affecting ports/roads in LATAM
+  - "company" - Manufacturer recalls, M&A, supply agreements
+
+IMPACT PARAMETERS (if CRITICAL or MODERATE):
+  - lead_time_multiplier: How much longer does delivery take? (e.g., 1.5 = 50% longer)
+  - demand_multiplier: Does demand increase? (e.g., 1.2 = 20% higher demand, 0.8 = 20% lower)
+  - fill_rate: Can suppliers meet demand? (e.g., 0.7 = only 70% of orders fulfilled)
 
 Output JSON only, no explanation:
 {
   "classification": "CRITICAL|MODERATE|MINOR|IRRELEVANT",
+  "shock_type": "manufacturing|logistics|regulatory|demand|currency|political|climate|company",
   "affected_drugs": ["drug1", "drug2"],
   "affected_countries": ["country1"],
   "impact": {
-    "lead_time_multiplier": null,
-    "demand_multiplier": null,
-    "fill_rate": null
+    "lead_time_multiplier": 1.0,
+    "demand_multiplier": 1.0,
+    "fill_rate": 1.0
   },
-  "reasoning": "one sentence"
+  "reasoning": "one sentence explaining the shock"
 }
 """
 
@@ -55,7 +79,12 @@ def classify_article(title: str, description: str) -> dict:
     Returns:
         dict with classification, affected_drugs, affected_countries, impact
     """
-    client = anthropic.Anthropic()
+    # Explicitly pass API key to client
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key or not api_key.strip():
+        raise ValueError("ANTHROPIC_API_KEY not found or empty in environment")
+
+    client = anthropic.Anthropic(api_key=api_key)
 
     user_msg = f"""Classify this article:
 

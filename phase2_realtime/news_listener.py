@@ -22,12 +22,32 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")  # Register at newsapi.org (free tier: 100 req/day)
 
-# News search queries (customize based on Phase 2 roadmap)
+# News search queries (multi-dimensional LATAM-specific supply chain shocks)
+# Each topic targets different shock types: manufacturing, logistics, regulatory, demand, currency, political, climate
 QUERIES = {
-    "geopolitical": "(pharma OR supply chain) AND (Iran OR sanctions OR Hormuz OR Suez)",
-    "logistics": "(shipping OR port OR logistics) AND (congestion OR delay OR disruption)",
-    "currency": "(currency OR devaluation OR peso OR peso crisis) AND (Latin America OR Colombia OR Argentina)",
-    "environmental": "(heat wave OR monsoon OR drought) AND (manufacturing OR supply chain)",
+    # Manufacturing shocks: facility disruptions, labor, quality issues in API source countries (India, China)
+    "manufacturing": "(API OR pharmaceutical OR drug) AND (India OR China) AND (facility OR factory) AND (strike OR shutdown OR recall OR accident OR GMP OR quality)",
+
+    # LATAM-specific logistics: Port congestion, road closures, shipping delays
+    "logistics_latam": "(shipping OR cargo OR port OR logistics) AND (Santos OR Valparaiso OR Callao OR Buenaventura OR La Guaira) AND (congestion OR delay OR closure OR backlog)",
+
+    # Regional political instability: sanctions, border closures, trade wars, government changes
+    "latam_politics": "(Venezuela OR Colombia OR Argentina OR Brazil OR LATAM) AND (pharma OR drug OR medicine OR oncology) AND (sanction OR embargo OR blockade OR protest OR political OR trade war)",
+
+    # Regulatory/policy shocks: drug pricing, patent changes, approval delays, healthcare policy
+    "regulatory": "(drug OR pharma OR pharmaceutical) AND (Argentina OR Colombia OR Venezuela OR Brazil) AND (approval OR pricing OR patent OR regulation OR policy OR generic)",
+
+    # Currency/FX volatility: affects procurement costs and payment delays
+    "currency": "(exchange rate OR devaluation OR inflation OR peso OR bolivar OR currency crisis) AND (Argentina OR Colombia OR Venezuela OR Brazil OR LATAM) AND (pharma OR healthcare OR supply)",
+
+    # Healthcare system demand shocks: cancer outbreaks, disease surges, hospital capacity, policy changes
+    "healthcare_demand": "(cancer OR oncology OR drug shortage OR hospital) AND (Argentina OR Colombia OR Venezuela OR Brazil) AND (outbreak OR surge OR shortage OR access OR budget)",
+
+    # Climate-specific to LATAM: Rainy season, landslides affecting mountain logistics, flooding of ports
+    "climate_latam": "(flooding OR landslide OR rainy season OR drought OR weather) AND (Andes OR Peru OR Colombia OR Ecuador OR road OR port OR warehouse)",
+
+    # Company-level disruptions: manufacturer recalls, M&A affecting production, supply agreements
+    "company_events": "(pharmaceutical OR drug manufacturer) AND (recall OR merger OR acquisition OR facility OR partnership OR supply agreement) AND (Cipla OR Aurobindo OR Hikma OR Pfizer OR Roche)",
 }
 
 

@@ -21,40 +21,42 @@ TARGETS = {
 PROCESSED_ARTICLES = set()
 
 
-def run_cycle(query_category: str = "all") -> dict:
+def run_cycle(query_category: str = "geopolitical", limit_articles: int = 10) -> dict:
     """
-    Run one complete Phase 2 cycle: fetch → classify → shock → alert.
+    Run one complete Phase 2 cycle: fetch → classify → simulate → alert.
 
     Args:
-        query_category: "geopolitical" / "logistics" / "currency" / "environmental" / "all"
+        query_category: "geopolitical" / "logistics" / "currency" / "environmental"
+        limit_articles: Max articles to process per cycle (simulation is slow)
 
     Returns:
-        dict with cycle results, alerts, articles processed
+        dict with cycle results, alerts, risk deltas
     """
 
     results = {
         "timestamp": datetime.now().isoformat(),
         "articles_fetched": 0,
-        "articles_classified": 0,
+        "articles_processed": 0,
+        "shocks_detected": 0,
         "alerts_triggered": [],
         "status": "ready",
     }
 
     # Step 1: Fetch news
     try:
-        articles = fetch_news(query=query_category)
+        articles = fetch_news(query=QUERIES.get(query_category, "pharma supply chain"))
         results["articles_fetched"] = len(articles)
         print(f"[scheduler] Fetched {len(articles)} articles")
     except Exception as e:
         results["status"] = f"fetch_error: {str(e)}"
         return results
 
-    # Step 2: Classify each article
-    for article in articles:
+    # Step 2: Classify each article (limit for performance)
+    for article in articles[:limit_articles]:
         article_id = hash(article.get("title", ""))
 
         if article_id in PROCESSED_ARTICLES:
-            continue  # Skip already-processed
+            continue
 
         try:
             classification = classify_article(
@@ -63,39 +65,61 @@ def run_cycle(query_category: str = "all") -> dict:
             )
 
             if classification["classification"] in ["CRITICAL", "MODERATE"]:
-                # Article identified as supply risk
-                results["articles_classified"] += 1
+                results["shocks_detected"] += 1
                 PROCESSED_ARTICLES.add(article_id)
 
-                # Step 3: Trigger simulations for affected drug/country pairs
-                affected_drugs = classification.get("affected_drugs", ["unknown"])
-                affected_countries = classification.get("affected_countries", ["unknown"])
+                # Step 3: Run simulation for each affected drug/country
+                affected_drugs = classification.get("affected_drugs", [])
+                affected_countries = classification.get("affected_countries", [])
+
+                # If no specific drugs/countries identified, check all
+                if "unknown" in affected_drugs:
+                    affected_drugs = TARGETS["drugs"]
+                if "unknown" in affected_countries:
+                    affected_countries = TARGETS["countries"]
 
                 for drug in affected_drugs:
                     for country in affected_countries:
-                        if (
-                            drug in TARGETS["drugs"]
-                            or drug == "unknown"
-                        ) and (country in TARGETS["countries"] or country == "unknown"):
-                            # Step 4: Alert if risk jumped
+                        if drug in TARGETS["drugs"] and country in TARGETS["countries"]:
+                            # Step 4: Compute risk delta
                             shock_result = trigger_simulation(
                                 classification, drug, country
                             )
+                            results["articles_processed"] += 1
 
-                            alert_obj = {
-                                "drug": drug,
-                                "country": country,
-                                "event": article.get("title", ""),
-                                "classification": classification,
-                                "shock_params": shock_result.get("shock_params"),
-                            }
-                            results["alerts_triggered"].append(alert_obj)
-                            print(
-                                f"[scheduler] ALERT: {drug}/{country} — {article.get('title')}"
-                            )
+                            if shock_result.get("status") == "simulated":
+                                # Step 5: Evaluate alert
+                                alert = evaluate_risk_change(
+                                    shock_result["baseline_risk"],
+                                    shock_result["shocked_risk"],
+                                )
+
+                                alert_msg = format_alert(
+                                    alert,
+                                    drug,
+                                    country,
+                                    article.get("title", ""),
+                                )
+
+                                if alert["should_alert"]:
+                                    results["alerts_triggered"].append({
+                                        "drug": drug,
+                                        "country": country,
+                                        "shock_type": shock_result.get("shock_type", "unknown"),
+                                        "severity": alert["severity"],
+                                        "baseline_risk": shock_result["baseline_risk"],
+                                        "shocked_risk": shock_result["shocked_risk"],
+                                        "risk_delta": shock_result["risk_delta"],
+                                        "percent_increase": shock_result["percent_increase"],
+                                        "event": article.get("title", "")[:100],
+                                    })
+                                    print(
+                                        f"[scheduler] {alert['severity']}: {drug}/{country} ({shock_result.get('shock_type', 'unknown')}) "
+                                        f"+{shock_result['risk_delta']}d ({shock_result['percent_increase']:.0f}%)"
+                                    )
 
         except Exception as e:
-            print(f"[scheduler] Error classifying article: {str(e)}")
+            print(f"[scheduler] Error: {str(e)}")
             continue
 
     return results
