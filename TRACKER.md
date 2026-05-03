@@ -2,7 +2,7 @@
 **Project:** OncoSupply Risk Analyst (JCNB Biotech)
 **Goal:** Working Streamlit RAG app by end of weekend
 **Week 6 check-in target:** ~2 weeks from now
-**Last updated:** 2026-05-03 (session 16 — CSO/CEO strategic review; mission rewrite; new strategic action plan)
+**Last updated:** 2026-05-03 (session 17 — macro_economic shock pathway: classifier + scenario + SQLite dedup; Actions 3+4 complete)
 **Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB (149 chunks, 59 files)
 
 ---
@@ -22,7 +22,73 @@
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Phase 2c Week 1 COMPLETE. Start Week 2 (after May 15): kalman_filter.py implementation.**
+**STATUS: Phase 2c Week 1 COMPLETE + macro_economic shock pathway shipped (session 17).
+Start Week 2 (after May 15): kalman_filter.py implementation.**
+
+### Session 17 — Macro-economic shock pathway (2026-05-03)
+
+**Triggering insight (CSO review):** The CNN article "Expensive tortillas, fewer buses:
+How war in Iran is squeezing Latin America" (2026-05-02) would have been classified
+IRRELEVANT by the existing pipeline. No pharma keywords → silent drop. Yet the article
+quantifies real LATAM macro pressure (Argentina inflation 3.4%/month, fuel +20%, air
+fares +24%) that propagates to oncology procurement budgets through:
+  oil shock → import inflation → real-USD budget erosion → drug procurement cut
+This is the unique JCNB pathway IQVIA/Max Foundation/CHAI/PAHO do not model.
+
+**What was built:**
+- ✅ **Action 3 (Demand surge + Regulatory squeeze scenarios)** in `supply_sim.py`.
+  `shock_mapper.SCENARIO_MAP` updated: `("demand", "MODERATE")` → `"Demand surge"`,
+  `("regulatory", "MODERATE")` → `"Regulatory squeeze"` (was wrongly `"Currency
+  devaluation"`). All scenarios run clean; regression on trastuzumab/Venezuela/Baseline
+  unchanged at 79.3d / CVaR_90=103.3d.
+- ✅ **Action 4 (SQLite persistence)** for `PROCESSED_ARTICLES` in `scheduler.py`.
+  `phase2_data/processed.db` — survives restart. **Pre-existing bug fixed**: original
+  `hash()` on title was non-deterministic across Python sessions (PYTHONHASHSEED) —
+  the in-memory dedup never worked across restarts even before this change. Replaced
+  with stable MD5.
+- ✅ **NEW: `macro_economic` shock type** added end-to-end:
+  - `event_classifier.py`: new shock type with PRECEDENCE rule (direct supply events
+    override macro framing — fixes Hormuz misclassification regression), country
+    directionality (Venezuela neutral due to OFAC + production collapse), anti-template
+    directive (Claude must derive params per article, not echo prompt examples).
+  - `supply_sim.py`: new `"Macro/inflation shock"` scenario. `lead_time_multiplier=1.0`
+    (air freight is COST not TIME — setting >1.0 caused (Q,r) policy adaptation that
+    paradoxically REDUCED simulated stockouts). Calibration: budget_multiplier=0.70
+    derived from 3.4%/month × 9 months CPI math. Duration 270d (UBA economist quote).
+  - `shock_mapper.py`: `("macro_economic", CRITICAL/MODERATE)` → `"Macro/inflation shock"`;
+    `DEFAULT_DURATION_BY_SHOCK["macro_economic"] = 270`.
+  - `news_listener.py`: new `macro_latam` query — **intentionally has no pharma keywords**.
+    That is the point: catches articles like the CNN piece that pharma-focused queries
+    silently drop.
+
+**End-to-end verified (live Claude):** CNN article → 8 drug-country sims (all dynamic
+mode, using Claude params) → 7/8 fired alerts. Trastuzumab/Argentina: CRITICAL
+(3.8d → 7.8d, mean_critical + cvar_abs + cvar_rel triggers). Argentina generics fire
+MODERATE on cvar_abs alone — exactly what the CVaR-aware engine was built for.
+
+**Honest residuals (do NOT skip on next pickup):**
+1. 🔴 **Streamlit `app.py:1157` `ALLOWED_SCENARIOS` still hardcoded to 4 scenarios** —
+   funders cannot see Demand surge / Regulatory squeeze / Macro shock in the demo.
+2. 🔴 **NewsAPI capacity overrun**: 9 query categories × hourly = 216 req/day vs. 100
+   free tier. Need query rotation or paid tier ($449/yr).
+3. 🔴 **Trastuzumab/Colombia macro signal silent** (Δmean +1.3d, ΔCVaR +3.2d both below
+   thresholds). Alert engine thresholds are calibrated for direct shocks; macro shocks
+   produce smaller deltas. Need `macro_economic`-specific tier in `alert_engine.py`.
+4. 🟡 **Venezuela trastuzumab macro shows −0.7d** — system at structural floor
+   (effective_Q=5 regardless). Modeling artifact. If a funder runs this single test,
+   "tortilla shock makes Venezuelan trastuzumab BETTER" is the headline. Document or
+   add a special-case explanation in `result_to_text()`.
+5. 🟡 **paclitaxel/oxaliplatin silently dropped** — classifier suggests them, scheduler
+   filters because not in DRUG_PARAMS. Either add to DRUG_PARAMS or restrict classifier.
+6. 🟡 **Claude reasoning text hallucinates dates** ("mid-2024" when article is May 2026).
+   Strip or validate before any funder-facing display.
+7. 🟡 **Calibration is anecdotal** — budget_multiplier=0.70 from one CNN article. No
+   historical backtest. Venezuela 2017–18 hyperinflation → cisplatin/trastuzumab
+   shortage data is the obvious validation case before any grant submission.
+8. 🟡 **Real news pipeline never run end-to-end with macro_latam query.** All today's
+   tests used synthetic articles. NewsAPI's actual hit rate on the new query is unknown.
+
+
 
 ### Progress Summary (as of 2026-05-03, session 15)
 
@@ -71,15 +137,31 @@
 
 **Phase 2c implementation is GATED behind 501(c)(3) filing and PAHO/A4C outreach.** Algorithmic elegance does not pay legal fees or get PAHO meetings.
 
-1. **ACTION 5** (highest schedule risk): File DC 501(c)(3) Form 1023-EZ — 60–90 day clock; every week of delay narrows 2026 grant access
-2. **ACTION 6**: Email PAHO Strategic Fund leadership quoting their Feb 2025 "predictability" statement
+1. **ACTION 6** (highest 2026 leverage): Email PAHO Strategic Fund leadership quoting
+   their Feb 2025 "predictability" statement. **This has been pending too long. Send
+   before any further coding.**
+2. **ACTION 5** (highest schedule risk): File DC 501(c)(3) Form 1023-EZ — 60–90 day
+   clock; every week of delay narrows 2026 grant access
 3. **ACTION 7**: Email Angels for Change to explore partnership (USAID/Google.org joint app)
-4. **ACTION 4**: SQLite persistence for `PROCESSED_ARTICLES` (2 hours)
-5. **ACTION 3**: Add `Demand surge` and `Regulatory squeeze` scenarios to `supply_sim.py` (1 hour)
-6. **ACTION 9**: Public risk dashboard v0 (GitHub Pages, static, ~1 week)
-7. **ACTION 8**: Pharma validation cycle (5 cold pitches; decision deadline July 15)
-8. **ACTION 2 shim**: `simulate_dynamic()` wrapper (1–2 days) — eliminates H1 credibility wound before any grant submission
-9. Phase 2c Week 2 (Kalman Filter implementation) — *only after items 1–8 in motion*
+4. **Update Streamlit `app.py:1157` `ALLOWED_SCENARIOS`** to surface the 3 new scenarios
+   (Demand surge, Regulatory squeeze, Macro/inflation shock). **Funders click demos.**
+   Without this, today's macro_economic capability is invisible to the people we need.
+5. **Run real NewsAPI macro_latam query** end-to-end via `python3 -m phase2_realtime.scheduler`.
+   First time the macro pipeline meets reality.
+6. **NewsAPI query rotation** in `news_listener.py` — round-robin 9 categories to stay
+   under 100/day free tier limit (currently overrun).
+7. **Recalibrate `alert_engine.py` thresholds** for `macro_economic` — add a macro-specific
+   tier with lower mean/CVaR cutoffs. Trastuzumab/Colombia silent case is the test.
+8. **Venezuela 2017–18 historical backtest** — validate macro scenario against Lancet
+   Oncology 2017 + HRW 2024 shortage data already in KB. **Without one validated
+   historical case, the macro capability is unfundable.**
+9. **ACTION 9**: Public risk dashboard v0 (GitHub Pages, static, ~1 week) — must show
+   macro_economic capability, not just baseline risk
+10. **ACTION 8**: Pharma validation cycle (5 cold pitches; decision deadline July 15)
+11. Phase 2c Week 2 (Kalman Filter implementation) — *only after items 1–10 in motion*
+
+**Done in session 17:** ACTION 3 ✓, ACTION 4 ✓, ACTION 2 shim ✓ (session 16),
+macro_economic shock pathway ✓.
 
 Full plan: [phase2_realtime/ACTION_ITEMS_STRATEGIC.md](phase2_realtime/ACTION_ITEMS_STRATEGIC.md)
 

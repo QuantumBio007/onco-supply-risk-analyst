@@ -39,15 +39,16 @@ SCENARIO_MAP = {
     ("logistics", "MODERATE"): "API export restriction",
     ("logistics", "MINOR"):    "Baseline",
 
-    # Regulatory pricing caps compress budgets like FX devaluation, not API supply
+    # Regulatory: CRITICAL = full import suspension (API + budget hit = Combined);
+    # MODERATE = pricing controls / re-registration delays → dedicated scenario
     ("regulatory", "CRITICAL"): "Combined shock",
-    ("regulatory", "MODERATE"): "Currency devaluation",
+    ("regulatory", "MODERATE"): "Regulatory squeeze",
     ("regulatory", "MINOR"):    "Baseline",
 
-    # Demand alone doesn't break supply in the discretized scenarios — known limitation
-    # (See H4 in STRATEGIC_REVIEW_2026-05-03.md). Dynamic path resolves this.
+    # Demand: MODERATE guideline expansion or incidence surge → Demand surge scenario.
+    # Dynamic path preferred; SCENARIO_MAP fallback now non-null for MODERATE.
     ("demand", "CRITICAL"): "Combined shock",
-    ("demand", "MODERATE"): "Baseline",
+    ("demand", "MODERATE"): "Demand surge",
     ("demand", "MINOR"):    "Baseline",
 
     ("currency", "CRITICAL"): "Combined shock",
@@ -65,6 +66,13 @@ SCENARIO_MAP = {
     ("company", "CRITICAL"): "API export restriction",
     ("company", "MODERATE"): "Baseline",
     ("company", "MINOR"):    "Baseline",
+
+    # Macro-economic: oil/commodity shocks → LATAM inflation → health budget compression.
+    # Dynamic path preferred when Claude quantifies budget_multiplier from article data.
+    # CRITICAL = >25% procurement budget compression; MODERATE = 12-25%.
+    ("macro_economic", "CRITICAL"): "Macro/inflation shock",
+    ("macro_economic", "MODERATE"): "Macro/inflation shock",
+    ("macro_economic", "MINOR"):    "Baseline",
 }
 
 # Default disruption duration per shock_type, in days (used by dynamic path
@@ -79,6 +87,8 @@ DEFAULT_DURATION_BY_SHOCK = {
     "political":     120,    # Trade restrictions / sanctions resolve in ~4 months
     "climate":        60,    # Floods, landslides resolve in weeks-to-months
     "company":        90,    # Recalls / facility issues resolve in ~3 months
+    "macro_economic": 270,   # Oil/inflation cycles persist 9 months (UBA economist May 2026:
+                             # "impact not yet fully realized, at least until mid-year, perhaps following months")
 }
 
 # Sentinel: values within this tolerance of the no-shock defaults are treated

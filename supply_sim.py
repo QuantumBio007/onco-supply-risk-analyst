@@ -167,6 +167,75 @@ SCENARIO_PARAMS = {
         "disruption_duration_mean": 120,  # intermediate: both shocks co-occur, resolve ~4 months
         "label": "Combined shock (API restriction + currency devaluation)",
     },
+    "Demand surge": {
+        # +30% demand: treatment guideline expansion (new HER2+ indication) or
+        # disease incidence surge. Does NOT affect supply-side params — the risk
+        # is that (Q,r) policy undershoots reorder point under elevated draw-down.
+        # Fill rate 0.90: suppliers partially capacity-constrained in early ramp.
+        # Duration 180d: guideline-driven surges persist until supply chain adjusts.
+        # Source: FIFARMA 2023 — trastuzumab indication expansion caused 4-6 month
+        # access gaps across LATAM before distributor stock was rebuilt.
+        "lead_time_multiplier":   1.0,
+        "demand_multiplier":      1.3,
+        "fill_rate":              0.90,
+        "budget_multiplier":      1.0,
+        "disruption_duration_mean": 180,
+        "label": "Demand surge (disease outbreak or guideline change)",
+    },
+    "Regulatory squeeze": {
+        # Pricing controls + regulatory compliance overhead (ANMAT/INVIMA/SUNDDE):
+        #   lead_time_multiplier 1.2: inspection cycles and re-registration delays
+        #     add ~20% to import lead time (documented: INVIMA backlog 14K+ items 2025).
+        #   fill_rate 0.80: vendors exit market or reduce allocation when price caps
+        #     compress margins below cost — 20% of supply lost to refusal or diversion.
+        #   budget_multiplier 0.75: effective procurement budget shrinks 25% under
+        #     price controls (hospital PO approvals frozen pending MSPS guidance).
+        #   Duration 365d: regulatory shocks are sticky — repricing and exemption
+        #     processes take 12+ months (Venezuela SUNDDE precedent 2022-23).
+        "lead_time_multiplier":   1.2,
+        "demand_multiplier":      1.0,
+        "fill_rate":              0.80,
+        "budget_multiplier":      0.75,
+        "disruption_duration_mean": 365,
+        "label": "Regulatory shock (pricing controls, budget cuts)",
+    },
+    "Macro/inflation shock": {
+        # External commodity/geopolitical shock propagating through LATAM inflation
+        # to healthcare budget compression. Distinct from "Currency devaluation":
+        #
+        #   Mechanism: INDIRECT — oil spike → import inflation → real budget erosion.
+        #     NOT a lead-time shock. Air freight +24% (Argentina, May 2026) is a COST
+        #     shock: the same USD buys fewer doses, it does not delay shipments. Setting
+        #     lead_time_multiplier=1.0 avoids spurious (Q,r) safety-stock inflation that
+        #     would otherwise cause the adaptive policy to ORDER EARLIER and paradoxically
+        #     REDUCE simulated stockouts — masking the real budget-compression effect.
+        #
+        #   budget_multiplier=0.70 (30% compression) is calibrated from two components:
+        #     1. Inflation: 3.4%/month (Argentina March 2026, MoE data) sustained 9 months
+        #        → (1.034)^9 ≈ 1.357 CPI multiplier on USD-priced imports; if nominal
+        #        ministry budget is fixed (standard under austerity), real purchasing power
+        #        ≈ 1/1.357 = 73.7% → factor 0.737.
+        #     2. Air freight cost (+24%) increases landed cost per unit; blended across
+        #        drug categories (not all air-shipped) → ~8% additional cost burden.
+        #        Combined: 0.737 / 1.08 ≈ 0.68 → rounded to 0.70 (conservative).
+        #
+        #   fill_rate=0.88: vendors consolidate or reduce LATAM shipments as margins
+        #     compress under sustained inflation; some suppliers exit lower-margin markets.
+        #
+        #   Duration 270d: macro shocks are stickier than FX events. UBA economist
+        #     Hugo Vasques (May 2026): "impact not yet fully realized, at least until
+        #     mid-year, perhaps even into the following months."
+        #
+        # Sources: CNN LATAM inflation reporting May 2026; Argentina Ministry of Economy
+        #   March 2026 data: fuel +20%, air fares +24%, freight +10% (FADEEAC ICT index);
+        #   IMF WEO April 2026: LATAM growth cut 0.1pp from Iran war energy shock.
+        "lead_time_multiplier":   1.0,
+        "demand_multiplier":      1.05,
+        "fill_rate":              0.88,
+        "budget_multiplier":      0.70,
+        "disruption_duration_mean": 270,
+        "label": "Macro/inflation shock (oil price → LATAM inflation → budget compression)",
+    },
 }
 
 

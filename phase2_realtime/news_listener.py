@@ -17,8 +17,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load API key from project root .env
-load_dotenv(Path(__file__).parent.parent / ".env")
+# Load API key from project root .env (override=True ensures .env takes precedence over shell environment)
+load_dotenv(Path(__file__).parent.parent / ".env", override=True)
 
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")  # Register at newsapi.org (free tier: 100 req/day)
 
@@ -48,6 +48,12 @@ QUERIES = {
 
     # Company-level disruptions: manufacturer recalls, M&A affecting production, supply agreements
     "company_events": "(pharmaceutical OR drug manufacturer) AND (recall OR merger OR acquisition OR facility OR partnership OR supply agreement) AND (Cipla OR Aurobindo OR Hikma OR Pfizer OR Roche)",
+
+    # Macro-economic signals: oil/commodity shocks → LATAM inflation → health budget compression.
+    # Intentionally excludes pharma keywords — the transmission pathway is macro, not supply-side.
+    # Catches articles like "Iran war squeezes Latin America" that would be IRRELEVANT under
+    # pharma-focused queries but represent real procurement budget risk (budget_multiplier channel).
+    "macro_latam": "(oil prices OR fuel prices OR inflation OR 'cost of living' OR 'economic pressure' OR 'energy costs') AND ('Latin America' OR LATAM OR Argentina OR Colombia OR Venezuela OR Brazil) AND (economy OR budget OR spending OR 'purchasing power' OR austerity OR 'public spending' OR households)",
 }
 
 

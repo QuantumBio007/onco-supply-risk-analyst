@@ -6,6 +6,8 @@ __pycache__/
 .DS_Store
 knowledge_base/sim_outputs/
 .venv/
+phase2_data/
+*.db
 
 # Course and personal documents — not part of the public project
 Personal/
