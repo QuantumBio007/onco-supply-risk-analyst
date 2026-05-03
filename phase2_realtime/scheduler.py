@@ -66,7 +66,7 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) 
                 description=article.get("description", ""),
             )
 
-            if classification["classification"] in ["CRITICAL", "MODERATE"]:
+            if classification["severity"] in ["CRITICAL", "MODERATE"]:
                 results["shocks_detected"] += 1
                 PROCESSED_ARTICLES.add(article_id)
 
@@ -75,9 +75,9 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) 
                 affected_countries = classification.get("affected_countries", [])
 
                 # If no specific drugs/countries identified, check all
-                if "unknown" in affected_drugs:
+                if not affected_drugs or "unknown" in affected_drugs:
                     affected_drugs = TARGETS["drugs"]
-                if "unknown" in affected_countries:
+                if not affected_countries or "unknown" in affected_countries:
                     affected_countries = TARGETS["countries"]
 
                 for drug in affected_drugs:
@@ -90,10 +90,12 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) 
                             results["articles_processed"] += 1
 
                             if shock_result.get("status") == "simulated":
-                                # Step 5: Evaluate alert
+                                # Step 5: Evaluate alert (CVaR-aware)
                                 alert = evaluate_risk_change(
                                     shock_result["baseline_risk"],
                                     shock_result["shocked_risk"],
+                                    baseline_cvar=shock_result.get("baseline_cvar_90"),
+                                    shocked_cvar=shock_result.get("shocked_cvar_90"),
                                 )
 
                                 alert_msg = format_alert(
@@ -108,16 +110,24 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) 
                                         "drug": drug,
                                         "country": country,
                                         "shock_type": shock_result.get("shock_type", "unknown"),
+                                        "simulation_mode": shock_result.get("simulation_mode", "unknown"),
                                         "severity": alert["severity"],
+                                        "triggers": alert.get("triggers", []),
                                         "baseline_risk": shock_result["baseline_risk"],
                                         "shocked_risk": shock_result["shocked_risk"],
                                         "risk_delta": shock_result["risk_delta"],
                                         "percent_increase": shock_result["percent_increase"],
+                                        "baseline_cvar_90": shock_result.get("baseline_cvar_90"),
+                                        "shocked_cvar_90": shock_result.get("shocked_cvar_90"),
+                                        "cvar_delta": alert.get("cvar_delta"),
+                                        "cvar_percent_increase": alert.get("cvar_percent_increase"),
                                         "event": article.get("title", "")[:100],
                                     })
                                     print(
                                         f"[scheduler] {alert['severity']}: {drug}/{country} ({shock_result.get('shock_type', 'unknown')}) "
-                                        f"+{shock_result['risk_delta']}d ({shock_result['percent_increase']:.0f}%)"
+                                        f"mean +{shock_result['risk_delta']}d ({shock_result['percent_increase']:+.0f}%) | "
+                                        f"CVaR_90 {alert.get('cvar_delta', 0):+.1f}d ({alert.get('cvar_percent_increase', 0):+.0f}%) "
+                                        f"[{','.join(alert.get('triggers', []))}]"
                                     )
 
         except Exception as e:

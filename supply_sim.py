@@ -468,6 +468,145 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
     return result
 
 
+# ── Dynamic-parameter simulation (Phase 2 shock_mapper consumer) ──────────────
+
+def simulate_dynamic(drug, country,
+                     lead_time_multiplier=1.0,
+                     demand_multiplier=1.0,
+                     fill_rate=0.95,
+                     budget_multiplier=1.0,
+                     disruption_duration_mean=120,
+                     n_runs=500, days=365,
+                     service_level_target=0.95,
+                     return_distribution=False):
+    """
+    Run Monte Carlo for arbitrary continuous shock parameters — bypassing the
+    discretized SCENARIO_PARAMS lookup.
+
+    Same engine and structural floors as simulate(); the only difference is that
+    scenario multipliers are passed as arguments instead of resolved from a
+    scenario name. Used by phase2_realtime/shock_mapper.py to consume
+    event_classifier.py impact parameters directly (lead_time_multiplier,
+    demand_multiplier, fill_rate, budget_multiplier extracted from each news
+    article by Claude) — closing the H1 defect identified in the 2026-05-03
+    strategic review (shock_mapper previously discarded these and used a
+    24-cell SCENARIO_MAP lookup table).
+
+    Structural country constraints (Venezuela structural_fill_rate=0.60,
+    structural_budget_cap=0.30) ALWAYS apply as floors — scenario multipliers
+    stack multiplicatively on top, never bypass.
+
+    Args:
+      lead_time_multiplier:    typically >= 1.0; e.g. 2.5 for API disruption (Izen 2025)
+      demand_multiplier:       typically [0.8, 1.5]; e.g. 1.15 for currency-accelerated demand
+      fill_rate:               scenario-level supplier fulfillment rate, [0.10, 1.0]
+      budget_multiplier:       scenario-level procurement budget remaining, [0.20, 1.0]
+      disruption_duration_mean: geometric mean in days (Badejo & Ierapetritou 2022).
+        Default 120 = intermediate (matches "Combined shock"). None = permanent worst-case.
+    """
+    dp = DRUG_PARAMS[drug]
+    cp = COUNTRY_PARAMS[country]
+
+    struct_fill   = cp["structural_fill_rate"]
+    struct_budget = cp["structural_budget_cap"]
+
+    demand_dist = dp.get("demand_dist", "normal")
+
+    # Disruption-state parameters (scenario × structural floor)
+    d        = dp["daily_demand_mean"] * demand_multiplier
+    sigma_d  = (np.sqrt(d) if demand_dist == "poisson"
+                else dp["daily_demand_std"] * demand_multiplier)
+    L_mean   = cp["lead_time_mean"] * lead_time_multiplier
+    L_cv     = cp["lead_time_cv"]
+    eff_fill_rate   = struct_fill   * fill_rate
+    eff_budget_mult = struct_budget * budget_multiplier
+
+    # Baseline (pre/post-disruption) — structural constraints still apply
+    base_d       = dp["daily_demand_mean"]
+    base_sigma_d = (np.sqrt(base_d) if demand_dist == "poisson"
+                   else dp["daily_demand_std"])
+    base_L_mean = cp["lead_time_mean"]
+    base_L_cv   = cp["lead_time_cv"]
+    base_fill_rate   = struct_fill   * SCENARIO_PARAMS["Baseline"]["fill_rate"]
+    base_budget_mult = struct_budget * SCENARIO_PARAMS["Baseline"]["budget_multiplier"]
+
+    policy = compute_policy(
+        d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=L_cv,
+        service_level=service_level_target,
+        unit_cost=dp["unit_cost_usd"], days=days,
+    )
+
+    initial_inv = int(base_d * cp["initial_stock_days"])
+
+    runs = [
+        _run_once(
+            d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=L_cv,
+            fill_rate=eff_fill_rate,
+            budget_multiplier=eff_budget_mult,
+            reorder_point=policy["reorder_point"],
+            order_quantity=policy["eoq"],
+            days=days, seed=i,
+            disruption_duration_mean=disruption_duration_mean,
+            base_L_mean=base_L_mean, base_L_cv=base_L_cv,
+            base_fill_rate=base_fill_rate,
+            base_budget_multiplier=base_budget_mult,
+            base_d=base_d, base_sigma_d=base_sigma_d,
+            initial_inventory=initial_inv,
+            demand_dist=demand_dist,
+        )
+        for i in range(n_runs)
+    ]
+
+    so   = np.array([r["stockout_days"]        for r in runs])
+    slu  = np.array([r["service_level_units"]   for r in runs])
+    sld  = np.array([r["service_level_days"]    for r in runs])
+    inv  = np.array([r["avg_inventory"]         for r in runs])
+    ddays = np.array([r["disruption_days_seen"] for r in runs])
+
+    ci = lambda a: round(1.96 * a.std() / np.sqrt(n_runs), 2)
+
+    var_90      = float(np.percentile(so, 90))
+    exceedances = so[so >= var_90]
+    cvar_90     = round(float(exceedances.mean()) if len(exceedances) > 0 else var_90, 1)
+
+    result = {
+        "drug": drug, "country": country, "scenario": "_dynamic_",
+        "n_runs": n_runs, "days": days,
+        "demand_dist": demand_dist,
+        # Echoed input parameters (Claude → simulation lineage for audit)
+        "input_lead_time_multiplier": round(lead_time_multiplier, 3),
+        "input_demand_multiplier":    round(demand_multiplier, 3),
+        "input_fill_rate":            round(fill_rate, 3),
+        "input_budget_multiplier":    round(budget_multiplier, 3),
+        # Policy
+        "reorder_point":   policy["reorder_point"],
+        "safety_stock":    policy["safety_stock"],
+        "eoq":             policy["eoq"],
+        "lead_time_mean":  round(L_mean, 1),
+        "lead_time_std":   round(L_mean * L_cv, 1),
+        "fill_rate":              eff_fill_rate,
+        "fill_rate_scenario":     fill_rate,
+        "fill_rate_structural":   struct_fill,
+        "budget_multiplier":      eff_budget_mult,
+        "budget_structural":      struct_budget,
+        "disruption_duration_mean": disruption_duration_mean,
+        # KPIs
+        "stockout_days_mean":  round(float(so.mean()), 1),
+        "stockout_days_ci":    ci(so),
+        "cvar_90":             cvar_90,
+        "sl_units_mean":       round(float(slu.mean()), 4),
+        "sl_units_ci":         ci(slu),
+        "sl_days_mean":        round(float(sld.mean()), 4),
+        "avg_inventory_mean":  round(float(inv.mean()), 1),
+        "avg_disruption_days": round(float(ddays.mean()), 1),
+        "prob_critical_shortage": round(float((so > 60).mean()), 3),
+        "prob_any_stockout":      round(float((so > 0).mean()), 3),
+    }
+    if return_distribution:
+        result["stockout_distribution"] = so.tolist()
+    return result
+
+
 # ── Output text generator ─────────────────────────────────────────────────────
 
 def result_to_text(r):

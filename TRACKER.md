@@ -1,15 +1,87 @@
 # OncoSupply Risk Analyst — Weekend Build Tracker
-**Project:** OncoSupply Risk Analyst  
-**Goal:** Working Streamlit RAG app by end of weekend  
-**Week 6 check-in target:** ~2 weeks from now  
-**Last updated:** 2026-05-02 (session 12 — Phase 2 v3 critical review)
+**Project:** OncoSupply Risk Analyst (JCNB Biotech)
+**Goal:** Working Streamlit RAG app by end of weekend
+**Week 6 check-in target:** ~2 weeks from now
+**Last updated:** 2026-05-03 (session 16 — CSO/CEO strategic review; mission rewrite; new strategic action plan)
 **Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB (149 chunks, 59 files)
+
+---
+
+## ▶ THE WHY — JCNB L99 (read before every work session)
+
+> **No one else can build this.** Angels for Change has US institutional backing but no LATAM presence. Max Foundation distributes drugs but has no predictive analytics. CHAI negotiates prices but doesn't model shortage risk. PAHO procures $800M/yr but has no foresight layer — and explicitly asked for one in February 2025. IQVIA could build it but won't, because the LATAM oncology TAM is too small and politically too thorny for a $14B public company. The only entity with (a) the LATAM institutional knowledge from JCNB Biotech Consulting, (b) the technical stack (RAG + Monte Carlo + 8-dimensional shock model + Kalman/Robust/MAB on the way), (c) the academic credibility (JHU Carey + peer-reviewed grounding), and (d) the willingness to operate as a public good rather than a $200K-per-seat commercial product — is JCNB. **That is why this organization must exist, and why it must exist as a nonprofit.**
+
+**Active mission (revised 2026-05-03):**
+> *"JCNB Biotech is a nonprofit dedicated to preventing oncology drug shortages in Latin America through AI-driven, multi-dimensional supply chain visibility — combining real-time news intelligence, peer-reviewed Monte Carlo simulation, and institutional knowledge across Argentina, Colombia, and Venezuela. We give ministries, hospitals, and pharmaceutical partners the foresight to act months before patients are harmed."*
+
+**Headline number for every funder pitch:** Trastuzumab/Venezuela = **79.3 stockout days/year**, CVaR_90 = 103d, p(crit≥60d)=91%.
+
+**Strategic plan of record:** [phase2_realtime/ACTION_ITEMS_STRATEGIC.md](phase2_realtime/ACTION_ITEMS_STRATEGIC.md) | Full review: [phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md](phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md)
 
 ---
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Session 12 complete (2026-05-02). PHASE 2 v3 BUILT, REVIEWED, AND COMMITTED.**
+**STATUS: Phase 2c Week 1 COMPLETE. Start Week 2 (after May 15): kalman_filter.py implementation.**
+
+### Progress Summary (as of 2026-05-03, session 15)
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 1 — RAG + Simulation | ✅ COMPLETE | Capstone delivered 2026-04-29 |
+| Phase 2 — News Pipeline (core) | ✅ COMPLETE | news_listener → classifier → shock_mapper → alert_engine |
+| Phase 2b — Validation | ✅ COMPLETE | 87.5% accuracy; 6 critical bugs fixed |
+| Phase 2c Week 1 — Design Specs | ✅ COMPLETE | KF, RO, MAB specs + API contracts |
+| Phase 2c Weeks 2-4 — Kalman Filter | ⏳ NOT STARTED | Starts after May 15 |
+| Phase 2c Weeks 4-8 — Robust Optimizer | ⏳ NOT STARTED | After KF complete |
+| Phase 2c Weeks 8-10 — MAB | ⏳ NOT STARTED | After RO complete |
+| Phase 2c Weeks 10-15 — Integration/Validation | ⏳ NOT STARTED | Final integration |
+| Phase 3 — RL / ERP Integration | 🔲 NOT DEFINED | Concept only (deferred RL, shadow-mode) |
+
+### What Was Done Sessions 14-16 (2026-05-02 → 2026-05-03)
+
+#### Session 14 — Phase 2c Week 1 (design + critical review)
+- ✅ `phase2_realtime/docs/kalman_filter_design.md` — σ_w=0.005/day (quarterly PO); log-space state
+- ✅ `phase2_realtime/docs/robust_optimization_design.md` — grid search (7×7); Bertsimas-Sim box uncertainty
+- ✅ `phase2_realtime/docs/mab_design.md` — signal_lift (not raw posterior); per-country background arm
+- ✅ `phase2_realtime/docs/api_contracts.md` — all 7 interfaces defined
+- ✅ **6 critical bugs fixed**: alert_engine absolute thresholds, baseline_risk=0 guard, "classification"→"severity" field rename across 4 files, empty-list guard in scheduler.py
+
+#### Session 15 — Housekeeping
+- ✅ `.claude/settings.json` created — read-only MCP tool allowlist (reduces permission prompts)
+- ✅ TRACKER updated and phase status confirmed
+
+#### Session 16 — CSO/CEO Strategic Review + H1 Defect Fix (2026-05-03)
+- ✅ Full Phase 1 + Phase 2 audit against nonprofit mission and grant readiness
+- ✅ Mission statement rewritten to LATAM-first (`DC_NONPROFIT_FORMATION_GUIDE.md:20`); legacy mission preserved for audit trail
+- ✅ Strategic review documented: `phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md`
+- ✅ 90-day strategic action plan documented: `phase2_realtime/ACTION_ITEMS_STRATEGIC.md`
+- ✅ THE WHY block added to top of TRACKER.md and ACTION_ITEMS_STRATEGIC.md (visible every session)
+- ✅ **H1 DEFECT FIXED** — `simulate_dynamic()` added to `supply_sim.py`; `shock_mapper.py` now consumes Claude's continuous impact parameters (with clamping defense) instead of discarding them. Mode field (`simulation_mode: "dynamic" | "scenario_map"`) added for audit. Regression verified: canonical 79.3-day result unchanged. 4/4 test cases pass. Grant copy can now honestly claim continuous parameterization.
+- ✅ **CVaR-aware alert_engine landed (2026-05-03 follow-up to H1)**: `evaluate_risk_change()` now uses three independent dimensions — mean (existing), CVaR_90 absolute (>=90/45/21 days), CVaR_90 relative (>=100%/50%/25%) — with severity = max of all triggers. Backward-compatible (cvar args optional → mean-only legacy path). `scheduler.py` updated to pass CVaR values; alerts_triggered now carries `triggers[]`, `simulation_mode`, `baseline_cvar_90`, `shocked_cvar_90`, `cvar_delta`, `cvar_percent_increase`. End-to-end smoke test (synthetic article, real Claude): 1 article → 6 CRITICAL alerts firing on combinations of mean_critical + cvar_abs_critical + cvar_rel_critical triggers. The H1 false-negative case (cisplatin/AR manufacturing CRITICAL with mean_delta=-1.0d) now correctly fires HIGH on CVaR triggers.
+- 🔵 **6 critical defects identified** (see strategic review §1 for full table):
+  - H1 (HIGH): `shock_mapper.py` discards Claude's continuous impact parameters → "multi-dimensional" claim is currently a categorical lookup. Phase 2c RO fixes; interim shim possible (1–2 days).
+  - H2 (MED): `PROCESSED_ARTICLES` in-memory only (`scheduler.py:21`) — restart wipes dedup
+  - H3 (MED): NewsAPI free tier 100/day vs. 192/day demand at hourly cycle — "real-time" is aspirational
+  - H4 (MED): No `Demand surge` scenario in `supply_sim.py`; demand MODERATE silently → Baseline
+  - H5 (LOW): MAB has no rewards (no labeled shortage outcomes) — Phase 2c addresses
+  - H6 (HIGH): Pharma commercial hypothesis 100% unvalidated; no comparable nonprofit charges pharma subscriptions
+
+### Next Session — Strategic Action Plan (priority order)
+
+**Phase 2c implementation is GATED behind 501(c)(3) filing and PAHO/A4C outreach.** Algorithmic elegance does not pay legal fees or get PAHO meetings.
+
+1. **ACTION 5** (highest schedule risk): File DC 501(c)(3) Form 1023-EZ — 60–90 day clock; every week of delay narrows 2026 grant access
+2. **ACTION 6**: Email PAHO Strategic Fund leadership quoting their Feb 2025 "predictability" statement
+3. **ACTION 7**: Email Angels for Change to explore partnership (USAID/Google.org joint app)
+4. **ACTION 4**: SQLite persistence for `PROCESSED_ARTICLES` (2 hours)
+5. **ACTION 3**: Add `Demand surge` and `Regulatory squeeze` scenarios to `supply_sim.py` (1 hour)
+6. **ACTION 9**: Public risk dashboard v0 (GitHub Pages, static, ~1 week)
+7. **ACTION 8**: Pharma validation cycle (5 cold pitches; decision deadline July 15)
+8. **ACTION 2 shim**: `simulate_dynamic()` wrapper (1–2 days) — eliminates H1 credibility wound before any grant submission
+9. Phase 2c Week 2 (Kalman Filter implementation) — *only after items 1–8 in motion*
+
+Full plan: [phase2_realtime/ACTION_ITEMS_STRATEGIC.md](phase2_realtime/ACTION_ITEMS_STRATEGIC.md)
 
 ---
 
@@ -55,7 +127,7 @@ NewsAPI → news_listener.py → event_classifier.py (Claude) → shock_mapper.p
 - [x] **API key loading**: `override=True` required in load_dotenv — fixed
 
 ### Known Limitations (Phase 2c Backlog)
-1. **Impact parameters ignored**: `event_classifier.py` computes `lead_time_multiplier`, `demand_multiplier`, `fill_rate` via Claude — but `shock_mapper.py` ignores them, selecting a fixed scenario instead. Phase 2c will wire these parameters directly into `supply_sim.py`.
+1. **Impact parameters ignored**: `event_classifier.py` computes `lead_time_multiplier`, `demand_multiplier`, `fill_rate`, `budget_multiplier` via Claude — but `shock_mapper.py` still uses SCENARIO_MAP lookup. Phase 2c RO will wire these parameters directly into CVaR objective.
 2. **No demand-surge scenario**: `supply_sim.py` has no standalone demand-spike scenario; demand MODERATE/MINOR defaults to Baseline. Need new `SCENARIO_PARAMS["Demand surge"]` entry.
 3. **PROCESSED_ARTICLES in-memory only**: deduplication resets on restart; needs file/DB persistence for production use.
 4. **Free tier NewsAPI**: 100 req/day limit; 8 query categories = 8 requests/cycle; max ~12 cycles/day before rate limit hit.
@@ -77,27 +149,189 @@ python3 -c "from phase2_realtime.scheduler import run_cycle; import json; print(
 
 ---
 
-## PHASE 2b — Remaining Work (before May 15 capstone, if time permits)
+## PHASE 2b — ✅ COMPLETE (2026-05-02)
 
 **Goal:** Validate classification quality with real articles; improve test coverage.
 
-- [ ] **Classification quality test**: Run all 8 query categories, print titles + classifications. Verify that manufacturing articles → shock_type="manufacturing", not generic IRRELEVANT. Identify misclassification patterns.
-- [ ] **Alert integration test**: Manually inject a CRITICAL/MODERATE event and verify the full alert path: classification → scenario → simulation → alert message is correctly formatted.
-- [ ] **Regulatory CRITICAL mapping fix**: Consider changing `("regulatory", "CRITICAL")` from "Combined shock" to "Currency devaluation" — regulatory pricing controls act like a budget cap, not an API disruption. Needs expert judgment.
-- [ ] **news_listener.py load_dotenv**: Add `override=True` to match event_classifier.py pattern (NEWSAPI_KEY currently loaded at module level — may silently fail if .env not loaded before import).
+- [x] **Classification quality test**: v1: 81.2% (13/16) → system prompt v2 → 87.5% (14/16) ✅ PASS (gate ≥80%). 3 misclassification patterns fixed (FDA Form 483→regulatory, healthcare budget cuts→demand, indirect climate→climate). 2 remaining boundary cases have no adverse downstream effect. Report: `phase2_realtime/docs/classification_quality_report_v2.md`
+- [x] **Alert integration test**: Synthetic event injection (bypassing news_listener) into shock_mapper→supply_sim→alert_engine. 2/3 scenarios executed clean; Currency CRITICAL case errored in test script (not production code) — scheduler.py verified correct (calls format_alert with all 4 required args). Known gap: end-to-end from live news not tested; deferred to Phase 2c. Report: `phase2_realtime/docs/alert_integration_test.md`
+- [x] **Regulatory mapping decision**: CRITICAL kept as "Combined shock" (full import ban = API disruption + budget impact justified). MODERATE changed from "API export restriction" → "Currency devaluation" (pricing caps compress budgets like FX devaluation). Decision documented in `shock_mapper.py` inline comment.
+- [x] **news_listener.py load_dotenv**: `override=True` added — confirmed in `news_listener.py` line 21.
 
 ---
 
-## PHASE 2c — Post-Capstone Redesign (after May 15)
+## PHASE 2c — Post-Capstone Implementation (after May 15; 10-15 weeks)
 
-**Goal:** Wire Claude-extracted impact parameters directly into supply_sim.py so each news event produces a custom simulation — not a fixed scenario proxy.
+**Goal:** Implement three complementary real-time optimization algorithms: Kalman Filter (state estimation), Robust Optimization (policy design), Multi-Armed Bandit (signal learning).
+
+### Why This Stack?
+
+**Kalman Filter** (foundation layer):
+- Online state estimation: transforms noisy ERP data into coherent inventory/demand/lead-time estimates with quantified uncertainty
+- No forecasters required; works immediately with existing data
+- Feeds uncertainty into all downstream components
+- Effort: 200 LOC, 2-3 weeks
+
+**Robust Optimization** (core decision layer):
+- Produces worst-case (Q,r) policies without requiring distributional assumptions
+- Perfect for LATAM sparse, non-stationary data
+- Outputs policy frontier (cost vs. risk tradeoff) — auditable and defensible to regulators
+- Effort: 300 LOC, 4-6 weeks
+
+**Multi-Armed Bandit** (signal refinement layer):
+- Thompson Sampling learns which 8 news categories best predict shortages
+- Feeds posterior probabilities into RO to adjust uncertainty dynamically
+- Transparent signal weights (unlike black-box RL)
+- Effort: 200 LOC, 2-3 weeks
+
+### Phase 2c Timeline & Milestones
+
+| Week | Milestone | Deliverable |
+|------|-----------|------------|
+| 1-2 | Design & API contracts | KF/RO/MAB specifications; interface mocks |
+| 2-4 | Kalman Filter implementation | KF module + integration tests |
+| 4-8 | Robust Optimization implementation | RO module + uncertainty set calibration + policy frontier |
+| 8-10 | MAB implementation | MAB module + posterior tracking |
+| 10-12 | Integration & system testing | End-to-end pipeline; dashboard updates; regression tests |
+| 12-15 | Validation & hardening | Regulatory docs; operational handoff; shadow-mode deployment |
+
+### Architecture (Phase 2c Final)
+```
+Real-time ERP/News Feed
+        ↓
+    Kalman Filter (online state estimation)
+        ↓ (state + uncertainty)
+    Multi-Armed Bandit (Thompson Sampling on 8 news categories)
+        ↓ (posterior signal probabilities)
+    Robust Optimization (CVaR-DRO for (Q,r) policy frontier)
+        ↓ (policy recommendations + CVaR forecast)
+    shock_mapper.py (uncertainty-set adjustment on news events)
+        ↓
+    Alert Engine → Procurement Team
+```
+
+### Step 1: Kalman Filter Design & Implementation
+
+**State Vector:**
+- `s_t = [log(L_mean), log(sigma_L), demand_rate, demand_rate_drift, ...]`
+- Process model: random walk (captures regime drift over 30-60 day windows)
+- Measurement model: noisy on-hand inventory, lead-time observations, demand withdrawals
+- Handle missing observations (skip update, propagate prediction)
+
+**Integration with supply_sim.py:**
+- Replace fixed `COUNTRY_PARAMS['lead_time_mean']` with `KF.state[0]`
+- Replace fixed `COUNTRY_PARAMS['lead_time_cv']` with `KF.state[1]`
+- Optional: track demand-rate from daily sales for pure demand-surge scenarios
+
+**Test Harness:**
+- Synthetic data: known lead times + noise → verify KF recovery ±10%
+- ERP audit logs: real shipment receipts → verify estimates
+- Gate: KF mean absolute error < 10% after 30 observations
+
+**New Files:**
+- `phase2_realtime/kalman_filter.py` — KF class, state/covariance updates
+- `phase2_realtime/tests/test_kalman_filter.py` — unit + integration tests
+- `phase2_realtime/docs/kalman_filter_design.md` — mathematical specification
+
+### Step 2: Robust Optimization Design & Implementation
+
+**Uncertainty Set:**
+- Bertsimas-Sim box uncertainty + Wasserstein-DRO ambiguity radius
+- Gamma conservatism dial: tuned via expert elicitation (pharmacist + procurement)
+- News events trigger dynamic set expansion (e.g., FDA Form 483 → lead-time upper bound × 2.5)
+
+**Objective:**
+- Minimize worst-case CVaR_90 stockout-days + holding cost + ordering cost
+- Wrapped around `supply_sim.py` as black-box objective
+
+**Integration with Phase 2:**
+- Current: shock_mapper.SCENARIO_MAP discretizes events into 4 fixed scenarios
+- New: RO accepts continuous impact parameters from event_classifier (lead_time_multiplier, fill_rate, demand_multiplier) and optimizes (Q,r) directly
+
+**Test Harness:**
+- Backtesting: historical scenarios (FDA Form 483, FX crash) → verify feasibility
+- Sensitivity: vary Gamma 0→1 → plot cost vs. risk frontier
+- Gate: RO policy feasible for all scenarios; cost inflation < 15% vs. baseline (Q,r)
+
+**New Files:**
+- `phase2_realtime/robust_optimizer.py` — RO formulation + solver
+- `phase2_realtime/uncertainty_sets.py` — uncertainty set definitions (box, ellipsoid, Wasserstein)
+- `phase2_realtime/tests/test_robust_optimizer.py`
+- `phase2_realtime/docs/robust_optimization_design.md`
+- `phase2_realtime/docs/gamma_tuning_rationale.md` (expert elicitation notes)
+
+### Step 3: MAB (Thompson Sampling) Design & Implementation
+
+**Arms:** 8 news categories (manufacturing, logistics_latam, latam_politics, regulatory, currency, healthcare_demand, climate_latam, company_events)
+
+**Reward:** Binary or continuous indicator that a fired alert preceded a true shortage within 14-60 day lead window
+
+**Posterior:** Beta(α,β) per category per SKU class; updated when shortage is labeled (manual or auto-detected)
+
+**Integration:**
+- event_classifier fires an alert (category=manufacturing, classification=CRITICAL)
+- When shortage is eventually observed, update bandit: `reward(category="manufacturing", shortage_observed=True)`
+- Posterior mean P(shortage | category) adjusts RO uncertainty set radius
+
+**Cold-start:** High regret for first 6 months; initial signal weights are noisy
+
+**Test Harness:**
+- Synthetic signals: known shortage causality → verify bandit learns correct rankings
+- Posterior entropy: should decrease over time
+- Gate: Top-ranked arms match Phase 2 alert history (manufacturing > climate)
+
+**New Files:**
+- `phase2_realtime/signal_learner.py` — Thompson Sampling implementation
+- `phase2_realtime/tests/test_signal_learner.py`
+- `phase2_realtime/docs/mab_design.md`
+
+### Step 4: Integration, Testing, Validation
+
+**Integration Tasks:**
+- End-to-end pipeline: news → KF → MAB → RO → alert
+- Run 100 simulated days; verify all components fire in order
+- Shadow-mode deployment: log all decisions, don't affect procurement (2-4 weeks)
+
+**Dashboard Updates:**
+- KF: state estimates + uncertainty bands (covariance)
+- RO: policy frontier (cost vs. CVaR); current (Q,r) position
+- MAB: posterior probabilities per news category
+- Alert: trace signal → shock → order impact
+
+**Regulatory Documentation:**
+- Technical briefs for FDA/ANVISA/COFEPRIS (state vector definitions, uncertainty guarantees, decision rules)
+- Operations manual (Q/R tuning, Gamma adjustment, rollback procedures)
+
+**Sign-off:** Pharmacist + procurement approval before production deployment
+
+---
+
+### Why NOT Other Algorithms (Phase 2c Decision)
+
+**Model Predictive Control (MPC):** Deferred
+- Requires demand + lead-time forecasters that work across regime shifts
+- Model-maintenance burden is severe (Venezuela forecasts break during crises)
+- Timeline: 8-12 weeks minimum + 6-month ramp
+- Better as Phase 2d follow-up (post-capstone) once KF + RO + MAB track record validates forecaster investment
+
+**Reinforcement Learning (RL):** Deferred to Phase 3
+- <2 years of LATAM data per drug per country insufficient for deep policy learning
+- Offline RL distributional shift: logged data reflects old policies
+- Black-box policy indefensible to regulators (ANVISA/COFEPRIS/FDA expect auditability)
+- Requires 18+ months of labeled data + residual policy wrapper for auditability
+
+---
+
+### Legacy Phase 2c Plan (Superseded)
+
+~~**Goal:** Wire Claude-extracted impact parameters directly into supply_sim.py so each news event produces a custom simulation — not a fixed scenario proxy.
 
 ### Step 1: Add dynamic scenario support to supply_sim.py
 Add new function accepting raw shock parameters:
 ```python
 def simulate_dynamic(drug: str, country: str,
                      lead_time_multiplier: float = 1.0,
-                     demand_multiplier: float = 1.0,
+                     demand_multiplier: float = 1.0,~~
                      fill_rate: float = 0.95,
                      budget_multiplier: float = 1.0,
                      disruption_duration_mean: int = 90,
@@ -444,7 +678,7 @@ Results land in `evaluation/outputs/`. Read `judge_results.txt` for the scored c
 
 **Key simulation results to cite in writeup:**
 - Venezuela Baseline = HIGH risk (31 stockout days/year) — chronic systemic breakdown, not just shock
-- Trastuzumab Venezuela = CRITICAL (117 stockout days/year, p(crit)=100%)
+- Trastuzumab Venezuela = CRITICAL (79.3 stockout days/year mean; CVaR_90: 103 days; p(crit≥60d)=91%; p(any stockout)=100%)
 - Disruption duration now modeled as geometric distribution (Badejo & Ierapetritou 2022)
 - Argentina Baseline = LOW risk (7 days); Colombia = best performer (2.5 days)
 
@@ -659,7 +893,7 @@ Using `supply_sim.py` (Monte Carlo (Q,r) model, 500 runs each). Run: `python3 kn
 Key results:
 - Venezuela Baseline: 31 stockout days/year (HIGH) — structural failure, not just scenario
 - Venezuela Combined Shock: 35 days (HIGH) — marginally worse than baseline
-- Trastuzumab Venezuela: 117 stockout days/year (CRITICAL, p=100%)
+- Trastuzumab Venezuela: 79.3 stockout days/year (CRITICAL; CVaR_90: 103 days; p(crit)=91%; p(any stockout)=100%)
 - Argentina Baseline: 7 days (LOW); Colombia Baseline: 2.5 days (LOW)
 
 ---
