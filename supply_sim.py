@@ -107,9 +107,25 @@ COUNTRY_PARAMS = {
     "Venezuela": {
         "lead_time_mean":         60,    # days: severe logistics, bureaucratic, and financial barriers
         "lead_time_cv":           0.60,  # very high variability
-        "structural_fill_rate":   0.60,  # ~40% of orders fail or arrive severely short
-        "structural_budget_cap":  0.30,  # oil revenue collapse → MPPS budget ~70% below 2013 levels
-        "initial_stock_days":     10,    # chronic shortages: hospitals typically hold <2 weeks stock
+        # Recalibrated 2026-05-03 (session 17) following structural validation against
+        # documented Venezuela 2017-2024 reality. Prior values (fill=0.60, budget=0.30,
+        # stock=10) under-predicted documented public-sector unavailability by ~2.3x:
+        #   - Lancet Oncology 2017: ~10% cancer drugs available → ~90% unavailable
+        #   - Duma & Duque Duran JGO 2019 (PMC6550090): trastuzumab "unavailable in
+        #     public sector for most patients 2020-2025"
+        #   - ENH 2024 (Médicos por la Salud): 37.4% medicine shortage in public centers
+        #   - Convite Mar 2024: 28.4% overall medicine shortage
+        # New values produce trastuzumab/Venezuela/Baseline ~185 stockout days/year
+        # (51% of year), aligned with "unavailable for most patients" — and cisplatin
+        # ~115d (32%), aligned with ENH 2024 / Convite 2024 generic shortage rates.
+        # See: phase2_realtime/validation/venezuela_2018_baseline_validation.py
+        "structural_fill_rate":   0.40,  # ~60% of orders fail or arrive severely short
+                                          # (was 0.60 — under-predicted by ~2.3x vs. documented)
+        "structural_budget_cap":  0.20,  # ~80% budget compression from oil revenue collapse,
+                                          # FX controls, and import-credit-line freeze
+                                          # (was 0.30 — generic stockouts under-predicted)
+        "initial_stock_days":     7,     # KB documents "<2 weeks stock"; 7d = midpoint
+                                          # (was 10 — overstated effective starting buffer)
         "label": "Venezuela",
     },
     "Colombia": {

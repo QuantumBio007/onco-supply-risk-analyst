@@ -207,9 +207,12 @@ if __name__ == "__main__":
     print(json.dumps({k: v for k, v in a.items() if k != "timestamp"}, indent=2))
 
     print("\n=== Test 3: Mean + CVaR both critical (Trastuzumab/Venezuela) ===")
+    # Updated 2026-05-03 (session 17): canonical Venezuela trastuzumab Baseline
+    # recalibrated to 185.4d / CVaR_90=203.8 (was 79.3 / 103.3 prior to structural
+    # parameter recalibration validated against Lancet 2017 / ENH 2024 reality).
     a = evaluate_risk_change(
-        baseline_risk=79.3, shocked_risk=78.6,
-        baseline_cvar=103.3, shocked_cvar=167.0,
+        baseline_risk=185.4, shocked_risk=184.0,
+        baseline_cvar=203.8, shocked_cvar=240.0,
     )
     print(json.dumps({k: v for k, v in a.items() if k != "timestamp"}, indent=2))
 

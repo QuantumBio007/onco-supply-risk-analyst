@@ -14,7 +14,7 @@
 **Active mission (revised 2026-05-03):**
 > *"JCNB Biotech is a nonprofit dedicated to preventing oncology drug shortages in Latin America through AI-driven, multi-dimensional supply chain visibility — combining real-time news intelligence, peer-reviewed Monte Carlo simulation, and institutional knowledge across Argentina, Colombia, and Venezuela. We give ministries, hospitals, and pharmaceutical partners the foresight to act months before patients are harmed."*
 
-**Headline number for every funder pitch:** Trastuzumab/Venezuela = **79.3 stockout days/year**, CVaR_90 = 103d, p(crit≥60d)=91%.
+**Headline number for every funder pitch:** Trastuzumab/Venezuela = **185 stockout days/year (51% of year)**, CVaR_90 = 204d, p(any stockout) = 100%, p(critical ≥60d) = 100%. *(Recalibrated 2026-05-03 session 17 from prior 79.3d figure, which under-predicted documented Venezuela public-sector unavailability by ~2.3x against Lancet Oncology 2017, Duma & Duque Duran JGO 2019, ENH 2024.)*
 
 **Strategic plan of record:** [phase2_realtime/ACTION_ITEMS_STRATEGIC.md](phase2_realtime/ACTION_ITEMS_STRATEGIC.md) | Full review: [phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md](phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md)
 
