@@ -1,9 +1,26 @@
 # OncoSupply Risk Analyst — Weekend Build Tracker
 **Project:** OncoSupply Risk Analyst (JCNB Biotech)
-**Goal:** Working Streamlit RAG app by end of weekend
-**Week 6 check-in target:** ~2 weeks from now
-**Last updated:** 2026-05-03 (session 17 — macro_economic shock pathway: classifier + scenario + SQLite dedup; Actions 3+4 complete)
-**Knowledge base scope:** 9 KB docs + 48 drug-country-scenario sim files → ChromaDB (149 chunks, 59 files)
+
+## ▶ READ FIRST: [MASTER_ACTION_PLAN.md](MASTER_ACTION_PLAN.md)
+
+The master action plan is the single source of truth for what to do next. It contains:
+- TIER 1 (tonight/tomorrow) — PAHO email, A4C outreach, 501(c)(3) start
+- TIER 2 (this week) — advisory board, Streamlit demo, real NewsAPI, customer discovery
+- TIER 3 (weeks 2–4) — numerical backtest, dashboard, validation depth
+- TIER 4 (weeks 5–15+) — Phase 2c Kalman/RO/MAB (GATED behind TIER 1)
+- TIER 5 — Phase 3 RL/ERP/Regulatory (deferred)
+- 10 open honest defects with CSO red-flag classification
+- Decision rules + review cadence
+
+**Workflow:** Open `MASTER_ACTION_PLAN.md` at the start of every session. Check items `[x]` as completed. Update weekly. This `TRACKER.md` is the historical log; `MASTER_ACTION_PLAN.md` is the forward-looking checklist.
+
+---
+
+**Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
+**Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
+**Phase 2c status:** 🔒 GATED until TIER 1 in MASTER_ACTION_PLAN.md is in motion
+**Last updated:** 2026-05-03 (session 17 — Master Action Plan created; canonical recalibration cascade; Phase 1 re-evaluation 12/12 perfect)
+**Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files)
 
 ---
 
