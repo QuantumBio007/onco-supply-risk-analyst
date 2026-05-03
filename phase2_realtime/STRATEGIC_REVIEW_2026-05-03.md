@@ -22,9 +22,9 @@
 ## 1. WHAT IS ACTUALLY BUILT (verified against current code, not memory)
 
 ### Phase 1 — Capstone delivered 2026-04-29
-- `supply_sim.py` — Monte Carlo (Q,r) inventory model, peer-reviewed citations (Warren OM, Andrade-Wang MIT, Izen et al. Cancer Journal 2025, Badejo-Ierapetritou AIChE 2025). Structural fragility (`supply_sim.py:107-114`) for Venezuela (fill 0.60, budget 0.30) and Colombia (EPS-IPS debt cascade) is institutional knowledge no comparable has.
-- `app/app.py` Streamlit RAG: ChromaDB, all-mpnet-base-v2, 11 KB docs + 48 sim outputs, RAG 12/12 vs prompt-only 8/12 across 5 cases. **Local-only** — Streamlit Cloud blocked by Python 3.14.
-- Canonical patient-harm headline: **Trastuzumab/Venezuela/Baseline = 79.3 ±1.2 stockout days/year, CVaR_90 = 103d, p(crit≥60d)=91%.** This single number is the headline for every grant deck.
+- `supply_sim.py` — Monte Carlo (Q,r) inventory model, peer-reviewed citations (Warren OM, Andrade-Wang MIT, Izen et al. Cancer Journal 2025, Badejo-Ierapetritou AIChE 2025). Structural fragility (`supply_sim.py:107-128`) for Venezuela (recalibrated session 17: fill 0.40, budget 0.20, stock 7d) and Colombia (EPS-IPS debt cascade) is institutional knowledge no comparable has.
+- `app/app.py` Streamlit RAG: ChromaDB, all-mpnet-base-v2, 11 KB docs + 84 sim outputs (4 drugs × 3 countries × 7 scenarios), RAG **12/12 perfect on all 5 cases** vs prompt-only 6.4/12 avg. **Local-only** — Streamlit Cloud blocked by Python 3.14.
+- Canonical patient-harm headline (RECALIBRATED 2026-05-03 session 17): **Trastuzumab/Venezuela/Baseline = 185.4 ±1.0 stockout days/year (51% of year), CVaR_90 = 204d, p(any stockout) = 100%, p(critical ≥60d) = 100%.** Validated against Lancet Oncology 2017 (~10% cancer drugs available), Duma & Duque Duran JGO 2019 (trastuzumab "unavailable in public sector for most patients 2020-2025"), ENH Sept 2024 (37.4% medicine shortage), Convite Mar 2024 (28.4%). Prior 79.3d figure under-predicted documented severity by ~2.3x.
 
 ### Phase 2 — Branch `phase-2-realtime-news`
 - 5 modules verified: `news_listener.py`, `event_classifier.py`, `shock_mapper.py`, `alert_engine.py`, `scheduler.py`.
@@ -74,7 +74,7 @@ You are not selling a tool. You are selling a **public good**: the first-ever in
 | Narrative | Funder | Hook | Evidence on hand |
 |-----------|--------|------|------------------|
 | **AI-for-science / AI-for-good** | Google.org ($500K–$3M, 9/10 fit per `grants/GRANT_SEARCH_FRAMEWORK.md`), Microsoft AI for Good, Patrick J. McGovern | Multi-dimensional shock model with Claude-in-the-loop classification and Monte Carlo grounding | 87.5% classifier accuracy; 8 shock categories; peer-reviewed sim |
-| **Health systems & access** | Gates Foundation, Rockefeller, RWJ | LATAM oncology access — quantified patient harm | 79.3 stockout days/year for trastuzumab/Venezuela; 28.4% WHO shortage rate |
+| **Health systems & access** | Gates Foundation, Rockefeller, RWJ | LATAM oncology access — quantified patient harm | 185 stockout days/year (51% of year) for trastuzumab/Venezuela, validated against Lancet 2017 + ENH 2024; 28.4% WHO shortage rate |
 | **Supply chain resilience** | USAID Innovation, World Bank, Skoll | Real-time visibility prevents stockouts before they happen | Phase 2 architecture; 8-dimension shock decomposition |
 | **Procurement partnership** | PAHO Strategic Fund (operationalize), St. Jude/PAHO 2024 model | Predictive analytics partner to PAHO | Quote PAHO's Feb 2025 statement asking for "predictability" |
 

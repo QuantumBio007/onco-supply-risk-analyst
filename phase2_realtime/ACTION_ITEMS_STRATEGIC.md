@@ -12,7 +12,7 @@
 
 > **No one else can build this.** Angels for Change has US institutional backing but no LATAM presence. Max Foundation distributes drugs but has no predictive analytics. CHAI negotiates prices but doesn't model shortage risk. PAHO procures $800M/yr but has no foresight layer — and explicitly asked for one in February 2025. IQVIA could build it but won't, because the LATAM oncology TAM is too small and politically too thorny for a $14B public company. The only entity with (a) the LATAM institutional knowledge from JCNB Biotech Consulting, (b) the technical stack (RAG + Monte Carlo + 8-dimensional shock model + Kalman/Robust/MAB on the way), (c) the academic credibility (JHU Carey + peer-reviewed grounding), and (d) the willingness to operate as a public good rather than a $200K-per-seat commercial product — is JCNB. **That is why this organization must exist, and why it must exist as a nonprofit.**
 
-**Patient-harm headline (use in every funder pitch):** Trastuzumab in Venezuela = **79.3 stockout days/year**, CVaR_90 = 103 days, p(critical ≥60d) = 91%. WHO 2023: 28.4% LATAM shortage rate.
+**Patient-harm headline (use in every funder pitch, RECALIBRATED 2026-05-03):** Trastuzumab in Venezuela = **185 stockout days/year (51% of year)**, CVaR_90 = 204 days, p(any stockout) = 100%, p(critical ≥60d) = 100%. Validated against Lancet Oncology 2017 (~10% cancer drugs available), Duma & Duque Duran JGO 2019, ENH Sept 2024 (37.4% public-sector medicine shortage), Convite Mar 2024 (28.4%). WHO 2023: 28.4% LATAM shortage rate. Prior 79.3d figure under-predicted documented severity by ~2.3x; corrected via structural validation in session 17.
 
 **The wedge (the niche statement, memorize):**
 
@@ -60,7 +60,7 @@ These are listed here, not below in the 90-day list, because **they are not "act
   - All-default impact dict (Claude classified severity but didn't quantify) → fallback to SCENARIO_MAP. Empty/missing impact dict → fallback.
   - Per-shock-type `DEFAULT_DURATION_BY_SHOCK` map (manufacturing=90d, regulatory=365d, currency=180d, etc.) used when Claude doesn't extract duration.
   - New `simulation_mode` field in result dict: `"dynamic"` | `"scenario_map"` | `"skipped"` | `"error"` — full audit trail of which path fired.
-- Regression check: `simulate('trastuzumab','Venezuela','Baseline')` still returns canonical 79.3 ± 1.2 days, CVaR_90 = 103.3.
+- Regression check: `simulate('trastuzumab','Venezuela','Baseline')` returned 79.3 ± 1.2 days under prior calibration (session 16). Recalibrated session 17 to 185.4 ± 1.0 days against documented reality.
 - Test cases (`python3 -m phase2_realtime.shock_mapper`): 4/4 pass — dynamic path, fallback path, defensive clamping, all-default-impact fallback.
 
 **Critical finding from this work (logged for follow-up):**
@@ -113,7 +113,7 @@ Then update `shock_mapper.SCENARIO_MAP` for `("demand", "MODERATE")` and `("regu
 
 ### ⏳ ACTION 6 — Email PAHO Strategic Fund leadership
 **Why:** PAHO Feb 2025 statement explicitly asks for "predictability" in cancer medicine access. JCNB IS that ask. Their $800M/yr procurement budget makes any analytical partnership ($50K–$200K) a rounding error. St. Jude/PAHO 2024 model already validated the partnership template.
-**What:** One-paragraph cold email quoting their own Feb 2025 statement, attaching one-page brief with the Trastuzumab/Venezuela 79.3-day result.
+**What:** One-paragraph cold email quoting their own Feb 2025 statement, attaching one-page brief with the Trastuzumab/Venezuela 185-day result (51% of year, validated against Lancet 2017 + ENH 2024).
 **Effort:** 2 hours including brief. Send this week.
 **Critical:** Highest-leverage single action in 2026. **Do not let Phase 2c implementation delay this.**
 
@@ -135,7 +135,7 @@ Then update `shock_mapper.SCENARIO_MAP` for `("demand", "MODERATE")` and `("regu
 ---
 
 ### ⏳ ACTION 9 — Build the public risk dashboard (static v0)
-**Why:** Funders click artifacts. Press picks up on numbers. A free public dashboard showing Trastuzumab/Venezuela = 79.3 days IS the convening artifact that legitimizes the public-good positioning vs. IQVIA's paywalled reports.
+**Why:** Funders click artifacts. Press picks up on numbers. A free public dashboard showing Trastuzumab/Venezuela = 185 stockout days/year (51% of year) IS the convening artifact that legitimizes the public-good positioning vs. IQVIA's paywalled reports.
 **What:** GitHub Pages site, static charts derived from existing 48 sim outputs. No backend required for v0. Use Plotly/Observable.
 **Effort:** 1 week.
 **Gate:** Live URL in time for Action 6 (PAHO email) and Action 7 (A4C outreach) attachments.

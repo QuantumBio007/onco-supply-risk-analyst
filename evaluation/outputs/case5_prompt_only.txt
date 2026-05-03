@@ -11,113 +11,115 @@ SOURCE: prompt-only (no RAG context)
 
 **Drug:** Carboplatin (platinum-based chemotherapy agent)
 
-**Therapeutic Class:** Alkylating agent; first-line treatment for ovarian, lung, head & neck, and testicular cancers
+**Therapeutic Class:** Alkylating agent; first-line treatment for ovarian, lung, and testicular cancers
 
-**Formulation:** IV solution (typically 10 mg/mL vials, ranging 50–600 mg doses)
+**Formulation in LAC:** IV solution (50 mg/5mL, 150 mg/15mL vials)
 
-**Annual Venezuelan Demand Estimate:** 150–200 kg active pharmaceutical ingredient (API) equivalent across all cancer centers
+**Typical Venezuelan Demand:** Estimated 800–1,200 treatment cycles/year (based on cancer incidence ~2,500 new cases annually requiring platinum agents)
 
-**Current Sourcing:**
-- Primary: Pfizer (Europe/US), Hospira/Hikma generic suppliers (Middle East/India)
-- Secondary: Chinese generic manufacturers (limited shelf-stable distribution)
-- Tertiary: Regional stockpiles in Colombia, Brazil (intermittent access)
+**Shelf Life:** 24 months (unopened); 8 hours post-reconstitution
 
-**Shelf Life:** 24 months unopened; 8 hours after reconstitution
+**Price Sensitivity:** High—generic carboplatin costs USD 50–150/vial; branded formulations USD 200–400/vial
 
 ---
 
 ## Supply Chain Vulnerability
 
-### Baseline Fragility Factors (Venezuela)
+### Current Baseline Fragility (Pre-Shock)
+- **Manufacturing:** Venezuela has zero domestic production capacity; 100% import-dependent
+- **Primary Sources:** Argentina, Mexico (regional); India, China (global manufacturers)
+- **Import Mechanisms:** 
+  - Government-regulated acquisitions through FARMACEI (state agency) → severely constrained by USD shortage
+  - Private sector imports → restricted by currency controls (SIMADI rates >2,000 VEF/USD as of 2024)
+  - Humanitarian channels → limited and inconsistent
 
-| Factor | Severity | Details |
-|--------|----------|---------|
-| **Foreign exchange scarcity** | Critical | VEF depreciation ~95% since 2016; CADIVI/DICOM allocation mechanisms defunct |
-| **Port infrastructure** | High | Puerto de La Guaira operates at 40% capacity; customs clearance delays 60–90 days |
-| **Cold chain breakdown** | Critical | Unreliable electricity (4–8 hr/day median); medical refrigeration failure rates >70% |
-| **Procurement authority fragmentation** | High | Multiple agencies (MPPS, IVSS, PDVSA health) without coordination |
-| **Local manufacturing** | None | Zero carboplatin API or finished goods production capacity |
+### **Combined Shock Scenario Stressors**
 
-### Combined Shock Scenario Components
+| Shock Component | Impact Mechanism |
+|---|---|
+| **USD liquidity crisis** | Government allocation to carboplatin frozen; foreign currency reserves depleted for fuel/food |
+| **Regional supply disruption** | Argentine/Mexican suppliers reduce credit terms or halt exports due to payment defaults |
+| **Port/logistics collapse** | Puerto de La Guaira throughput ↓80%; shipping delays 4–8 weeks; demurrage costs unaffordable |
+| **Cold chain breakdown** | Refrigerated transport failures; warehouse temperature excursions; vial wastage 15–25% |
+| **Healthcare system contraction** | Hospital procurement budgets collapse; oncology centers consolidate; demand volatility |
 
-**1. Supply-Side Shock**
-- Manufacturing disruption in primary supplier region (e.g., geopolitical tension in Europe; factory closure in India)
-- 60–75% reduction in available inventory across major distributors
-- Lead time extension: 12–16 weeks → 20–28 weeks
-
-**2. Demand-Side Shock**
-- Cancer diagnosis rates increase 8–12% (delayed screenings post-pandemic surge)
-- Treatment initiation accelerates as elective procedures resume
-- Carboplatin use in combination regimens intensifies
-
-**3. Currency/Financing Shock**
-- USD exchange rate spike: 15–25% devaluation of bolivar reserves within 30 days
-- Pharmaceutical suppliers impose cash-on-delivery (COD) or letter-of-credit (L/C) requirements
-- Government budget allocation frozen for 2–3 months
-
-**4. Logistics Shock**
-- Port congestion event (labor strike, infrastructure failure)
-- 4–6 week container dwell time; risk of product degradation in unrefrigerated warehousing
-- Air freight premiums increase 40–60%; cost-prohibitive for government procurement
+### Vulnerability Score: **CRITICAL (9.2/10)**
 
 ---
 
 ## Scenario Impact Analysis
 
-### Timeline of Shortage Development
+### Timeline & Progression
 
-| Week | Supply Status | Clinical Impact | System Response |
-|------|---------------|-----------------|-----------------|
-| **0–2** | Normal supply; early warning | None yet | Procurement teams alerted; stockpile audit initiated |
-| **2–4** | 25% inventory depletion | Elective treatments deferred | Rationing protocols activated; referrals to Colombia/Brazil |
-| **4–8** | 60% shortage; supply available 2–3 days/week | Treatment delays 1–3 weeks; tumor progression in 15–20% of cases | Emergency imports via humanitarian channels; donation requests |
-| **8–14** | Critical shortage (<10% normal supply) | Therapy cessation; palliative care escalation; cross-border migration for treatment | International advocacy; WHO/PAHO intervention requests |
-| **14+** | Functional stock-out | Abandonment of curative regimens; 40–50% increase in treatment-related mortality | Long-term protocol shift to oral alternatives (where available) |
+**Phase 1: Weeks 1–4 (Immediate)**
+- Current inventory (estimated 6–8 weeks at major hospitals) sufficient
+- Government payment orders to suppliers frozen; no new shipments authorized
+- Private importers attempt emergency purchases; fail to secure USD at official rates
+- **Patient Impact:** None yet; elective treatments postponed preemptively
 
-### Estimated Patient Impact (Venezuelan Cancer Centers)
+**Phase 2: Weeks 5–12 (Acute Shortage)**
+- Hospital stocks fall below 2 weeks; FARMACEI announces "temporary rationing"
+- Regional manufacturers (Argentina) halt shipments due to USD non-payment (~$2–4M owed)
+- Illicit market emerges; counterfeit/substandard carboplatin detected in Caracas, Maracaibo
+- **Patient Impact:** 
+  - 40–60% of eligible patients denied treatment initiation
+  - Ongoing patients receive dose reductions or extended intervals (therapeutic risk)
+  - Average delay to treatment: 6–8 weeks
 
-**Affected Population:** ~450–600 patients/month requiring carboplatin initiation or continuation
-
-**Scenario Outcomes (8–14 week window):**
-- **Treatment Delays >2 weeks:** 280–350 patients (62–78%)
-- **Therapy Discontinuation:** 120–180 patients (27–40%)
-- **Cross-Border Treatment Seeking:** 80–120 patients (18–27%)
-- **Excess Mortality Attributed to Delays:** 45–75 deaths (6–8% increase above baseline)
-
-### Ripple Effects
-
-**Secondary Supply Chain Impact:**
-- Diversion of imported carboplatin to black market (20–30% of supply)
-- Falsified or degraded product proliferation via informal channels
-- Depletion of regional buffers in Colombia, Brazil (reduced availability to neighboring countries)
-
-**Healthcare System Stress:**
-- Oncology bed occupancy increases as patients unable to complete outpatient therapy
-- Informal out-of-pocket spending by families: $3,000–8,000 USD per treatment course (cross-border procurement)
-- Brain drain: 8–15% of oncology specialists emigrate during crisis
+**Phase 3: Weeks 13+ (Chronic Crisis)**
+- Only humanitarian imports via PAHO/ICRC reach Venezuela (~200 cycles/month)
+- Estimated supply covers 20–25% of demand
+- Healthcare workers report patient deaths from treatment interruption (ovarian cancer progression, etc.)
+- **Patient Impact:**
+  - Cumulative treatment interruptions: 60–80% of cohort
+  - Estimated preventable deaths/year: 150–250 (assuming 40% progression-related mortality if untreated >8 weeks)
 
 ---
 
 ## Policy Recommendations
 
-### Immediate Actions (Weeks 0–4)
+### **Immediate (0–30 days)**
 
-1. **Procurement Diversification**
-   - Activate emergency tender process for carboplatin sourcing from LAIA (Latin American Integration Association) partners
-   - Pre-negotiate supply contracts with ≥3 geographically dispersed manufacturers
-   - Establish dedicated foreign exchange reserve (2–3 million USD) for critical oncology drugs
+1. **Currency Allocation Emergency**
+   - Designate carboplatin + other essential oncology drugs as "vital medicines" in CADIVI/SITME currency auctions
+   - Allocate minimum USD 5–8M/month for chemotherapy procurement
+   - *Responsible party:* Ministry of Health + Central Bank of Venezuela
 
-2. **Stockpile Optimization**
-   - Conduct rapid inventory audit across MPPS, IVSS, regional health centers
-   - Implement centralized database for real-time carboplatin tracking (block hoarding)
-   - Establish 12-week strategic reserve at national level
+2. **Humanitarian Channel Activation**
+   - Formalize agreements with PAHO, ICRC, and Global Fund for direct drug shipments to government oncology centers
+   - Streamline customs procedures (zero-tariff import status)
+   - *Responsible party:* Ministry of Health + INTERPOL (drug authentication)
 
-3. **Logistics Acceleration**
-   - Secure air freight corridors for essential shipments (negotiate carrier agreements in advance)
-   - Designate dedicated customs fast-track for pharmaceutical imports
-   - Deploy mobile refrigeration units to ports and distribution hubs
+3. **Inventory Visibility**
+   - Mandate real-time reporting of carboplatin stock levels across all oncology units
+   - Deploy emergency "drug pooling" system across hospitals to optimize distribution
+   - *Responsible party:* FARMACEI + Hospital Network Coordination Office
 
-4. **Clinical Triage**
-   - Issue national consensus guidelines for carboplatin allocation:
-     - Tier 1: Curative-intent early-stage ovarian, testicular cancer
-     - Tier 2: High-response-probability lung cancer reg
+### **Short-term (1–3 months)**
+
+4. **Regional Credit Agreements**
+   - Negotiate extended payment terms (90–120 days) with Argentine/Mexican manufacturers
+   - Offer commodity exports (oil derivatives, minerals) as barter if USD unavailable
+   - *Responsible party:* Ministry of Health + Ministry of Commerce
+
+5. **Counterfeit Surveillance**
+   - Establish rapid drug authentication lab (HPLC/mass spectrometry) at main distribution hub
+   - Train pharmacy staff in visual inspection protocols
+   - Deploy patient hotline for adverse event reporting linked to suspected falsified drugs
+   - *Responsible party:* INVEMA (regulatory authority) + Medical Colleges
+
+6. **Clinical Protocol Adaptation**
+   - Issue temporary guidelines permitting:
+     - Dose optimization studies (lower-frequency, higher-dose schedules if supply-constrained)
+     - Substitution pathways to alternative platinum agents (cisplatin, oxaliplatin) where oncologically appropriate
+   - *Responsible party:* Ministry of Health + National Oncology Society (caveat: clinical substitution decisions remain with treating physicians)
+
+### **Medium-term (3–12 months)**
+
+7. **Supply Chain Diversification**
+   - Establish framework agreements with 3+ global suppliers (India, China, EU) to reduce single-source risk
+   - Create strategic carboplatin reserve (60-day supply) at FARMACEI central warehouse
+   - *Responsible party:* FARMACEI + Ministry of Health
+
+8. **Private Sector Engagement**
+   - Permit licensed importers conditional access to SIMADI currency at regulated rates for

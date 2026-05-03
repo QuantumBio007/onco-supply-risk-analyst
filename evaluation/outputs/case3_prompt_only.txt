@@ -3,124 +3,128 @@ SOURCE: prompt-only (no RAG context)
 ============================================================
 
 # Drug Shortage Risk Brief: Cisplatin in Argentina
-## Scenario: Active Pharmaceutical Ingredient (API) Export Restriction
+## API Export Restriction Scenario
 
 ---
 
 ## Drug Profile
 
-**Drug:** Cisplatin (cis-diamminedichloroplatinum II)
-**Therapeutic Class:** Platinum-based chemotherapy agent
-**WHO Status:** Essential Medicine (cancer treatment)
-**Argentine Formulations:** Injectable solution (10 mg/mL, 50 mL vials; 1 mg/mL bulk formulations)
-**Primary Indications in Region:** Ovarian, testicular, bladder, lung, and gastric cancers
-**Current Argentine Market Volume:** Estimated 8,000–12,000 treatment cycles annually across public/private systems
-**Typical Shelf Life:** 24–36 months from manufacture
+**Drug:** Cisplatin (Cisplatinum)
+**Therapeutic Class:** Platinum-based alkylating chemotherapy agent
+**Clinical Indications:** Testicular cancer, ovarian cancer, bladder cancer, head & neck cancers, lung cancer
+**Formulation in Argentina:** Injectable solution (10 mg/5mL, 50 mg/25mL vials); powder for reconstitution
+**Annual Estimated Demand (Argentina):** 8,000–12,000 treatment cycles (~200–300 kg API equivalent)
+**Regulatory Status:** ANMAT-approved; included in National Cancer Treatment Program
+
+**Market Structure:**
+- Primary suppliers: Pfizer, Hospira (Pfizer subsidiary), Actavis, Sandoz
+- Domestic manufacturing: Limited (primarily formulation/packaging; no active API synthesis)
+- Import dependency: ~95% of API sourced from India, China, and EU
 
 ---
 
 ## Supply Chain Vulnerability
 
-### Current Supply Structure
+### Critical Vulnerabilities
 
-| Component | Source | Risk Level |
-|-----------|--------|-----------|
-| **API** | India (80%), China (15%), EU (5%) | **CRITICAL** |
-| **Formulation/Packaging** | Argentina (Richet, local manufacturers), India | HIGH |
-| **Distribution** | Regional wholesalers, ANMAT-licensed importers | MODERATE |
+**1. API Source Concentration**
+- India represents 40–50% of global cisplatin API exports; primary suppliers: Cipla, Dr. Reddy's, Aurobindo
+- China supplies 25–30% (Hubei, Shandong provinces)
+- Single-source risk: Argentina lacks redundant supplier agreements
+- Lead time from India: 60–90 days (ocean freight)
 
-### Critical Vulnerabilities Under Export Restriction Scenario
+**2. Domestic Manufacturing Gaps**
+- No active API synthesis capacity in Argentina
+- Formulation/packaging occurs at 2–3 local sites (Roemmers, Farmapiel, Laboratorio Richet)
+- These facilities are contract manufacturers dependent on imported APIs
+- No strategic national reserve
 
-**1. API Dependency Exposure**
-- Argentina has **zero domestic API production capacity** for cisplatin
-- 80% of regional API supply concentrated in 3–4 Indian manufacturers
-- If India implements export restrictions (precedent: COVID-19 API hoarding 2020–2021), Argentine formulation capacity becomes orphaned within **6–8 weeks**
-- China represents thin backup with geopolitical risk
+**3. Regulatory & Logistical Constraints**
+- ANMAT import licensing requires 15–30 days per shipment
+- Cold-chain requirements (2–8°C) add complexity; limited refrigerated storage infrastructure in regional hospitals
+- Currency volatility in Argentina increases procurement costs by 20–40% during economic downturns
 
-**2. Buffer Stock Inadequacy**
-- Most manufacturers maintain 4–6 week working inventory
-- Argentine healthcare system (public PAMI, provinces) holds minimal strategic reserves
-- Private sector hospitals typically stock 2–3 month supply for cost reasons
-
-**3. Regulatory Bottlenecks**
-- ANMAT approval for new suppliers averages **8–12 months**
-- Emergency use pathways exist but require documentation from alternate suppliers (unavailable if restrictions global)
-- Importation requires currency allocation—subject to Argentine forex constraints
-
-**4. Market Concentration**
-- Domestic formulation dominated by 2–3 manufacturers
-- No inter-changeable generic competition reduces negotiating power with API suppliers
-- Oncology drug import typically deprioritized in forex rationing vs. insulin, cardiovascular agents
+**4. Market Competition**
+- High-income OECD countries (US, EU) will prioritize allocation if global scarcity emerges
+- Argentina's purchasing power lower than competing markets; risk of deprioritization
 
 ---
 
 ## Scenario Impact Analysis
 
-### Timeline & Progression
+### Trigger: API Export Restriction
 
-| Phase | Timeline | Impact |
-|-------|----------|--------|
-| **Phase 1: Announcement** | Week 0–2 | Panic buying; price volatility; informal hoarding by private sector |
-| **Phase 2: Supply Squeeze** | Week 3–8 | Exhaustion of immediate stocks; price inflation 150–300%; rationing begins |
-| **Phase 3: Acute Shortage** | Week 9–16 | Treatment delays/cancellations; diversion to private market; regional arbitrage |
-| **Phase 4: Crisis** | Week 17+ | Systemic treatment disruption; mortality impact; regulatory emergency measures |
+**Assumption:** India implements temporary (6–12 month) or permanent export quota/licensing restriction on cisplatin API due to:
+- Domestic supply constraints
+- Regulatory enforcement (environmental compliance at manufacturing sites)
+- Geopolitical friction or trade protectionism
 
-### Quantified Risk Estimates
+---
 
-**Treatment Access Impact:**
-- Public sector (PAMI, provincial oncology centers): **60–70% of patients** experience 2–4 week treatment delays by month 2
-- Private sector: **30–40% of patients** maintain access via direct importation attempts or alternative protocols
-- Estimated **400–600 treatment cycles postponed/abandoned** over 6-month restriction period
+### Phase 1: Immediate Impact (Weeks 1–4)
 
-**Price Escalation:**
-- Current Argentine retail: ~$800–1,200 USD/patient cycle
-- Projected under API restriction: $2,000–3,500 USD within 8–12 weeks
-- Out-of-pocket affordability collapse for middle-income patients
+| Metric | Impact Level | Details |
+|--------|--------------|---------|
+| **Supply Disruption** | HIGH | In-transit shipments (60–90 days pipeline) unaffected; new orders blocked |
+| **Hospital Stock Depletion** | MODERATE | Most hospitals maintain 4–8 week buffer; critical stockouts unlikely immediately |
+| **Price Volatility** | CRITICAL | Ex-India pricing +150–300%; gray-market premiums possible |
+| **Treatment Delays** | LOW–MODERATE | Elective/adjuvant cases delayed; urgent cases (testicular) prioritized |
 
-**Mortality/Morbidity Proxy:**
-- Delayed cisplatin initiation in testicular cancer: 5–10% relapse rate increase per 4-week delay
-- Ovarian cancer: increased progression; reduced overall survival probability
-- Estimated excess deaths (Argentina, 6-month period): **40–80 cases** (model dependent)
+**Estimated Affected Patients:** 400–600 patients/month delayed ≥2 weeks
 
-### Geographic/Socioeconomic Disparity
-- **Buenos Aires private clinics:** Limited impact (direct import attempts, private supply chains)
-- **Provincial public hospitals:** Severe impact (dependent on federal/provincial distribution; weaker negotiating power)
-- **Rural/underserved regions:** Near-total access loss for 4–8 weeks
+---
+
+### Phase 2: Mid-Term (Months 2–4)
+
+| Metric | Impact Level | Details |
+|--------|--------------|---------|
+| **Hospital Stockouts** | MODERATE–HIGH | Regional hospitals (provinces) exhaust reserves first |
+| **Rationing** | HIGH | ANMAT may implement allocation protocols; preference for curative indications (testicular, ovarian) over palliative |
+| **Treatment Abandonment** | MODERATE | Estimated 10–15% of planned cycles cancelled; patients shift to alternative regimens (carboplatin, taxane-based) |
+| **Clinical Outcomes** | MODERATE | Inferior outcomes expected for cisplatin-sensitive tumors; ~5–8% reduction in 5-year survival for testicular cancer if delays >3 weeks |
+| **Healthcare Costs** | HIGH | Increased use of salvage therapies; hospitalization for complications |
+
+**Estimated Affected Patients:** 1,200–1,800 cumulative patients experience treatment modification or delay
+
+---
+
+### Phase 3: Extended Impact (Months 5+)
+
+| Metric | Impact Level | Details |
+|--------|--------------|---------|
+| **Supply Stabilization** | Dependent on policy | Alternative suppliers (China, EU) may partially offset; lead times 90–120 days |
+| **Market Reallocation** | HIGH | Argentina loses negotiating power; price premiums may persist 12+ months post-crisis |
+| **Clinical Portfolio Shift** | MODERATE | Oncology practice shifts toward carboplatin, combination taxane regimens; departure from gold-standard protocols |
+
+---
+
+### Cascading Risks
+
+1. **Secondary Market Distortion**
+   - Carboplatin prices increase 40–60% due to substitution demand
+   - Docetaxel, paclitaxel shortages possible
+   - Cost burden on healthcare system borne by provinces
+
+2. **Equity Impact**
+   - Private/CABA patients access gray-market supplies; public system (INSSJP, provincial hospitals) prioritized for government reserves
+   - Regional disparities widen (interior provinces receive 30–40% less allocation)
+
+3. **Regulatory Strain**
+   - ANMAT expedited licensing may reduce safety surveillance capability
+   - Importation of non-GMP compliant batches possible from intermediary suppliers
 
 ---
 
 ## Policy Recommendations
 
-### Immediate Actions (0–4 weeks post-announcement)
+### Immediate Actions (Days 1–30)
 
-1. **Emergency API Strategic Reserve**
-   - Activate ANMAT/Ministry of Health to contract 8–12 week emergency API buffer
-   - Secure allocation from neutral suppliers (EU, Switzerland if available)
-   - Cost: ~$2–4M USD; justifiable under public health emergency
+**1. Strategic Inventory Audit**
+- ANMAT + provincial health ministries conduct 72-hour census of cisplatin reserves
+- Establish emergency stockpile threshold: ≥500 kg API (4–6 months supply)
+- **Responsible parties:** ANMAT, Ministerio de Salud
 
-2. **Supplier Diversification Initiative**
-   - Fast-track ANMAT pre-qualification of alternate API suppliers (Brazil, Mexico, EU)
-   - Implement expedited documentation review (4-week pathway vs. standard 8–12 months)
-   - Legal authority: ANMAT Emergency Use/Equivalent procedure
-
-3. **Domestic Formulation Capacity Mapping**
-   - Audit existing Argentine formulation capacity (Richet, others); identify surge capacity
-   - Facilitate API stockpiling by licensed manufacturers with government guarantee of purchase
-   - Estimated surge capacity: +30–40% within 6 weeks
-
-4. **Price Regulation & Procurement**
-   - Freeze retail/wholesale pricing at current levels (IOMA/PAMI authority)
-   - Centralize procurement through Ministry of Health to consolidate demand (improve negotiating power with remaining suppliers)
-   - Establish price caps: reject >120% markup justifications
-
-### Medium-Term Actions (4–12 weeks)
-
-5. **Regional Supply Coordination**
-   - Engage MERCOSUR partners (Brazil, Uruguay, Paraguay) for API resource-sharing agreements
-   - Brazil has some API capacity; formalize emergency supply pact
-   - Regional purchase pooling to reduce individual vulnerability
-
-6. **Alternative Treatment Pathways**
-   - Convene oncology consensus panel to identify non-cisplatin protocols for select indications (e.g., carboplatin substitution with risk counseling)
-   - Document in medical literature/guidelines to avoid off-label chaos
-   - **Important:**
+**2. Supplier Diversification**
+- Issue expedited RFQ to non-Indian suppliers:
+  - China (Hubei Gotanda, Shandong Weigao): 30–40 kg/week
+  - EU (Germany: Teva; Italy
