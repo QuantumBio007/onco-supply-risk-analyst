@@ -16,7 +16,9 @@ from supply_sim import (
 ALLOWED_DRUGS     = ["cisplatin", "doxorubicin", "carboplatin", "trastuzumab"]
 ALLOWED_COUNTRIES = ["Argentina", "Venezuela", "Colombia"]
 ALLOWED_SCENARIOS = ["Baseline", "API export restriction",
-                     "Currency devaluation", "Combined shock"]
+                     "Currency devaluation", "Combined shock",
+                     "Demand surge", "Regulatory squeeze",
+                     "Macro/inflation shock"]
 
 def check_refusal(drug, country):
     """Validate that drug and country are in scope. Returns error message or None."""
