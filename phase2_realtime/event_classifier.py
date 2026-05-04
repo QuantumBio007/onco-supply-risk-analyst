@@ -72,8 +72,10 @@ Type definitions:
 
   - "regulatory" - Government or agency ACTION on market access or compliance:
     FDA/ANVISA/COFEPRIS import alerts, Form 483 warnings, approval denials, drug pricing
-    controls, patent rulings. FDA Form 483 = "regulatory" even if target is a factory.
-    Healthcare budget policy changes = "regulatory".
+    controls, patent rulings. Healthcare budget policy changes = "regulatory".
+    IMPORTANT — FDA Form 483 alone (inspection note, no production halt) = "regulatory".
+    FDA Form 483 followed by a facility SHUTDOWN or production halt = "manufacturing"
+    (the regulatory action is context; the physical production disruption is the shock).
 
   - "demand" - Patient-side volume changes: disease outbreak, cancer diagnosis surge,
     treatment guideline changes, hospital capacity shifts.
@@ -126,15 +128,28 @@ Type definitions:
     LATAM budget/inflation impact from an external shock = valid macro_economic signal.
 
 DISAMBIGUATION EXAMPLES:
-  - "FDA inspects Indian plant, issues Form 483" → regulatory
+  - "FDA inspects Indian plant, issues Form 483" → regulatory (note issued, no production halt)
+  - "Plant announces indefinite shutdown following FDA Form 483 citing GMP failure" → manufacturing (halt = production disruption; Form 483 is cause, not the shock type)
   - "Indian plant shuts down voluntarily after contamination" → manufacturing
   - "Brazil cuts healthcare budget 15%" → regulatory
   - "Hospital budget cuts reduce oncology admissions" → demand
   - "Argentina peso drops 25% overnight" → currency (direct FX event)
   - "Iran war: LATAM fuel prices surge 20%, air fares up 24%, inflation 3.4%/month"
     → macro_economic MODERATE, Argentina/Colombia (NOT Venezuela); lead_time_multiplier=1.0
-    (air freight is a budget effect, not lead-time); budget_multiplier in low 0.7s
-    (compute from cumulative inflation × duration, do not echo this exact number)
+    (air freight is a budget effect, not lead-time).
+    Arithmetic: 3.4%/month × 9 months = 30.6% cumulative inflation → budget_multiplier ≈
+    1/(1+0.306) ≈ 0.77 → 23% compression → MODERATE range (10–25%). Do NOT escalate to
+    CRITICAL because the article mentions war or geopolitical drama — the CAUSAL CHAIN is
+    still indirect and gradual. CRITICAL requires explicit ministerial warning of >25%
+    compression or computed multiplier ≤ 0.75.
+
+  SEVERITY CAP FOR macro_economic:
+    Default to MODERATE for gradual commodity/inflation signals (≤5%/month, no acute FX
+    event, no ministry explicitly warning of crisis). CRITICAL is reserved for:
+      (a) article explicitly quotes ministry/government warning of >25% procurement cuts, OR
+      (b) arithmetic from article specifics produces budget_multiplier ≤ 0.75 (>25% compression).
+    A geopolitically dramatic headline does NOT by itself justify CRITICAL — the magnitude
+    of the budget compression pathway is what matters.
   - "Iran closes Strait of Hormuz; pharmaceutical APIs face 20-day delay"
     → logistics CRITICAL (NOT macro_economic — direct supply event takes precedence)
   - "IMF warns LATAM growth cut, oil shock stresses health budgets" → macro_economic MODERATE

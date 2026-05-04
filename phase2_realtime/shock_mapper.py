@@ -222,6 +222,24 @@ def trigger_simulation(event_classification: dict, drug: str, country: str) -> d
         risk_delta = shocked_risk - baseline_risk
         cvar_delta = shocked_cvar - baseline_cvar
 
+        # Anti-artifact: (Q,r) safety-stock adaptation can paradoxically reduce
+        # simulated stockouts when lead-time increase dominates fill-rate degradation
+        # (Badejo & Ierapetritou 2022 §4.3). A CRITICAL/MODERATE event cannot
+        # realistically improve drug availability. If baseline is not already at
+        # structural floor (≥60d = Venezuela-class collapse), negative delta is an
+        # artifact → fall back to SCENARIO_MAP for a conservative monotone estimate.
+        if severity in ("CRITICAL", "MODERATE") and risk_delta < 0 and baseline_risk < 60:
+            fallback_scenario = SCENARIO_MAP.get((shock_type, severity), "Baseline")
+            fallback_result = simulate(
+                drug=drug, country=country, scenario=fallback_scenario, n_runs=500
+            )
+            shocked_risk     = fallback_result["stockout_days_mean"]
+            shocked_cvar     = fallback_result["cvar_90"]
+            risk_delta       = shocked_risk - baseline_risk
+            cvar_delta       = shocked_cvar - baseline_cvar
+            simulation_mode  = "scenario_map_fallback"
+            applied_scenario = fallback_scenario
+
         return {
             "drug": drug,
             "country": country,
