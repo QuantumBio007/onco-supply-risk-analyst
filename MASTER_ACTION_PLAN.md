@@ -1,6 +1,6 @@
-# JCNB Biotech — Master Action Plan
+# OncoSupply — Master Action Plan
 **Owner:** Carlos Martino (solo founder; advisory board pending)
-**Last updated:** 2026-05-03 (session 17)
+**Last updated:** 2026-05-04 (session 20)
 **Companion docs:** [TRACKER.md](TRACKER.md), [phase2_realtime/ACTION_ITEMS_STRATEGIC.md](phase2_realtime/ACTION_ITEMS_STRATEGIC.md), [phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md](phase2_realtime/STRATEGIC_REVIEW_2026-05-03.md)
 **Read this before every session.** Check off items as completed.
 
@@ -8,7 +8,7 @@
 
 ## ▶ THE WHY (memorize)
 
-> No one else can build this. Angels for Change has US institutional backing but no LATAM presence. Max Foundation distributes drugs but has no predictive analytics. CHAI negotiates prices but doesn't model shortage risk. PAHO procures $800M/yr but has no foresight layer — and explicitly asked for one in February 2025. IQVIA could build it but won't, because the LATAM oncology TAM is too small and politically too thorny for a $14B public company. Only JCNB has (a) LATAM institutional knowledge, (b) the technical stack, (c) academic credibility, and (d) the willingness to operate as a public good.
+> No one else can build this. Angels for Change has US institutional backing but no LATAM presence. Max Foundation distributes drugs but has no predictive analytics. CHAI negotiates prices but doesn't model shortage risk. PAHO procures $800M/yr but has no foresight layer — and explicitly asked for one in February 2025. IQVIA could build it but won't, because the LATAM oncology TAM is too small and politically too thorny for a $14B public company. Only OncoSupply has (a) LATAM institutional knowledge, (b) the technical stack, (c) academic credibility, and (d) the willingness to operate as a public good.
 
 ## ▶ HEADLINE NUMBER (memorize, recalibrated 2026-05-03)
 
@@ -18,8 +18,8 @@ Validated against Lancet Oncology 2017, Duma & Duque Duran JGO 2019, ENH Sept 20
 ## ▶ THE CEO GATE (discipline)
 
 Phase 2c implementation is GATED behind ALL of these:
-- [ ] 501(c)(3) Form 1023-EZ filing initiated
-- [ ] PAHO email sent
+- [x] 501(c)(3) Form 1023-EZ filing initiated — EIN SS-4 faxed 2026-05-04
+- [x] PAHO email sent — Christopher Lim (email) + Vasquez (LinkedIn) 2026-05-04
 - [ ] One advisory board signature secured
 - [ ] One numerical backtest with pre-registered criteria
 
@@ -36,8 +36,8 @@ Phase 2c implementation is GATED behind ALL of these:
 | Phase 2c Week 1 — Design specs | ✅ COMPLETE | — |
 | Phase 2c Weeks 2-15 — Implementation | 🔒 GATED | Kalman Filter |
 | Phase 3 — RL / ERP / Regulatory | 🔲 NOT DEFINED | Concept only |
-| Business — Legal entity (501c3) | 🔲 NOT STARTED | Form 1023-EZ |
-| Business — Funder pipeline | 🔲 NOT STARTED | PAHO email |
+| Business — Legal entity (501c3) | 🟡 IN PROGRESS — EIN faxed 2026-05-04 | DC Articles (after EIN arrives ~May 5) |
+| Business — Funder pipeline | 🟡 IN PROGRESS — PAHO email sent 2026-05-04 | Reply ~May 9–13; A4C outreach pending |
 | Business — Validation depth | 🟡 PARTIAL (directional only) | Numerical backtest |
 | Business — Team | 🔲 NOT STARTED | Advisory board |
 
@@ -48,21 +48,21 @@ Phase 2c implementation is GATED behind ALL of these:
 These items block all other progress. Order matters.
 
 ## 1.1 — PAHO Strategic Fund email
-- [ ] **Status:** NOT SENT (pending since session 16)
-- **Owner:** Carlos | **Deadline:** May 4 EOD | **Effort:** 1 hour
+- [x] **Status:** SENT 2026-05-04 — Christopher Lim (email) + Dr. Liliana Vasquez (LinkedIn) + Dr. Mauricio Maza (LinkedIn pending acceptance)
+- **Owner:** Carlos | **Deadline:** May 4 EOD ✅ | **Effort:** 1 hour
 - **Why:** Highest-leverage 2026 action. PAHO Feb 2025 statement explicitly asked for "predictability."
-- **Payload:** One paragraph quoting their Feb 2025 statement; one-page brief attached with 185 stockout days for trastuzumab/Venezuela; cite Lancet 2017 + ENH 2024 validation.
-- **Kill rule:** If not sent by May 4 EOD, project deceleration is the diagnosis, not the strategy.
+- **Next:** Monitor Lim reply (5–7 business days, ~May 9–13). Accept Maza connection when he responds.
 
 ## 1.2 — Angels for Change partnership outreach
-- [ ] **Status:** NOT SENT
-- **Owner:** Carlos | **Deadline:** May 4 EOD | **Effort:** 30 min
-- **Frame:** LATAM analogue to A4C's US predictive model. Joint USAID or Google.org cycle.
+- [x] **Status:** SENT 2026-05-04 — communications@angelsforchange.org
+- **Revised ask:** Data co-citation (congressional briefs/SummitONE) + EDSA membership ($500, 90+ pharma contacts) + call with Anthony Flammia (COO, global supply chain background)
+- **Note:** Original "joint USAID/Google.org" framing was wrong — A4C is a $690K advocacy org that grants TO manufacturers, not analytics nonprofits. Real value is EDSA network access and Flammia as potential advisory board member.
 
 ## 1.3 — DC 501(c)(3) Form 1023-EZ
-- [ ] **Status:** NOT STARTED
-- **Owner:** Carlos | **Deadline:** Filing started by May 11 | **Effort:** $3,500–5,500 cash + 20 hours founder time over 60–90 days
-- **Why:** Most schedule-sensitive item in the entire project. Every week of delay narrows 2026 grant access.
+- [x] **EIN SS-4 faxed** 2026-05-04 to 1-855-641-6935 — response expected ~May 5
+- [ ] **DC Articles of Incorporation** — file via CorpOnline (corponline.dlcp.dc.gov) after EIN arrives ($350, 5–7 days)
+- [ ] **Form 1023-EZ** — file after Articles approved (~May 20+)
+- **Owner:** Carlos | **Hard deadline:** Filing started by May 11 ✅ (EIN already in motion) | **Effort:** $3,500–5,500 cash + 20 hours
 - **Reference:** [DC_NONPROFIT_FORMATION_GUIDE.md](DC_NONPROFIT_FORMATION_GUIDE.md) Phases 1–4
 
 ---
@@ -75,10 +75,7 @@ These items block all other progress. Order matters.
 - **Why:** CSO red flag #1 is solo founder. One credentialed name (JHU Carey biostatistician, Bloomberg School health systems researcher) changes how funders read the project. Even unpaid, even informal.
 
 ## 2.2 — Streamlit demo update (`app/app.py:1157`)
-- [ ] **Status:** NOT STARTED
-- **Owner:** Carlos | **Effort:** 15 min
-- **What:** Add `Demand surge`, `Regulatory squeeze`, `Macro/inflation shock` to `ALLOWED_SCENARIOS` list. Verify renders.
-- **Why:** Funders click demos. Today's macro_economic capability is currently invisible.
+- [x] **Status:** DONE — commit a5c9b92d (2026-05-04). `Demand surge`, `Regulatory squeeze`, `Macro/inflation shock` added and live.
 
 ## 2.3 — Real NewsAPI macro_latam smoke test
 - [ ] **Status:** NOT RUN
