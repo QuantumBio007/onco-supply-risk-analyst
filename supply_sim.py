@@ -959,6 +959,177 @@ def simulate_correlated_pair(country, scenario="API export restriction",
     }
 
 
+# ── Transient-mode simulation (Path B, Amendment B1, 2026-05-05) ──────────────
+
+def simulate_transient(drug, country,
+                       lead_time_multiplier=1.0,
+                       demand_multiplier=1.0,
+                       fill_rate=0.95,
+                       budget_multiplier=1.0,
+                       disruption_duration_mean=90,
+                       n_runs=500, days=365,
+                       service_level_target=0.95,
+                       return_distribution=False):
+    """
+    Transient-mode Monte Carlo simulation (Amendment B1 — Path B).
+
+    The critical difference from simulate_dynamic():
+      - (Q, r) policy is computed from PRE-SHOCK (baseline) COUNTRY_PARAMS only,
+        so the policy is FROZEN at pre-shock values during the disruption window.
+      - Shock multipliers (lead_time_multiplier, fill_rate, demand_multiplier,
+        budget_multiplier) apply to the operational parameters WITHIN the
+        disruption window, but do NOT feed back into policy computation.
+      - After the disruption window, the simulation returns to baseline params.
+
+    This isolates the impact of the shock from the policy's adaptive response:
+    simulate_dynamic() re-computes (Q,r) from post-shock parameters, allowing
+    the EOQ and reorder point to grow and partially buffer the shock — masking
+    the true operational impact. simulate_transient() holds (Q,r) fixed at what
+    the system actually had before the disruption, exposing the full shock effect.
+
+    Root cause of defect #4: Argentina/cisplatin (Q,r) policy already provides
+    adequate safety stock for the nominal 35-day lead time. When simulate_dynamic()
+    receives lead_time_multiplier=3.0, it computes a much larger safety stock from
+    L_mean=105 days, and the reorder point inflates enough that the 12.9% delta
+    stays below the 25% alert threshold. With frozen pre-shock (Q,r), the same
+    3x lead time hits an undersized buffer and produces the correct larger delta.
+
+    Design reference: phase2_realtime/docs/design_amendments_2026-05-05.md §B1
+    Pre-registration criterion: phase2_realtime/docs/preregistration_phase2c.md H1
+      PASS if mean_delta_pct >= 25% OR cvar_delta_pct >= 30%
+
+    Args:
+        drug:                     key in DRUG_PARAMS
+        country:                  key in COUNTRY_PARAMS
+        lead_time_multiplier:     applied within disruption window (>= 1.0)
+        demand_multiplier:        applied within disruption window
+        fill_rate:                scenario-level fill rate within disruption window
+        budget_multiplier:        scenario-level budget within disruption window
+        disruption_duration_mean: geometric mean disruption length in days
+        n_runs:                   Monte Carlo replications
+        days:                     simulation horizon (default 365)
+        service_level_target:     for policy computation from baseline params
+        return_distribution:      if True, includes raw stockout_distribution list
+
+    Returns:
+        dict matching simulate_dynamic() schema, with additional keys:
+            - "mode": "transient"
+            - "baseline_reorder_point", "baseline_eoq": the frozen pre-shock policy
+    """
+    dp = DRUG_PARAMS[drug]
+    cp = COUNTRY_PARAMS[country]
+
+    struct_fill   = cp["structural_fill_rate"]
+    struct_budget = cp["structural_budget_cap"]
+    demand_dist   = dp.get("demand_dist", "normal")
+
+    # ── Baseline parameters (policy is computed from these, NOT the shock params) ──
+    base_d       = dp["daily_demand_mean"]
+    base_sigma_d = (np.sqrt(base_d) if demand_dist == "poisson"
+                   else dp["daily_demand_std"])
+    base_L_mean  = cp["lead_time_mean"]
+    base_L_cv    = cp["lead_time_cv"]
+    base_fill_rate   = struct_fill   * SCENARIO_PARAMS["Baseline"]["fill_rate"]
+    base_budget_mult = struct_budget * SCENARIO_PARAMS["Baseline"]["budget_multiplier"]
+
+    # ── Frozen pre-shock policy (the key distinction from simulate_dynamic) ──
+    baseline_policy = compute_policy(
+        d=base_d, sigma_d=base_sigma_d, L_mean=base_L_mean, L_cv=base_L_cv,
+        service_level=service_level_target,
+        unit_cost=dp["unit_cost_usd"], days=days,
+    )
+
+    # ── Shock-state operational parameters (applied within disruption window) ──
+    shock_d        = dp["daily_demand_mean"] * demand_multiplier
+    shock_sigma_d  = (np.sqrt(shock_d) if demand_dist == "poisson"
+                     else dp["daily_demand_std"] * demand_multiplier)
+    shock_L_mean   = cp["lead_time_mean"] * lead_time_multiplier
+    shock_L_cv     = cp["lead_time_cv"]
+    shock_fill_eff = struct_fill   * fill_rate
+    shock_bud_eff  = struct_budget * budget_multiplier
+
+    # Initial inventory: from baseline stock days (same as simulate_dynamic)
+    initial_inv = int(base_d * cp["initial_stock_days"])
+
+    # Run Monte Carlo with frozen (Q,r) but live shock operational params
+    runs = [
+        _run_once(
+            # Disruption-window operational params (shock state)
+            d=shock_d, sigma_d=shock_sigma_d,
+            L_mean=shock_L_mean, L_cv=shock_L_cv,
+            fill_rate=shock_fill_eff,
+            budget_multiplier=shock_bud_eff,
+            # FROZEN pre-shock policy
+            reorder_point=baseline_policy["reorder_point"],
+            order_quantity=baseline_policy["eoq"],
+            days=days, seed=i,
+            disruption_duration_mean=disruption_duration_mean,
+            # Post-disruption baseline params
+            base_L_mean=base_L_mean, base_L_cv=base_L_cv,
+            base_fill_rate=base_fill_rate,
+            base_budget_multiplier=base_budget_mult,
+            base_d=base_d, base_sigma_d=base_sigma_d,
+            initial_inventory=initial_inv,
+            demand_dist=demand_dist,
+        )
+        for i in range(n_runs)
+    ]
+
+    so    = np.array([r["stockout_days"]       for r in runs])
+    slu   = np.array([r["service_level_units"]  for r in runs])
+    sld   = np.array([r["service_level_days"]   for r in runs])
+    inv   = np.array([r["avg_inventory"]        for r in runs])
+    ddays = np.array([r["disruption_days_seen"] for r in runs])
+
+    ci = lambda a: round(1.96 * a.std() / np.sqrt(n_runs), 2)
+
+    var_90      = float(np.percentile(so, 90))
+    exceedances = so[so >= var_90]
+    cvar_90     = round(float(exceedances.mean()) if len(exceedances) > 0 else var_90, 1)
+
+    result = {
+        "drug": drug, "country": country, "scenario": "_transient_",
+        "mode": "transient",
+        "n_runs": n_runs, "days": days,
+        "demand_dist": demand_dist,
+        # Echoed shock input parameters
+        "input_lead_time_multiplier": round(lead_time_multiplier, 3),
+        "input_demand_multiplier":    round(demand_multiplier, 3),
+        "input_fill_rate":            round(fill_rate, 3),
+        "input_budget_multiplier":    round(budget_multiplier, 3),
+        # Frozen pre-shock policy (the key diagnostic field)
+        "baseline_reorder_point": baseline_policy["reorder_point"],
+        "baseline_safety_stock":  baseline_policy["safety_stock"],
+        "baseline_eoq":           baseline_policy["eoq"],
+        # For API compatibility with simulate_dynamic schema
+        "reorder_point":   baseline_policy["reorder_point"],
+        "safety_stock":    baseline_policy["safety_stock"],
+        "eoq":             baseline_policy["eoq"],
+        "lead_time_mean":  round(shock_L_mean, 1),
+        "lead_time_std":   round(shock_L_mean * shock_L_cv, 1),
+        "fill_rate":              shock_fill_eff,
+        "fill_rate_scenario":     fill_rate,
+        "fill_rate_structural":   struct_fill,
+        "budget_multiplier":      shock_bud_eff,
+        "budget_structural":      struct_budget,
+        "disruption_duration_mean": disruption_duration_mean,
+        # KPIs
+        "stockout_days_mean":  round(float(so.mean()), 1),
+        "stockout_days_ci":    ci(so),
+        "cvar_90":             cvar_90,
+        "sl_units_mean":       round(float(slu.mean()), 4),
+        "sl_units_ci":         ci(slu),
+        "sl_days_mean":        round(float(sld.mean()), 4),
+        "avg_inventory_mean":  round(float(inv.mean()), 1),
+        "avg_disruption_days": round(float(ddays.mean()), 1),
+        "prob_critical_shortage": round(float((so > 60).mean()), 3),
+        "prob_any_stockout":      round(float((so > 0).mean()), 3),
+    }
+    if return_distribution:
+        result["stockout_distribution"] = so.tolist()
+    return result
+
+
 if __name__ == "__main__":
     r = simulate("cisplatin", "Argentina", "Baseline", n_runs=200)
     print(result_to_text(r))
