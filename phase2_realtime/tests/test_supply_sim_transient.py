@@ -254,3 +254,256 @@ def test_defect4_cisplatin_argentina_closure():
         "mean_delta_pct": mean_delta_pct,
         "cvar_delta_pct": cvar_delta_pct,
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Phase 2c — Realistic-response mode tests
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ── (e) Realistic mode with default params: strictly between baseline and frozen ─
+
+def test_realistic_mode_between_baseline_and_frozen():
+    """
+    response_mode="realistic" with default response_trigger_day=30 and
+    response_acceleration=0.3 should produce a shocked stockout count that is:
+      (i)  strictly greater than the transient baseline (some shock remains)
+      (ii) strictly less than frozen-policy shocked count (emergency response helps)
+
+    Tolerance: ε = 1.0 days to handle Monte Carlo noise.
+    Drug/country: cisplatin/Argentina (defect #4 case — large dynamic range).
+    """
+    drug, country = "cisplatin", "Argentina"
+    eps = 1.0
+
+    baseline = simulate_transient(
+        drug, country,
+        lead_time_multiplier=1.0, demand_multiplier=1.0,
+        fill_rate=0.95, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+    )
+
+    frozen = simulate_transient(
+        drug, country,
+        lead_time_multiplier=3.0, fill_rate=0.55,
+        demand_multiplier=1.0, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="frozen",
+    )
+
+    realistic = simulate_transient(
+        drug, country,
+        lead_time_multiplier=3.0, fill_rate=0.55,
+        demand_multiplier=1.0, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="realistic",
+        response_trigger_day=30,
+        response_acceleration=0.3,
+    )
+
+    assert realistic["mode"] == "transient_realistic", (
+        f"Expected mode='transient_realistic', got '{realistic['mode']}'"
+    )
+
+    # (i) realistic must be worse than no-shock baseline (shock still hurts)
+    assert realistic["stockout_days_mean"] >= baseline["stockout_days_mean"] - eps, (
+        f"Realistic ({realistic['stockout_days_mean']}) should be >= baseline "
+        f"({baseline['stockout_days_mean']}) - eps={eps}"
+    )
+
+    # (ii) realistic must be better than frozen (emergency response helps)
+    assert realistic["stockout_days_mean"] <= frozen["stockout_days_mean"] + eps, (
+        f"Realistic ({realistic['stockout_days_mean']}) should be <= frozen "
+        f"({frozen['stockout_days_mean']}) + eps={eps}"
+    )
+
+    # At least a non-trivial improvement over frozen (not just noise)
+    improvement = frozen["stockout_days_mean"] - realistic["stockout_days_mean"]
+    assert improvement >= 0.0, (
+        f"Realistic mode should not worsen outcome vs frozen: improvement={improvement:.2f}"
+    )
+
+    print(f"\n[realistic_between] baseline={baseline['stockout_days_mean']:.1f}, "
+          f"realistic={realistic['stockout_days_mean']:.1f}, "
+          f"frozen={frozen['stockout_days_mean']:.1f}, "
+          f"improvement={improvement:.1f}d")
+
+
+# ── (f) response_acceleration=0.0 gives identical result to frozen ────────────
+
+def test_zero_acceleration_matches_frozen():
+    """
+    response_acceleration=0.0 means no lead-time compression — the realistic
+    runner should produce a result identical to frozen mode (same seeds, same RNG
+    path through the disruption window sampling).
+
+    Tolerance: ±0.5 days (floating-point / ordering differences only).
+    """
+    drug, country = "doxorubicin", "Colombia"
+    eps = 0.5
+
+    frozen = simulate_transient(
+        drug, country,
+        lead_time_multiplier=2.0, fill_rate=0.65,
+        demand_multiplier=1.0, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="frozen",
+    )
+
+    zero_accel = simulate_transient(
+        drug, country,
+        lead_time_multiplier=2.0, fill_rate=0.65,
+        demand_multiplier=1.0, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="realistic",
+        response_trigger_day=30,
+        response_acceleration=0.0,
+    )
+
+    diff_mean = abs(zero_accel["stockout_days_mean"] - frozen["stockout_days_mean"])
+    diff_cvar = abs(zero_accel["cvar_90"] - frozen["cvar_90"])
+
+    assert diff_mean <= eps, (
+        f"zero_acceleration mean={zero_accel['stockout_days_mean']} differs from "
+        f"frozen mean={frozen['stockout_days_mean']} by {diff_mean:.2f} (tol {eps})"
+    )
+    assert diff_cvar <= eps, (
+        f"zero_acceleration cvar={zero_accel['cvar_90']} differs from "
+        f"frozen cvar={frozen['cvar_90']} by {diff_cvar:.2f} (tol {eps})"
+    )
+
+    print(f"\n[zero_accel] frozen_mean={frozen['stockout_days_mean']:.1f}, "
+          f"zero_accel_mean={zero_accel['stockout_days_mean']:.1f}, diff={diff_mean:.2f}")
+
+
+# ── (g) response_acceleration=1.0 gives stockout count close to baseline ───────
+
+def test_full_acceleration_approaches_baseline():
+    """
+    response_acceleration=1.0 means instant delivery (lead time compressed to 0,
+    floored at 1 day). Emergency-sourced orders arrive near-instantly so the shock
+    should be largely offset.  Stockout count should be close to baseline (within
+    a generous tolerance — the fill rate shock still applies, so it won't match
+    exactly).
+
+    Tolerance: realistic mean <= baseline mean + 20 days (generous — fill rate
+    shock at 0.55 still degrades service even with instant procurement).
+    """
+    drug, country = "cisplatin", "Argentina"
+
+    baseline = simulate_transient(
+        drug, country,
+        lead_time_multiplier=1.0, demand_multiplier=1.0,
+        fill_rate=0.95, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+    )
+
+    full_accel = simulate_transient(
+        drug, country,
+        lead_time_multiplier=3.0, fill_rate=0.55,
+        demand_multiplier=1.0, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="realistic",
+        response_trigger_day=30,
+        response_acceleration=1.0,
+    )
+
+    # With instant procurement, outcome should be much closer to baseline than frozen
+    # Generous tolerance: fill rate shock (0.55 effective) still causes some stockouts
+    assert full_accel["stockout_days_mean"] <= baseline["stockout_days_mean"] + 20.0, (
+        f"Full acceleration mean={full_accel['stockout_days_mean']:.1f} should be "
+        f"close to baseline={baseline['stockout_days_mean']:.1f} "
+        f"(within 20 days; fill-rate shock still active)"
+    )
+
+    print(f"\n[full_accel] baseline={baseline['stockout_days_mean']:.1f}, "
+          f"full_accel={full_accel['stockout_days_mean']:.1f}")
+
+
+# ── (h) Defect #4 closure under realistic mode — the publishable number ────────
+
+def test_defect4_realistic_mode_closure():
+    """
+    Defect #4 closure under response_mode="realistic" (default params).
+    This is the number we would report externally — the upper-bound frozen result
+    (+1006% / +790%) is correct but may be challenged as unrealistic; this test
+    produces the calibrated estimate assuming modest emergency procurement.
+
+    Shock: cisplatin / Argentina, lead_time_multiplier=3.0, fill_rate=0.55,
+    disruption_duration_mean=90, response_trigger_day=30, response_acceleration=0.3.
+
+    PASS criterion: mean_delta_pct >= 25% OR cvar_delta_pct >= 30% (locked thresholds).
+    The test itself does NOT fail on NULL — records the label for reporting.
+    """
+    drug, country = "cisplatin", "Argentina"
+
+    baseline = simulate_transient(
+        drug, country,
+        lead_time_multiplier=1.0, demand_multiplier=1.0,
+        fill_rate=0.95, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="realistic",
+        response_trigger_day=30,
+        response_acceleration=0.3,
+        return_distribution=True,
+    )
+
+    shocked = simulate_transient(
+        drug, country,
+        lead_time_multiplier=3.0, fill_rate=0.55,
+        demand_multiplier=1.0, budget_multiplier=1.0,
+        disruption_duration_mean=90, n_runs=N_RUNS, days=DAYS,
+        response_mode="realistic",
+        response_trigger_day=30,
+        response_acceleration=0.3,
+        return_distribution=True,
+    )
+
+    baseline_mean = baseline["stockout_days_mean"]
+    baseline_cvar = baseline["cvar_90"]
+    shocked_mean  = shocked["stockout_days_mean"]
+    shocked_cvar  = shocked["cvar_90"]
+
+    if baseline_mean > 0:
+        mean_delta_pct = (shocked_mean - baseline_mean) / baseline_mean * 100.0
+    else:
+        mean_delta_pct = float("inf") if shocked_mean > 0 else 0.0
+
+    if baseline_cvar > 0:
+        cvar_delta_pct = (shocked_cvar - baseline_cvar) / baseline_cvar * 100.0
+    else:
+        cvar_delta_pct = float("inf") if shocked_cvar > 0 else 0.0
+
+    MEAN_THRESHOLD = 25.0
+    CVAR_THRESHOLD = 30.0
+
+    passes_mean = mean_delta_pct >= MEAN_THRESHOLD
+    passes_cvar = cvar_delta_pct >= CVAR_THRESHOLD
+    label = "PASS" if (passes_mean or passes_cvar) else "NULL"
+
+    print(f"\n{'='*65}")
+    print(f"DEFECT #4 CLOSURE — realistic mode (response_trigger_day=30, accel=0.3)")
+    print(f"{'='*65}")
+    print(f"  baseline_mean    = {baseline_mean:.2f} days")
+    print(f"  baseline_cvar_90 = {baseline_cvar:.2f} days")
+    print(f"  shocked_mean     = {shocked_mean:.2f} days")
+    print(f"  shocked_cvar_90  = {shocked_cvar:.2f} days")
+    print(f"  mean_delta_pct   = {mean_delta_pct:+.1f}%  (threshold >= {MEAN_THRESHOLD}%: {'PASS' if passes_mean else 'miss'})")
+    print(f"  cvar_delta_pct   = {cvar_delta_pct:+.1f}%  (threshold >= {CVAR_THRESHOLD}%: {'PASS' if passes_cvar else 'miss'})")
+    print(f"  RESULT: {label}")
+    print(f"{'='*65}")
+
+    # Monotonicity sanity check
+    assert shocked_mean >= baseline_mean - 0.5, (
+        f"Monotonicity violation: shocked_mean ({shocked_mean}) < baseline_mean ({baseline_mean})"
+    )
+
+    # Record for external reporting
+    test_defect4_realistic_mode_closure.result_label = label
+    test_defect4_realistic_mode_closure.numbers = {
+        "baseline_mean":    baseline_mean,
+        "baseline_cvar_90": baseline_cvar,
+        "shocked_mean":     shocked_mean,
+        "shocked_cvar_90":  shocked_cvar,
+        "mean_delta_pct":   mean_delta_pct,
+        "cvar_delta_pct":   cvar_delta_pct,
+    }

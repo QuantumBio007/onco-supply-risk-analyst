@@ -959,6 +959,138 @@ def simulate_correlated_pair(country, scenario="API export restriction",
     }
 
 
+# ── Realistic-response single run (Phase 2c, realistic mode) ─────────────────
+
+def _run_once_realistic(d, sigma_d, L_mean, L_cv, fill_rate, budget_multiplier,
+                        reorder_point, order_quantity, days=365, seed=None,
+                        disruption_duration_mean=None,
+                        base_L_mean=None, base_L_cv=None,
+                        base_fill_rate=0.95, base_budget_multiplier=1.0,
+                        base_d=None, base_sigma_d=None,
+                        initial_inventory=None,
+                        demand_dist='normal',
+                        response_trigger_day=30,
+                        response_acceleration=0.3):
+    """
+    Variant of _run_once() for simulate_transient(response_mode="realistic").
+
+    Identical to _run_once() except: for orders placed on day >= disruption_start +
+    response_trigger_day (the emergency procurement trigger), the lead time drawn
+    from the disruption-state log-normal distribution is multiplied by
+    (1 - response_acceleration).  All other mechanics (fill rate, demand, budget,
+    (Q,r) policy) are unchanged — the frozen pre-shock (Q,r) still applies.
+
+    response_trigger_day:   day within disruption window when emergency sourcing kicks in
+    response_acceleration:  fraction of remaining lead time compressed (0.0 = no change,
+                            1.0 = instant; use 0.0 to reproduce frozen-policy result,
+                            use 0.3 for modest realistic response)
+    """
+    rng = np.random.default_rng(seed)
+
+    if disruption_duration_mean is not None and disruption_duration_mean > 0:
+        disruption_start = int(rng.integers(1, 45))
+        p_recovery = 1.0 / disruption_duration_mean
+        raw_duration = int(rng.geometric(p_recovery))
+        disruption_end = disruption_start + raw_duration
+    else:
+        disruption_start = 0
+        disruption_end   = days
+
+    # Day on/after which emergency procurement compresses lead time
+    response_day = disruption_start + response_trigger_day
+
+    _base_L_mean  = base_L_mean  if base_L_mean  is not None else L_mean
+    _base_L_cv    = base_L_cv    if base_L_cv    is not None else L_cv
+    _base_d       = base_d       if base_d       is not None else d
+    _base_sigma_d = base_sigma_d if base_sigma_d is not None else sigma_d
+
+    def _lognormal_params(lm, lcv):
+        lv = np.log(1 + lcv**2)
+        return np.log(lm) - 0.5 * lv, np.sqrt(lv)
+
+    mu_log_disrupt, sigma_log_disrupt = _lognormal_params(L_mean, L_cv)
+    mu_log_base,    sigma_log_base    = _lognormal_params(_base_L_mean, _base_L_cv)
+
+    effective_Q_disrupt = max(5, int(order_quantity * budget_multiplier))
+    effective_Q_base    = max(5, int(order_quantity * base_budget_multiplier))
+
+    inventory  = reorder_point if initial_inventory is None else initial_inventory
+    pipeline   = []
+    stockout_days        = 0
+    total_demand         = 0.0
+    total_fulfilled      = 0.0
+    inv_history          = []
+    disruption_days_seen = 0
+
+    for day in range(days):
+        in_disruption = disruption_start <= day < disruption_end
+
+        if in_disruption:
+            disruption_days_seen += 1
+            cur_fill_rate = fill_rate
+            cur_demand_d  = d
+            cur_sigma_d   = sigma_d
+            cur_Q         = effective_Q_disrupt
+            mu_log_cur    = mu_log_disrupt
+            sigma_log_cur = sigma_log_disrupt
+        else:
+            cur_fill_rate = base_fill_rate
+            cur_demand_d  = _base_d
+            cur_sigma_d   = _base_sigma_d
+            cur_Q         = effective_Q_base
+            mu_log_cur    = mu_log_base
+            sigma_log_cur = sigma_log_base
+
+        # 1. Receive arriving orders
+        new_pipeline = []
+        for qty, arrival, order_fill in pipeline:
+            if arrival <= day:
+                inventory += int(qty * order_fill)
+            else:
+                new_pipeline.append((qty, arrival, order_fill))
+        pipeline = new_pipeline
+
+        # 2. Daily demand
+        if demand_dist == 'poisson':
+            demand = float(rng.poisson(max(0.001, cur_demand_d)))
+        else:
+            demand = max(0.0, float(rng.normal(cur_demand_d, cur_sigma_d)))
+        total_demand += demand
+
+        # 3. Fulfill demand
+        if demand > inventory:
+            stockout_days   += 1
+            total_fulfilled += inventory
+            inventory        = 0
+        else:
+            inventory       -= demand
+            total_fulfilled += demand
+
+        # 4. Reorder decision — frozen (Q,r) policy
+        on_order = sum(qty for qty, _, _ in pipeline)
+        ip = inventory + on_order
+        if ip <= reorder_point:
+            lt = max(1, int(rng.lognormal(mu_log_cur, sigma_log_cur)))
+            # Emergency procurement: compress lead time for orders placed on/after
+            # the response trigger day (only during the disruption window)
+            if in_disruption and day >= response_day and response_acceleration > 0.0:
+                lt = max(1, int(lt * (1.0 - response_acceleration)))
+            pipeline.append((cur_Q, day + lt, cur_fill_rate))
+
+        inv_history.append(inventory)
+
+    sl_days  = 1.0 - stockout_days / days
+    sl_units = total_fulfilled / total_demand if total_demand > 0 else 1.0
+
+    return {
+        "stockout_days":         stockout_days,
+        "avg_inventory":         float(np.mean(inv_history)),
+        "service_level_days":    sl_days,
+        "service_level_units":   sl_units,
+        "disruption_days_seen":  disruption_days_seen,
+    }
+
+
 # ── Transient-mode simulation (Path B, Amendment B1, 2026-05-05) ──────────────
 
 def simulate_transient(drug, country,
@@ -969,7 +1101,10 @@ def simulate_transient(drug, country,
                        disruption_duration_mean=90,
                        n_runs=500, days=365,
                        service_level_target=0.95,
-                       return_distribution=False):
+                       return_distribution=False,
+                       response_mode="frozen",
+                       response_trigger_day=30,
+                       response_acceleration=0.3):
     """
     Transient-mode Monte Carlo simulation (Amendment B1 — Path B).
 
@@ -1010,11 +1145,23 @@ def simulate_transient(drug, country,
         days:                     simulation horizon (default 365)
         service_level_target:     for policy computation from baseline params
         return_distribution:      if True, includes raw stockout_distribution list
+        response_mode:            "frozen" (default) — pre-shock (Q,r) held, no lead-time
+                                  compression. "realistic" — after response_trigger_day
+                                  days into the disruption, orders are accelerated by
+                                  compressing lead time by (1 - response_acceleration).
+                                  The (Q,r) policy itself is still frozen; only the
+                                  realized lead time for new orders changes.
+        response_trigger_day:     day within disruption window when emergency procurement
+                                  kicks in (default 30). Ignored if response_mode="frozen".
+        response_acceleration:    fraction of lead time compressed for accelerated orders
+                                  (default 0.3 = 30% reduction). 0.0 reproduces frozen;
+                                  1.0 = instant delivery. Ignored if response_mode="frozen".
 
     Returns:
         dict matching simulate_dynamic() schema, with additional keys:
-            - "mode": "transient"
+            - "mode": "transient" or "transient_realistic"
             - "baseline_reorder_point", "baseline_eoq": the frozen pre-shock policy
+            - "response_mode", "response_trigger_day", "response_acceleration" (echoed)
     """
     dp = DRUG_PARAMS[drug]
     cp = COUNTRY_PARAMS[country]
@@ -1051,29 +1198,54 @@ def simulate_transient(drug, country,
     # Initial inventory: from baseline stock days (same as simulate_dynamic)
     initial_inv = int(base_d * cp["initial_stock_days"])
 
-    # Run Monte Carlo with frozen (Q,r) but live shock operational params
-    runs = [
-        _run_once(
-            # Disruption-window operational params (shock state)
-            d=shock_d, sigma_d=shock_sigma_d,
-            L_mean=shock_L_mean, L_cv=shock_L_cv,
-            fill_rate=shock_fill_eff,
-            budget_multiplier=shock_bud_eff,
-            # FROZEN pre-shock policy
-            reorder_point=baseline_policy["reorder_point"],
-            order_quantity=baseline_policy["eoq"],
-            days=days, seed=i,
-            disruption_duration_mean=disruption_duration_mean,
-            # Post-disruption baseline params
-            base_L_mean=base_L_mean, base_L_cv=base_L_cv,
-            base_fill_rate=base_fill_rate,
-            base_budget_multiplier=base_budget_mult,
-            base_d=base_d, base_sigma_d=base_sigma_d,
-            initial_inventory=initial_inv,
-            demand_dist=demand_dist,
-        )
-        for i in range(n_runs)
-    ]
+    # ── Monte Carlo: branch on response_mode ─────────────────────────────────
+    if response_mode == "realistic":
+        # Realistic mode: use _run_once_realistic() which compresses lead time
+        # for orders placed >= disruption_start + response_trigger_day
+        runs = [
+            _run_once_realistic(
+                d=shock_d, sigma_d=shock_sigma_d,
+                L_mean=shock_L_mean, L_cv=shock_L_cv,
+                fill_rate=shock_fill_eff,
+                budget_multiplier=shock_bud_eff,
+                reorder_point=baseline_policy["reorder_point"],
+                order_quantity=baseline_policy["eoq"],
+                days=days, seed=i,
+                disruption_duration_mean=disruption_duration_mean,
+                base_L_mean=base_L_mean, base_L_cv=base_L_cv,
+                base_fill_rate=base_fill_rate,
+                base_budget_multiplier=base_budget_mult,
+                base_d=base_d, base_sigma_d=base_sigma_d,
+                initial_inventory=initial_inv,
+                demand_dist=demand_dist,
+                response_trigger_day=response_trigger_day,
+                response_acceleration=response_acceleration,
+            )
+            for i in range(n_runs)
+        ]
+        mode_label = "transient_realistic"
+    else:
+        # Frozen mode (default): original behavior — no lead-time compression
+        runs = [
+            _run_once(
+                d=shock_d, sigma_d=shock_sigma_d,
+                L_mean=shock_L_mean, L_cv=shock_L_cv,
+                fill_rate=shock_fill_eff,
+                budget_multiplier=shock_bud_eff,
+                reorder_point=baseline_policy["reorder_point"],
+                order_quantity=baseline_policy["eoq"],
+                days=days, seed=i,
+                disruption_duration_mean=disruption_duration_mean,
+                base_L_mean=base_L_mean, base_L_cv=base_L_cv,
+                base_fill_rate=base_fill_rate,
+                base_budget_multiplier=base_budget_mult,
+                base_d=base_d, base_sigma_d=base_sigma_d,
+                initial_inventory=initial_inv,
+                demand_dist=demand_dist,
+            )
+            for i in range(n_runs)
+        ]
+        mode_label = "transient"
 
     so    = np.array([r["stockout_days"]       for r in runs])
     slu   = np.array([r["service_level_units"]  for r in runs])
@@ -1089,7 +1261,7 @@ def simulate_transient(drug, country,
 
     result = {
         "drug": drug, "country": country, "scenario": "_transient_",
-        "mode": "transient",
+        "mode": mode_label,
         "n_runs": n_runs, "days": days,
         "demand_dist": demand_dist,
         # Echoed shock input parameters
@@ -1097,6 +1269,10 @@ def simulate_transient(drug, country,
         "input_demand_multiplier":    round(demand_multiplier, 3),
         "input_fill_rate":            round(fill_rate, 3),
         "input_budget_multiplier":    round(budget_multiplier, 3),
+        # Response mode params (echoed for audit)
+        "response_mode":          response_mode,
+        "response_trigger_day":   response_trigger_day,
+        "response_acceleration":  response_acceleration,
         # Frozen pre-shock policy (the key diagnostic field)
         "baseline_reorder_point": baseline_policy["reorder_point"],
         "baseline_safety_stock":  baseline_policy["safety_stock"],
