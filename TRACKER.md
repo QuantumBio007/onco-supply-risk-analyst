@@ -19,7 +19,7 @@ The master action plan is the single source of truth for what to do next. It con
 **Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
 **Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
 **Phase 2c status:** 🟡 IMPLEMENTATION CLEARED 2026-05-05 — three algorithms locked (Kalman + Robust Opt + MAB); pre-registration in place; advisory-board gate explicitly deferred (recruitment lead time)
-**Last updated:** 2026-05-06 (session 25 — Literature synthesis complete. 6 papers analyzed + filed. KB `argentina_procurement_system.txt` enriched with CONETEC/HTA section [Marin 2024]. T3.1b Plan B FINAL: H2 PASS 118d median. H4 pre-reg: AUTO-NULL expected. Plan A (amparo backtest) viability assessed — blocked on Marin reply.)
+**Last updated:** 2026-05-06 (session 26 — Tier A + Tier B code sprints complete. macro_latam query fixed, daily cadence guard, H4 eval wired. DIGEMID scraper live (Peru). Macro alert threshold tuned. ANMAT endpoint reverse-engineered — ZK protocol documented, rewrite queued. Branch: phase-2-realtime-news. Waiting on: Marin reply ~May 16, Lim LinkedIn follow-up, Pablo/ANMAT outreach.)
 **Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files) + 5 PDFs in `knowledge_base/literature/`
 
 ---
