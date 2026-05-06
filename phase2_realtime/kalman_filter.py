@@ -18,7 +18,7 @@ Notes:        phase2_realtime/docs/kalman_filter_implementation_notes.md
 
 import logging
 import math
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Optional, Union
 
 import numpy as np
@@ -110,6 +110,8 @@ class KalmanFilterSupplyChain:
         x_k = F x_{k-1}  (F = I for random walk)
         P_k = F P F^T + dt * Q
         """
+        if dt < 0:
+            raise ValueError(f"dt must be non-negative; got {dt}")
         # Random walk: state unchanged, covariance grows
         # (F = identity, so F P F^T = P)
         self._P = self._P + dt * self._Q
@@ -175,7 +177,7 @@ class KalmanFilterSupplyChain:
         outlier_flag = None
         if z_score > OUTLIER_SIGMA:
             outlier_flag = {
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "type": "lead_time_outlier",
                 "observed": round(observation, 2),
                 "expected": round(math.exp(float(z_hat[0, 0])), 2),
@@ -201,7 +203,7 @@ class KalmanFilterSupplyChain:
 
         # Bookkeeping
         self._observations_count += 1
-        self._last_updated = date.today()
+        self._last_updated = datetime.now(timezone.utc).date()
         self._days_since_update = 0
 
         return outlier_flag

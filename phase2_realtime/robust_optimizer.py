@@ -31,7 +31,7 @@ import numpy as np
 
 # Supply sim is at project root (one level up from phase2_realtime/)
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from supply_sim import COUNTRY_PARAMS, DRUG_PARAMS, SCENARIO_PARAMS, simulate_dynamic, _run_once
+from supply_sim import COUNTRY_PARAMS, DRUG_PARAMS, SCENARIO_PARAMS, _run_once
 
 from phase2_realtime.uncertainty_sets import BoxUncertaintySet, N_PARAMS
 
@@ -128,35 +128,56 @@ class RobustOptimizer:
         # 2. Build uncertainty set
         uncertainty_set = BoxUncertaintySet(nominal=nominal, deltas=deltas, gamma=gamma)
 
-        # 3. Compute baseline (Q,r) under COUNTRY_PARAMS nominal (no shock).
-        #    baseline_Q / baseline_r: textbook EOQ values from simulate_dynamic.
-        #    baseline_CVaR_90: cost-proxy CVaR at gamma=0 (nominal params only)
-        #    evaluated at the *best grid point under gamma=0* so the comparison
-        #    is apples-to-apples with best_cvar (both in dollar cost units).
-        baseline_sim = self._evaluate_baseline(drug, country)
-        baseline_Q = baseline_sim["eoq"]
-        baseline_r = baseline_sim["reorder_point"]
+        # 3. Compute drug/country constants ONCE — passed to all workers below
+        #    (avoids 24,500 redundant compute_policy calls per grid search).
+        constants = _compute_drug_country_constants(drug, country)
+        textbook_EOQ = constants["textbook_EOQ"]
+        textbook_r   = constants["textbook_r"]
 
-        # Cost-proxy baseline: grid-search at gamma=0 (nominal only, no adversarial)
+        # 4. Grid search at user's gamma → best grid-label (Q_grid, r_grid)
+        #    Returns dict keyed by (Q, r) so we can extract specific cells below.
+        cvar_by_cell = self._grid_search_full(drug, country, uncertainty_set, constants)
+        best_Q_grid, best_r_grid = min(cvar_by_cell, key=cvar_by_cell.get)
+        best_cvar = cvar_by_cell[(best_Q_grid, best_r_grid)]
+
+        # 5. EOQ-equivalent grid cell evaluated at SAME gamma — needed for
+        #    "does RO beat EOQ?" comparison. This cell is already in cvar_by_cell.
+        EOQ_GRID_CELL = (max(Q_CANDIDATES), max(R_CANDIDATES))   # (200, 110)
+        eoq_cvar_at_gamma = cvar_by_cell.get(EOQ_GRID_CELL, best_cvar)
+
+        # 6. No-shock baseline: single cell at (200, 110) with gamma=0.
+        #    Replaces the redundant 49-cell grid search at gamma=0 (Item 1).
+        #    At gamma=0 the EOQ-equivalent cell is by definition optimal.
         nominal_uset = BoxUncertaintySet(nominal=nominal, deltas=deltas, gamma=0.0)
-        _bQ, _br, baseline_cvar = self._grid_search(drug, country, nominal_uset)
-
-        # 4. Grid search → best grid-label (Q_grid, r_grid)
-        best_Q_grid, best_r_grid, best_cvar = self._grid_search(
-            drug, country, uncertainty_set
+        baseline_cvar = _evaluate_candidate(
+            drug, country, EOQ_GRID_CELL[0], EOQ_GRID_CELL[1],
+            nominal_uset, self.n_scenarios, self.random_seed,
+            constants=constants,
         )
 
         # Translate grid labels to actual procurement quantities
         best_Q, best_r = self._grid_to_actual(drug, country, best_Q_grid, best_r_grid)
 
-        # 5. Policy confidence
+        # baseline (Q, r) = textbook EOQ from already-computed constants
+        baseline_Q = textbook_EOQ
+        baseline_r = textbook_r
+
+        # 7. Policy confidence
         policy_confidence = self._compute_policy_confidence(
             drug, country, best_Q_grid, best_r_grid, uncertainty_set
         )
 
-        # 6. Improvement vs baseline
+        # 8. Improvement vs EOQ AT THE SAME GAMMA — the question that matters.
+        #    Positive = RO policy beats textbook EOQ under the same shock.
         improvement_pct = (
-            (baseline_cvar - best_cvar) / baseline_cvar * 100
+            (eoq_cvar_at_gamma - best_cvar) / eoq_cvar_at_gamma * 100
+            if eoq_cvar_at_gamma > 0 else 0.0
+        )
+
+        # Shock cost uplift = how much worse the shock makes the no-RO baseline.
+        #    Positive = the shock raised costs above no-shock; informational.
+        shock_cost_uplift_pct = (
+            (eoq_cvar_at_gamma - baseline_cvar) / baseline_cvar * 100
             if baseline_cvar > 0 else 0.0
         )
 
@@ -173,6 +194,9 @@ class RobustOptimizer:
             "baseline_r": baseline_r,
             "baseline_CVaR_90": round(baseline_cvar, 2),
             "improvement_pct": round(improvement_pct, 2),
+            # Auxiliary fields for interpretability of improvement_pct
+            "eoq_cvar_at_gamma": round(eoq_cvar_at_gamma, 2),
+            "shock_cost_uplift_pct": round(shock_cost_uplift_pct, 2),
             # Provenance fields (not in spec §7 but needed for auditability)
             "drug": drug,
             "country": country,
@@ -293,22 +317,33 @@ class RobustOptimizer:
         """
         Exhaustive grid search over Q_CANDIDATES × R_CANDIDATES.
 
-        Returns (best_Q, best_r, best_cvar).
+        Returns (best_Q, best_r, best_cvar). Kept for backward compatibility
+        with build_frontier() and any external callers; new code should use
+        _grid_search_full() to get the full cell map.
         """
-        # Build evaluation tasks: list of (Q, r)
+        cvar_by_cell = self._grid_search_full(drug, country, uncertainty_set)
+        (best_Q, best_r) = min(cvar_by_cell, key=cvar_by_cell.get)
+        return best_Q, best_r, cvar_by_cell[(best_Q, best_r)]
+
+    def _grid_search_full(
+        self,
+        drug: str,
+        country: str,
+        uncertainty_set: BoxUncertaintySet,
+        constants: Optional[dict] = None,
+    ) -> dict:
+        """
+        Exhaustive grid search over Q_CANDIDATES × R_CANDIDATES.
+
+        Returns dict mapping (Q, r) → CVaR_90 for every grid cell, so callers
+        can extract specific cells (e.g., the EOQ-equivalent corner) without
+        re-running simulations.
+        """
+        if constants is None:
+            constants = _compute_drug_country_constants(drug, country)
         tasks = [(Q, r) for Q in Q_CANDIDATES for r in R_CANDIDATES]
-
-        # Attempt parallel evaluation
-        results = self._evaluate_parallel(drug, country, uncertainty_set, tasks)
-
-        best_Q, best_r, best_cvar = None, None, float("inf")
-        for (Q, r), cvar in zip(tasks, results):
-            if cvar < best_cvar:
-                best_cvar = cvar
-                best_Q = Q
-                best_r = r
-
-        return best_Q, best_r, best_cvar
+        results = self._evaluate_parallel(drug, country, uncertainty_set, tasks, constants)
+        return {(Q, r): cvar for (Q, r), cvar in zip(tasks, results)}
 
     def _evaluate_parallel(
         self,
@@ -316,6 +351,7 @@ class RobustOptimizer:
         country: str,
         uncertainty_set: BoxUncertaintySet,
         tasks: list,
+        constants: dict,
     ) -> list:
         """
         Evaluate CVaR_90 for each (Q, r) in tasks.
@@ -338,7 +374,7 @@ class RobustOptimizer:
                         _evaluate_candidate,
                         [
                             (drug, country, Q, r, uncertainty_set,
-                             self.n_scenarios, self.random_seed)
+                             self.n_scenarios, self.random_seed, constants)
                             for Q, r in tasks
                         ],
                     )
@@ -350,7 +386,7 @@ class RobustOptimizer:
         return [
             _evaluate_candidate(
                 drug, country, Q, r, uncertainty_set,
-                self.n_scenarios, self.random_seed
+                self.n_scenarios, self.random_seed, constants,
             )
             for Q, r in tasks
         ]
@@ -366,40 +402,10 @@ class RobustOptimizer:
         Q_grid=200 → 100% of textbook EOQ (most ordering capacity)
         r_grid=110 → 100% of textbook reorder point (most safety stock)
         """
-        from supply_sim import compute_policy
-        dp = DRUG_PARAMS[drug]
-        cp = COUNTRY_PARAMS[country]
-        base_d       = dp["daily_demand_mean"]
-        base_sigma_d = (np.sqrt(base_d) if dp.get("demand_dist") == "poisson"
-                        else dp["daily_demand_std"])
-        baseline = compute_policy(
-            d=base_d, sigma_d=base_sigma_d,
-            L_mean=cp["lead_time_mean"], L_cv=cp["lead_time_cv"],
-            service_level=0.95, unit_cost=dp["unit_cost_usd"],
-        )
-        textbook_EOQ = max(1, baseline["eoq"])
-        textbook_r   = max(1, baseline["reorder_point"])
-        actual_Q = max(5, int((Q_grid / 200) * textbook_EOQ))
-        actual_r = max(1, int((r_grid / 110) * textbook_r))
+        c = _compute_drug_country_constants(drug, country)
+        actual_Q = max(5, int((Q_grid / 200) * c["textbook_EOQ"]))
+        actual_r = max(1, int((r_grid / 110) * c["textbook_r"]))
         return actual_Q, actual_r
-
-    def _evaluate_baseline(self, drug: str, country: str) -> dict:
-        """
-        Run simulate_dynamic() at nominal (no-shock) parameters to get baseline
-        (Q, r, CVaR_90) for comparison.
-        """
-        result = simulate_dynamic(
-            drug=drug,
-            country=country,
-            lead_time_multiplier=1.0,
-            demand_multiplier=1.0,
-            fill_rate=0.95,
-            budget_multiplier=1.0,
-            disruption_duration_mean=None,  # no disruption = baseline
-            n_runs=max(100, self.n_scenarios // 5),
-            return_distribution=False,
-        )
-        return result
 
     def _compute_policy_confidence(
         self,
@@ -419,60 +425,40 @@ class RobustOptimizer:
         """
         import math
         rng = np.random.default_rng(self.random_seed)
-        dp = DRUG_PARAMS[drug]
-        cp = COUNTRY_PARAMS[country]
-        struct_fill   = cp["structural_fill_rate"]
-        struct_budget = cp["structural_budget_cap"]
-        base_L_mean   = cp["lead_time_mean"]
-        base_L_cv     = cp["lead_time_cv"]
-        demand_dist   = dp.get("demand_dist", "normal")
-        base_d        = dp["daily_demand_mean"]
-        base_sigma_d  = (math.sqrt(base_d) if demand_dist == "poisson"
-                         else dp["daily_demand_std"])
-        base_fill_rate   = struct_fill   * SCENARIO_PARAMS["Baseline"]["fill_rate"]
-        base_budget_mult = struct_budget * SCENARIO_PARAMS["Baseline"]["budget_multiplier"]
-        initial_inv   = int(base_d * cp["initial_stock_days"])
+        c = _compute_drug_country_constants(drug, country)
 
-        from supply_sim import compute_policy
-        baseline_policy = compute_policy(
-            d=base_d, sigma_d=base_sigma_d,
-            L_mean=base_L_mean, L_cv=base_L_cv,
-            service_level=0.95, unit_cost=dp["unit_cost_usd"],
-        )
-        textbook_EOQ = max(1, baseline_policy["eoq"])
-        textbook_r   = max(1, baseline_policy["reorder_point"])
-        actual_Q = max(5, int((Q / 200) * textbook_EOQ))
-        actual_r = max(1, int((r / 110) * textbook_r))
+        actual_Q = max(5, int((Q / 200) * c["textbook_EOQ"]))
+        actual_r = max(1, int((r / 110) * c["textbook_r"]))
 
         feasible_count = 0
         for seed_i in range(n_check):
             u = uncertainty_set.sample(rng)
             u_clamped = _clamp_params(u)
-            L_mean     = base_L_mean * u_clamped["lead_time_multiplier"]
-            d          = base_d * u_clamped["demand_multiplier"]
-            sigma_d    = (math.sqrt(d) if demand_dist == "poisson"
-                          else base_sigma_d * u_clamped["demand_multiplier"])
-            eff_fill   = struct_fill   * u_clamped["fill_rate"]
-            eff_budget = struct_budget * u_clamped["budget_multiplier"]
+            L_mean     = c["base_L_mean"] * u_clamped["lead_time_multiplier"]
+            d          = c["base_d"] * u_clamped["demand_multiplier"]
+            sigma_d    = (math.sqrt(d) if c["demand_dist"] == "poisson"
+                          else c["base_sigma_d"] * u_clamped["demand_multiplier"])
+            eff_fill   = c["struct_fill"]   * u_clamped["fill_rate"]
+            eff_budget = c["struct_budget"] * u_clamped["budget_multiplier"]
 
             result = _run_once(
-                d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=base_L_cv,
+                d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=c["base_L_cv"],
                 fill_rate=eff_fill, budget_multiplier=eff_budget,
                 reorder_point=actual_r, order_quantity=actual_Q,
                 days=365, seed=(self.random_seed or 0) + seed_i,
                 disruption_duration_mean=DEFAULT_DISRUPTION_DURATION,
-                base_L_mean=base_L_mean, base_L_cv=base_L_cv,
-                base_fill_rate=base_fill_rate,
-                base_budget_multiplier=base_budget_mult,
-                base_d=base_d, base_sigma_d=base_sigma_d,
-                initial_inventory=initial_inv, demand_dist=demand_dist,
+                base_L_mean=c["base_L_mean"], base_L_cv=c["base_L_cv"],
+                base_fill_rate=c["base_fill_rate"],
+                base_budget_multiplier=c["base_budget_mult"],
+                base_d=c["base_d"], base_sigma_d=c["base_sigma_d"],
+                initial_inventory=c["initial_inv"], demand_dist=c["demand_dist"],
             )
             if result["stockout_days"] <= 30:
                 feasible_count += 1
         return feasible_count / n_check
 
 
-# ── Module-level function for multiprocessing pickling ───────────────────────
+# ── Module-level functions for multiprocessing pickling ──────────────────────
 
 def _clamp_params(u: dict) -> dict:
     """Clamp sampled params to physically meaningful ranges."""
@@ -484,6 +470,49 @@ def _clamp_params(u: dict) -> dict:
     }
 
 
+def _compute_drug_country_constants(drug: str, country: str) -> dict:
+    """
+    Compute all (drug, country)-dependent constants once per optimize() call.
+
+    Hoisted out of _evaluate_candidate so it runs 1x per grid search instead of
+    49 × n_scenarios times. Returns a dict consumed by _evaluate_candidate and
+    _compute_policy_confidence.
+    """
+    import math
+    from supply_sim import compute_policy
+    dp = DRUG_PARAMS[drug]
+    cp = COUNTRY_PARAMS[country]
+    demand_dist  = dp.get("demand_dist", "normal")
+    base_d       = dp["daily_demand_mean"]
+    base_sigma_d = (math.sqrt(base_d) if demand_dist == "poisson"
+                    else dp["daily_demand_std"])
+    base_L_mean  = cp["lead_time_mean"]
+    base_L_cv    = cp["lead_time_cv"]
+    struct_fill   = cp["structural_fill_rate"]
+    struct_budget = cp["structural_budget_cap"]
+
+    baseline_policy = compute_policy(
+        d=base_d, sigma_d=base_sigma_d,
+        L_mean=base_L_mean, L_cv=base_L_cv,
+        service_level=0.95,
+        unit_cost=dp["unit_cost_usd"],
+    )
+    return {
+        "demand_dist":      demand_dist,
+        "base_d":           base_d,
+        "base_sigma_d":     base_sigma_d,
+        "base_L_mean":      base_L_mean,
+        "base_L_cv":        base_L_cv,
+        "struct_fill":      struct_fill,
+        "struct_budget":    struct_budget,
+        "base_fill_rate":   struct_fill   * SCENARIO_PARAMS["Baseline"]["fill_rate"],
+        "base_budget_mult": struct_budget * SCENARIO_PARAMS["Baseline"]["budget_multiplier"],
+        "initial_inv":      int(base_d * cp["initial_stock_days"]),
+        "textbook_EOQ":     max(1, baseline_policy["eoq"]),
+        "textbook_r":       max(1, baseline_policy["reorder_point"]),
+    }
+
+
 def _evaluate_candidate(
     drug: str,
     country: str,
@@ -492,6 +521,7 @@ def _evaluate_candidate(
     uncertainty_set: BoxUncertaintySet,
     n_scenarios: int,
     random_seed: Optional[int],
+    constants: Optional[dict] = None,
 ) -> float:
     """
     Estimate CVaR_90 for a single (Q, r) grid point.
@@ -506,72 +536,43 @@ def _evaluate_candidate(
         actual_Q = int(Q_ratio × textbook_EOQ)   where Q_ratio = Q / Q_grid_max
         actual_r = int(r_ratio × textbook_r)     where r_ratio = r / r_grid_max
 
-    Mapping:
-      Q=50  → 0.25 × EOQ  (very small orders, high ordering frequency)
-      Q=200 → 1.00 × EOQ  (full textbook EOQ)
-      r=20  → 0.18 × r*   (very low reorder point, high stockout risk)
-      r=110 → 1.00 × r*   (full textbook reorder point)
-
-    This approach:
-      1. Uses _run_once() directly to fix (Q, r) externally (supply_sim not modified)
-      2. Scales to the drug/country context so results are clinically meaningful
-      3. Produces genuine variation across all 49 grid cells
-      4. Allows higher Gamma → larger (Q, r) because adversarial scenarios
-         penalize low-buffer policies more severely
-
-    For each sampled scenario u from the uncertainty set:
-      1. Scale to actual_Q, actual_r
-      2. Compute effective disruption-state parameters (shock × structural floor)
-      3. Run one DES year with fixed (actual_Q, actual_r)
-      4. Compute total cost = holding + ordering + shortage penalty
-
     Cost formula (design spec §2):
       C = 0.50 × avg_inventory + 200 × orders_per_year + 500 × stockout_days
 
     CVaR_90 = mean of worst 10% of sampled costs.
+
+    Args:
+        constants: Pre-computed drug/country constants from
+                   _compute_drug_country_constants(). If None, computed on
+                   the fly (kept for backward compatibility with any external
+                   callers; internal code always passes constants).
     """
     import math
     rng = np.random.default_rng(random_seed)
 
-    dp = DRUG_PARAMS[drug]
-    cp = COUNTRY_PARAMS[country]
-    struct_fill   = cp["structural_fill_rate"]
-    struct_budget = cp["structural_budget_cap"]
-    base_L_mean   = cp["lead_time_mean"]
-    base_L_cv     = cp["lead_time_cv"]
-    demand_dist   = dp.get("demand_dist", "normal")
-    base_d        = dp["daily_demand_mean"]
-    base_sigma_d  = (math.sqrt(base_d) if demand_dist == "poisson"
-                     else dp["daily_demand_std"])
-    base_fill_rate   = struct_fill   * SCENARIO_PARAMS["Baseline"]["fill_rate"]
-    base_budget_mult = struct_budget * SCENARIO_PARAMS["Baseline"]["budget_multiplier"]
-    initial_inv   = int(base_d * cp["initial_stock_days"])
-
-    # Compute textbook baseline policy at nominal (no-shock) parameters
-    from supply_sim import compute_policy
-    baseline_policy = compute_policy(
-        d=base_d, sigma_d=base_sigma_d,
-        L_mean=base_L_mean, L_cv=base_L_cv,
-        service_level=0.95,
-        unit_cost=dp["unit_cost_usd"],
-    )
-    textbook_EOQ = max(1, baseline_policy["eoq"])
-    textbook_r   = max(1, baseline_policy["reorder_point"])
+    if constants is None:
+        constants = _compute_drug_country_constants(drug, country)
+    c = constants
 
     # Grid → actual policy values (Q=200 → 100% of EOQ; r=110 → 100% of textbook_r)
     Q_GRID_MAX = 200   # max(Q_CANDIDATES)
     R_GRID_MAX = 110   # max(R_CANDIDATES)
-    Q_ratio    = Q / Q_GRID_MAX   # [0.25, 1.0]
-    r_ratio    = r / R_GRID_MAX   # [0.18, 1.0]
-    actual_Q   = max(5, int(Q_ratio * textbook_EOQ))
-    actual_r   = max(1, int(r_ratio * textbook_r))
+    actual_Q   = max(5, int((Q / Q_GRID_MAX) * c["textbook_EOQ"]))
+    actual_r   = max(1, int((r / R_GRID_MAX) * c["textbook_r"]))
 
-    costs = []
-    for seed_offset in range(n_scenarios):
+    base_d         = c["base_d"]
+    base_sigma_d   = c["base_sigma_d"]
+    base_L_mean    = c["base_L_mean"]
+    base_L_cv      = c["base_L_cv"]
+    demand_dist    = c["demand_dist"]
+    struct_fill    = c["struct_fill"]
+    struct_budget  = c["struct_budget"]
+
+    costs = np.empty(n_scenarios, dtype=float)
+    for i in range(n_scenarios):
         u = uncertainty_set.sample(rng)
         u_clamped = _clamp_params(u)
 
-        # Disruption-state parameters (shock × structural floor)
         L_mean    = base_L_mean * u_clamped["lead_time_multiplier"]
         d         = base_d * u_clamped["demand_multiplier"]
         sigma_d   = (math.sqrt(d) if demand_dist == "poisson"
@@ -586,27 +587,24 @@ def _evaluate_candidate(
             reorder_point=actual_r,
             order_quantity=actual_Q,
             days=365,
-            seed=(random_seed or 0) + seed_offset,
+            seed=(random_seed or 0) + i,
             disruption_duration_mean=DEFAULT_DISRUPTION_DURATION,
             base_L_mean=base_L_mean, base_L_cv=base_L_cv,
-            base_fill_rate=base_fill_rate,
-            base_budget_multiplier=base_budget_mult,
+            base_fill_rate=c["base_fill_rate"],
+            base_budget_multiplier=c["base_budget_mult"],
             base_d=base_d, base_sigma_d=base_sigma_d,
-            initial_inventory=initial_inv,
+            initial_inventory=c["initial_inv"],
             demand_dist=demand_dist,
         )
 
-        # Cost formula (design spec §2)
         orders_per_year = 365.0 / max(1, actual_Q)
-        cost = (
+        costs[i] = (
             0.50  * result["avg_inventory"]
             + 200.0 * orders_per_year
             + 500.0 * result["stockout_days"]
         )
-        costs.append(cost)
 
-    costs_arr = np.array(costs)
-    n_tail = max(1, int(0.10 * len(costs_arr)))
-    costs_arr.sort()
-    cvar_90 = float(costs_arr[-n_tail:].mean())
-    return cvar_90
+    # Use np.partition for tail mean (faster than full sort)
+    n_tail = max(1, int(0.10 * n_scenarios))
+    tail = np.partition(costs, n_scenarios - n_tail)[-n_tail:]
+    return float(tail.mean())
