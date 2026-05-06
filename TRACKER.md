@@ -19,7 +19,7 @@ The master action plan is the single source of truth for what to do next. It con
 **Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
 **Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
 **Phase 2c status:** 🟡 IMPLEMENTATION CLEARED 2026-05-05 — three algorithms locked (Kalman + Robust Opt + MAB); pre-registration in place; advisory-board gate explicitly deferred (recruitment lead time)
-**Last updated:** 2026-05-06 (session 24 — INVIMA PDF parser sprint COMPLETE. 6,467 rows / 283 oncology ingested. Cisplatin descontinuado since 2023-12.)
+**Last updated:** 2026-05-06 (session 24 — INVIMA parser DONE; MAB v1 DONE. 31/31 tests. H3 CLOSED: manufacturing (0.855) >> climate_latam (0.333). 163/163 Phase 2c tests passing.)
 **Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files)
 
 ---
@@ -47,7 +47,7 @@ The master action plan is the single source of truth for what to do next. It con
 1. ~~**Send Marin email.**~~ ✅ SENT 2026-05-06 — `gmarin@med.unlp.edu.ar` cc `info@iecs.org.ar`. Concise Spanish version, one-pager attached. Await reply (~10 days). T3.1 backtest blocked until reply.
 2. ~~**Citation correction throughout KB.**~~ ✅ FIXED 2026-05-06 — `knowledge_base/docs/argentina_procurement_system.txt` and `phase2_realtime/docs/preregistration_t3_1_amparo_backtest.md` corrected to **Alcaraz et al. 2024** (PMID 38907958). Also fixed volume: 84(3) not 84(5).
 3. ✅ **INVIMA PDF parser sprint** — COMPLETE 2026-05-06. `phase2_realtime/data_ingestion/invima_pdf_parser.py`. 9 PDFs parsed (2023-06 → 2025-09). **6,467 total rows / 283 oncology rows** in `phase2_data/invima.db`. Bugs fixed: frozen-col0 false-positive, 2025-06 schema variant, T3-section numbering collision, filename-as-period ground truth. **Strategic findings: CISPLATINO DESCONTINUADO (T3) since 2023-12. CARBOPLATINO DESCONTINUADO since 2024-04 (2 formulations from 2024-12 onward). Longitudinal signal available for MAB calibration.**
-4. **MAB v1 sprint** (per amendments B2, B3, S5 — 9 arms, ARM_TO_CATEGORY locked, calibration-only). Gated on at least one real-label source landing (openFDA suffices; richer when ANMAT/INVIMA live data is populated).
+4. ✅ **MAB v1 sprint** — COMPLETE 2026-05-06. `phase2_realtime/mab.py`. Thompson Sampling, 9 arms, calibrated from openFDA (118 oncology records) + INVIMA (8 estado groups). State persisted to `phase2_data/mab_state.json`. **H3 CLOSED: manufacturing (0.855) >> climate_latam (0.333) after 30 rewards, robust across 5/5 seeds.** Surprise finding: healthcare_demand (0.967) and company_events (0.960) rank above manufacturing due to strong openFDA demand-increase + discontinuation signal. 31/31 tests passing.
 5. **Run live ANMAT + openFDA ingestion** once to populate `phase2_data/*.db` with real data — script execution, no code work. Useful as MAB calibration substrate.
 
 **Open defects (not for tomorrow but track):**

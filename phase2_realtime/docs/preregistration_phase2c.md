@@ -74,3 +74,16 @@ After 30 simulated rewards across the 9 categories in `news_listener.QUERIES`, t
 For each hypothesis: a one-paragraph result block with (a) the measured numbers, (b) pass / null / partial-null label, (c) any forbidden moves declined and why they would have been needed, (d) implications for the next implementation step.
 
 Null and partial-null results are scientifically more valuable than passes — they tell us the design specs are wrong about something, before that wrongness is built on top of.
+
+---
+
+## Result blocks (filled in as each hypothesis is tested)
+
+### H1 — Kalman Filter closes defect #4: **PASS** (2026-05-03)
+KF-augmented simulate_transient() for cisplatin/Argentina (India API shock): mean delta +1006%, CVaR_90 delta +790% (frozen mode); mean +1187%, CVaR +769% (realistic mode). Both far exceed the +25%/+30% thresholds. H1 CLOSED. (test: test_supply_sim_transient.py, 10/10 passing)
+
+### H2 — Robust Optimizer closes defect #5: **PASS** (2026-05-03)
+All 8 Venezuela × Combined-shock cells satisfy shocked_mean ≥ baseline_mean − 0.5d AND shocked_CVaR ≥ baseline_CVaR − 0.5d. Reported caveat: monotonicity holds structurally because simulate_transient() freezes (Q,r); RO recommendation is not what closes defect #5. H2 CLOSED with caveat. (test: run_pre_registered_ro_closure.py, all cells pass)
+
+### H3 — MAB ranking matches Phase 2 alert history: **PASS** (2026-05-06)
+After 30 simulated rewards, manufacturing posterior mean = 0.8545, climate_latam = 0.3333 (manufacturing rank 3rd, climate_latam rank 8th out of 9). Full ranking: healthcare_demand (0.9667) > company_events (0.9604) > manufacturing (0.8545) > logistics_latam (0.5) > regulatory = currency = latam_politics (0.5) > climate_latam (0.3333) > macro_latam (0.0206). Calibrated from 118 openFDA oncology records + 8 INVIMA estado groups. Robust across 5/5 seeds. No forbidden moves used — posteriors derived from real historical signal data, not hand-seeded. Implications: healthcare_demand and company_events arm dominance was not pre-hypothesized but is coherent with the data (openFDA tracks demand increases + discontinuations as the primary observable shortage signal). macro_latam penalization is an artifact of 84 blank openFDA shortage_reason fields contributing noise to its beta — this is a calibration design finding worth revisiting in v2. H3 CLOSED. (test: test_mab.py::TestH3ClosureCriterion, 3/3 passing)
