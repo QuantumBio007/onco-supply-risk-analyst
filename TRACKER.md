@@ -24,6 +24,46 @@ The master action plan is the single source of truth for what to do next. It con
 
 ---
 
+## ▶ END-OF-DAY 2026-05-05 (session 22 — Phase 2c implementation sprint)
+
+**Tests: 132 passing, 6 skipped (live-test gates) across the Phase 2c suite.**
+
+**Delivered (committed locally; nothing pushed to GitHub per Phase 2 policy):**
+| Module | Status | Tests | Notes |
+|---|---|---|---|
+| Kalman Filter v1 (`kalman_filter.py`) | ✅ | 6/6 | 2D `[log(L_mean), log(sigma_L)]`. Joseph-form covariance. Dropped event-triggered P-reset (design review S4). |
+| Path B transient simulator (`supply_sim.simulate_transient`) | ✅ | 10/10 | Frozen + realistic response modes. Defect #4 PASS: +1006% mean / +790% CVaR (frozen); +1187% / +769% (realistic). Both above pre-reg gates (+25% / +30%). |
+| Robust Optimizer v1 (`robust_optimizer.py`, `uncertainty_sets.py`) | ✅ | 39/39 | Box uncertainty only per amendment S1. Grid search 49-cell. Stubs for Ellipsoid/Wasserstein. |
+| RO 6-cell closure runner (`run_pre_registered_ro_closure.py`) | ✅ | — | Hypothesis 2 PASS for Venezuela combined: shocked_mean +37.8d / shocked_CVaR +60.9d above baseline (gate: ≥-0.5d). Caveat: monotonicity holds structurally because `simulate_transient()` freezes (Q,r); RO recommendation is not what closes defect #5. |
+| openFDA ingestion (`data_ingestion/openfda_shortages.py`) | ✅ | 18/18 | Live API confirmed: 118 oncology records returned. SQLite at `phase2_data/openfda.db`. |
+| ANMAT scraper (`data_ingestion/anmat_scraper.py`) | ✅ | 23/25 | Three streams (Listado_Faltantes Latin-1, alertas Latin-1, Boletín Oficial UTF-8). Live tests gated on `ANMAT_LIVE_TEST`. |
+| INVIMA scraper (`data_ingestion/invima_scraper.py`) | ✅ partial | 36/40 | Report-event level only — INVIMA publishes monthly PDFs not structured tables. **Drug-level signal blocked on PDF parser (next sprint).** |
+
+**Pre-registrations (locked):**
+- `preregistration_phase2c.md` — Hypothesis 1 (KF/Path B closes defect #4): **PASS**. Hypothesis 2 (RO closes defect #5): **PASS** (with the structural-monotonicity caveat noted above).
+- `preregistration_t3_1_amparo_backtest.md` — Spearman ρ ≥ 0.40 / AUC ≥ 0.65 against the Alcaraz et al. 2024 amparo dataset. **Blocked on dataset acquisition.**
+
+**Open items for tomorrow morning (priority order):**
+1. **Send Marin email.** Spanish draft ready at [phase2_realtime/docs/marin_email_draft.md](phase2_realtime/docs/marin_email_draft.md). To: `gmarin@med.unlp.edu.ar` cc `info@iecs.org.ar`. Attach `Strategy/ONCOSUPPLY_ONE_PAGER_PAHO.docx`. T3.1 backtest blocked until reply.
+2. **Citation correction throughout KB.** Paper is **Alcaraz et al. 2024** (PMID 38907958), NOT "Romero et al. 2024". Files to fix: `knowledge_base/docs/argentina_procurement_system.txt`, `phase2_realtime/docs/preregistration_t3_1_amparo_backtest.md`, anything in `grants/` or `NIH_SPECIFIC_AIMS_*` that cites this work.
+3. **INVIMA PDF parser sprint** (fresh Sonnet, ~2-3 hr). Download 5-10 monthly PDFs, parse drug-level rows. Risk: format varies; OCR may be needed. Gates Colombia drug-level shortage signal for MAB.
+4. **MAB v1 sprint** (per amendments B2, B3, S5 — 9 arms, ARM_TO_CATEGORY locked, calibration-only). Gated on at least one real-label source landing (openFDA suffices; richer when ANMAT/INVIMA live data is populated).
+5. **Run live ANMAT + openFDA ingestion** once to populate `phase2_data/*.db` with real data — script execution, no code work. Useful as MAB calibration substrate.
+
+**Open defects (not for tomorrow but track):**
+- Path B realistic-mode RNG path differs from frozen-mode (baseline 5.30d vs 7.30d); modes should share seeds. Not load-bearing on PASS verdict.
+- INVIMA `desabastecimientos` returns PDF report metadata, not products. Documented in [invima_scraper_notes.md](phase2_realtime/docs/invima_scraper_notes.md).
+
+**Architectural decisions made today (locked):**
+- B1 = **Path B** (transient-mode simulator with frozen pre-shock (Q,r)). Inventory KF (Path A) NOT pursued.
+- B2 = MAB has **9 arms** (added macro_latam).
+- B3 = ARM_TO_CATEGORY mapping locked in `design_amendments_2026-05-05.md`.
+- S1 = RO v1 = **Box only**. Wasserstein/Ellipsoidal deferred.
+- S5 = MAB v1 is **calibration-only**, not real signal learning. Acknowledged caveat.
+- A4 = Pre-reg subset = 6 cells (locked).
+
+---
+
 ## ▶ PHASE 2C IMPLEMENTATION POSITION (2026-05-05)
 
 **Sequence rule (do not violate):** implement on `phase2_realtime/` (reference, validated) → run pre-registered closure tests → port to `optimized/` (post-May-14, separate task) → archive `phase2_realtime/` originals only after the swap is green. The `optimized/` fast variants are NOT canonical and MUST NOT be edited until the swap task begins.
