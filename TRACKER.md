@@ -19,7 +19,7 @@ The master action plan is the single source of truth for what to do next. It con
 **Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
 **Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
 **Phase 2c status:** 🟡 IMPLEMENTATION CLEARED 2026-05-05 — three algorithms locked (Kalman + Robust Opt + MAB); pre-registration in place; advisory-board gate explicitly deferred (recruitment lead time)
-**Last updated:** 2026-05-05 (session 21 — Phase 2c implementation prep: handoff brief + falsifiable closure pre-registration written; Sonnet 4.6 coding session to follow)
+**Last updated:** 2026-05-06 (session 24 — INVIMA PDF parser sprint COMPLETE. 6,467 rows / 283 oncology ingested. Cisplatin descontinuado since 2023-12.)
 **Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files)
 
 ---
@@ -44,9 +44,9 @@ The master action plan is the single source of truth for what to do next. It con
 - `preregistration_t3_1_amparo_backtest.md` — Spearman ρ ≥ 0.40 / AUC ≥ 0.65 against the Alcaraz et al. 2024 amparo dataset. **Blocked on dataset acquisition.**
 
 **Open items for tomorrow morning (priority order):**
-1. **Send Marin email.** Spanish draft ready at [phase2_realtime/docs/marin_email_draft.md](phase2_realtime/docs/marin_email_draft.md). To: `gmarin@med.unlp.edu.ar` cc `info@iecs.org.ar`. Attach `Strategy/ONCOSUPPLY_ONE_PAGER_PAHO.docx`. T3.1 backtest blocked until reply.
-2. **Citation correction throughout KB.** Paper is **Alcaraz et al. 2024** (PMID 38907958), NOT "Romero et al. 2024". Files to fix: `knowledge_base/docs/argentina_procurement_system.txt`, `phase2_realtime/docs/preregistration_t3_1_amparo_backtest.md`, anything in `grants/` or `NIH_SPECIFIC_AIMS_*` that cites this work.
-3. **INVIMA PDF parser sprint** (fresh Sonnet, ~2-3 hr). Download 5-10 monthly PDFs, parse drug-level rows. Risk: format varies; OCR may be needed. Gates Colombia drug-level shortage signal for MAB.
+1. ~~**Send Marin email.**~~ ✅ SENT 2026-05-06 — `gmarin@med.unlp.edu.ar` cc `info@iecs.org.ar`. Concise Spanish version, one-pager attached. Await reply (~10 days). T3.1 backtest blocked until reply.
+2. ~~**Citation correction throughout KB.**~~ ✅ FIXED 2026-05-06 — `knowledge_base/docs/argentina_procurement_system.txt` and `phase2_realtime/docs/preregistration_t3_1_amparo_backtest.md` corrected to **Alcaraz et al. 2024** (PMID 38907958). Also fixed volume: 84(3) not 84(5).
+3. ✅ **INVIMA PDF parser sprint** — COMPLETE 2026-05-06. `phase2_realtime/data_ingestion/invima_pdf_parser.py`. 9 PDFs parsed (2023-06 → 2025-09). **6,467 total rows / 283 oncology rows** in `phase2_data/invima.db`. Bugs fixed: frozen-col0 false-positive, 2025-06 schema variant, T3-section numbering collision, filename-as-period ground truth. **Strategic findings: CISPLATINO DESCONTINUADO (T3) since 2023-12. CARBOPLATINO DESCONTINUADO since 2024-04 (2 formulations from 2024-12 onward). Longitudinal signal available for MAB calibration.**
 4. **MAB v1 sprint** (per amendments B2, B3, S5 — 9 arms, ARM_TO_CATEGORY locked, calibration-only). Gated on at least one real-label source landing (openFDA suffices; richer when ANMAT/INVIMA live data is populated).
 5. **Run live ANMAT + openFDA ingestion** once to populate `phase2_data/*.db` with real data — script execution, no code work. Useful as MAB calibration substrate.
 

@@ -1,4 +1,4 @@
-# T3.1 Numerical Backtest Pre-Registration — Romero Amparo Dataset
+# T3.1 Numerical Backtest Pre-Registration — Alcaraz Amparo Dataset
 
 **Authored:** 2026-05-05 (before any commit touches the dataset)
 **Owner:** Carlos | **Status:** LOCKED — must be committed to git before the data file is fetched, parsed, or inspected.
@@ -6,7 +6,7 @@
 This is the broader pre-registration referenced by [MASTER_ACTION_PLAN.md](MASTER_ACTION_PLAN.md) T3.1 (open defect #1, "validation criteria not pre-registered"). It is distinct from `preregistration_phase2c.md`, which covers algorithm-closure on synthetic shocks. This one tests whether OncoSupply's risk predictions correlate with real Argentinian access-failure events.
 
 ## Dataset
-Romero et al. 2024 amparo dataset: 405 federal and provincial amparo (legal injunction) cases 2017–2020, filed by patients to compel access to oncology drugs. Cited in `knowledge_base/docs/argentina_procurement_system.txt`. Public, not previously analyzed by this project.
+Alcaraz et al. 2024 amparo dataset: 405 federal and provincial amparo (legal injunction) cases 2017–2020, filed by patients to compel access to oncology drugs. Cited in `knowledge_base/docs/argentina_procurement_system.txt`. Public, not previously analyzed by this project.
 
 ## Hypothesis
 Drug × province × quarter cells where OncoSupply predicts elevated stockout risk should over-represent amparo filings vs cells predicted as low risk.
@@ -24,8 +24,8 @@ Binary classification — top-quartile-predicted-risk cells vs bottom-quartile �
 **Pass criterion:** AUC ≥ **0.65**.
 
 ## Data scope (locked before fetch)
-- **Drugs included:** cisplatin, carboplatin, doxorubicin, trastuzumab. Other oncology drugs in the Romero dataset are excluded (out of OncoSupply scope).
-- **Provinces:** all in Romero dataset that have ≥3 filings across the 4 drugs over the 4-year window. Provinces below threshold dropped to avoid sparse-cell instability.
+- **Drugs included:** cisplatin, carboplatin, doxorubicin, trastuzumab. Other oncology drugs in the Alcaraz dataset are excluded (out of OncoSupply scope).
+- **Provinces:** all in Alcaraz dataset that have ≥3 filings across the 4 drugs over the 4-year window. Provinces below threshold dropped to avoid sparse-cell instability.
 - **Time:** quarterly bins, 2017Q1–2020Q4 (16 quarters per drug × province cell).
 - **Population normalization:** drug-class incidence rate × province population (INDEC 2018 census). If incidence rate unavailable for a class, use national oncology incidence rate × province population share. The choice between these is locked at fetch time and recorded in the analysis log.
 
