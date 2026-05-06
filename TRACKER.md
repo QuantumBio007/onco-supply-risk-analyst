@@ -54,6 +54,23 @@ The master action plan is the single source of truth for what to do next. It con
 - Path B realistic-mode RNG path differs from frozen-mode (baseline 5.30d vs 7.30d); modes should share seeds. Not load-bearing on PASS verdict.
 - INVIMA `desabastecimientos` returns PDF report metadata, not products. Documented in [invima_scraper_notes.md](phase2_realtime/docs/invima_scraper_notes.md).
 
+**Overnight research (completed 2026-05-05 ~22:44):**
+- Background agent harvested **34 INVIMA monthly PDF URLs** (2023-02 → 2026-03), downloaded **9 representative PDFs** to `phase2_data/invima_sample_pdfs/` (~11MB total).
+- Full structural analysis at [phase2_realtime/docs/invima_pdf_structure_research_2026-05-06.md](phase2_realtime/docs/invima_pdf_structure_research_2026-05-06.md) (418 lines).
+- **Key findings:**
+  - All PDFs are text-extractable (pdfplumber, no OCR).
+  - 3 distinct schema versions identified — parser needs version-aware dispatch.
+  - Tables 2/3 (compact "No comercializado / Descontinuado") are high-signal, low-effort targets.
+  - **HEADLINE:** CISPLATINO and CARBOPLATINO 150/450 mg flagged "Descontinuado" in INVIMA records — two of four OncoSupply core drugs actively discontinued in Colombia. Competitive intel datapoint not available from any other source.
+  - 9 of 11 oncology whitelist INNs visible in September 2025 PDF.
+  - Recommended whitelist expansion: bleomicina, capecitabina, citarabina, daunorrubicina, melfalan, talidomida, tamoxifeno, vinblastina, vinorelbina (all tracked by INVIMA).
+  - `registro_sanitario` and `fecha_normalizacion_estimada` NOT recoverable from PDFs — drop from schema.
+- **Estimated INVIMA PDF parser sprint:** 8–12 hr (pdfplumber, version-aware schema dispatch).
+
+**Live ingestion (completed 2026-05-05 ~22:23):**
+- openFDA: **118 oncology shortage records ingested**, 69 currently active. Real data in `phase2_data/openfda.db`. ✅
+- ANMAT: only 1 alert ingested, 0 shortages. **Production bug surfaced** — live ANMAT shortage page returned no `<table>`; fixture-based tests pass but live HTML structure differs. Add to tomorrow's punch list (priority 4).
+
 **Architectural decisions made today (locked):**
 - B1 = **Path B** (transient-mode simulator with frozen pre-shock (Q,r)). Inventory KF (Path A) NOT pursued.
 - B2 = MAB has **9 arms** (added macro_latam).
