@@ -48,7 +48,7 @@ DISCONT_ESTADOS = {"descontinuado", "no_comercializado"}
 
 # Snapshot ordinal map — locked before analysis runs
 SNAPSHOT_ORDER = [
-    "2023-06", "2023-12", "2024-01", "2024-04", "2024-08",
+    "2022-12", "2023-04", "2023-06", "2023-12", "2024-01", "2024-04", "2024-08",
     "2024-12", "2025-01", "2025-06", "2025-09",
 ]
 SNAPSHOT_INDEX = {p: i for i, p in enumerate(SNAPSHOT_ORDER)}

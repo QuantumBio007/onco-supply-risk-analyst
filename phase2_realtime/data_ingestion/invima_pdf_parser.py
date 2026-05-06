@@ -89,6 +89,18 @@ _COLS = {
         "fecha_i": 2, "fecha_u": 3, "estado": 4,
         "causas": 5, "resumen_c": 6, "resumen_i": None, "cierre": 7,
     },
+    # Pre-June 2023 PDFs: 9 cols, no ATC (Fecha alerta in col2, not ATC)
+    "v1_2022": {
+        "no": 0, "nombre": 1, "atc": None,
+        "fecha_i": 2, "fecha_u": 3, "estado": 4,
+        "causas": 5, "resumen_c": 7, "resumen_i": None, "cierre": 8,
+    },
+    # April 2023 PDF: 10 cols, no ATC (dual Estado + dual Causa columns)
+    "v1_extended": {
+        "no": 0, "nombre": 1, "atc": None,
+        "fecha_i": 2, "fecha_u": 3, "estado": 4,
+        "causas": 6, "resumen_c": 8, "resumen_i": None, "cierre": 9,
+    },
     "v2": {
         "no": 0, "nombre": 1, "atc": 2,
         "fecha_i": 3, "fecha_u": 4, "estado": 5,
@@ -514,7 +526,14 @@ def parse_pdf(pdf_path: str | Path) -> list[InvimaDrugRow]:
                 schema = "v1"
                 for r in data_rows:
                     if _clean(r[0]).isdigit():
-                        schema = "v1" if len(r) <= 8 else "v2"
+                        if len(r) <= 8:
+                            schema = "v1"
+                        elif len(r) == 9:
+                            # Distinguish v1_2022 (fecha in col2) from v2 (ATC in col2)
+                            col2 = _clean(r[2])
+                            schema = "v1_2022" if re.match(r"\d{1,2}/\d", col2) else "v2"
+                        else:
+                            schema = "v1_extended"
                         break
 
                 results.extend(_parse_rows(t1_rows_old, schema, "T1", report_period, pub_date, pdf_path))
