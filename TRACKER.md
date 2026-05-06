@@ -40,8 +40,13 @@ The master action plan is the single source of truth for what to do next. It con
 | INVIMA scraper (`data_ingestion/invima_scraper.py`) | ✅ partial | 36/40 | Report-event level only — INVIMA publishes monthly PDFs not structured tables. **Drug-level signal blocked on PDF parser (next sprint).** |
 
 **Pre-registrations (locked):**
-- `preregistration_phase2c.md` — Hypothesis 1 (KF/Path B closes defect #4): **PASS**. Hypothesis 2 (RO closes defect #5): **PASS** (with the structural-monotonicity caveat noted above).
-- `preregistration_t3_1_amparo_backtest.md` — Spearman ρ ≥ 0.40 / AUC ≥ 0.65 against the Alcaraz et al. 2024 amparo dataset. **Blocked on dataset acquisition.**
+- `preregistration_phase2c.md` — Hypothesis 1 (KF/Path B closes defect #4): **PASS**. Hypothesis 2 (RO closes defect #5): **PASS** (with the structural-monotonicity caveat noted above). Hypothesis 3 (MAB ranking): **PASS**.
+- `preregistration_t3_1_amparo_backtest.md` — Spearman ρ ≥ 0.40 / AUC ≥ 0.65 against the Alcaraz et al. 2024 amparo dataset. **Blocked on dataset acquisition (Marin reply ~May 16).**
+- `preregistration_t3_1b_invima_leadtime.md` — **NEW (2026-05-06).** Plan B retrospective lead-time analysis on INVIMA longitudinal data (9 monthly snapshots, 2023-06 → 2025-09). Tests whether monitorizacion → desabastecido status transitions provide ≥1-month leading signal vs final desabastecido flag. Honest scope: this is signal-precedence analysis, NOT a predictive backtest of the live news pipeline (would require historical news ingestion). Documented as such in any funder communication.
+
+**Backtest plan status (2026-05-06):**
+- Plan A (full T3.1, ANMAT historical bulletins → predictive backtest of news pipeline): **DEFERRED.** ANMAT scraper has known production bug; only 1 alert ingested. Resuming Plan A requires: (a) ANMAT scraper fix, (b) historical news API ingestion (NewsAPI archive or similar), (c) replay infrastructure to feed news through classifier in chronological order. Estimated 2 weeks. Picked up after Marin reply or after Plan B completes, whichever first.
+- Plan B (INVIMA retrospective lead-time): **IN PROGRESS** — running in background 2026-05-06. ~4 hour effort.
 
 **Open items for tomorrow morning (priority order):**
 1. ~~**Send Marin email.**~~ ✅ SENT 2026-05-06 — `gmarin@med.unlp.edu.ar` cc `info@iecs.org.ar`. Concise Spanish version, one-pager attached. Await reply (~10 days). T3.1 backtest blocked until reply.
