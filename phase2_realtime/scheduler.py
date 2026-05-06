@@ -182,12 +182,13 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10,
                             results["articles_processed"] += 1
 
                             if shock_result.get("status") == "simulated":
-                                # Step 5: Evaluate alert (CVaR-aware)
+                                # Step 5: Evaluate alert (CVaR-aware, macro-aware)
                                 alert = evaluate_risk_change(
                                     shock_result["baseline_risk"],
                                     shock_result["shocked_risk"],
                                     baseline_cvar=shock_result.get("baseline_cvar_90"),
                                     shocked_cvar=shock_result.get("shocked_cvar_90"),
+                                    shock_type=classification.get("shock_type", "unknown"),
                                 )
 
                                 alert_msg = format_alert(

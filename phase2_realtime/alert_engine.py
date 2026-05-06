@@ -11,6 +11,12 @@ the (Q,r) policy in supply_sim.py adapts to long lead times by raising the
 reorder point (r = d × L_mean + SS), which can SUPPRESS mean stockout while
 DOUBLING CVaR_90 — a real false-negative hazard if alerts use mean only.
 Discovered during H1 testing 2026-05-03; see STRATEGIC_REVIEW_2026-05-03.md.
+
+Macro-economic shocks (currency_devaluation, budget_cut, inflation, currency,
+macro_economic) produce smaller absolute deltas than direct supply shocks but
+are SYSTEMIC — they affect all drugs simultaneously. A separate lower-threshold
+path (60% of normal) is applied when shock_type is a macro variant, and fires
+a "macro_systemic" trigger label to distinguish it from normal-threshold alerts.
 """
 
 import json
@@ -22,44 +28,79 @@ from typing import Optional
 _SEVERITY_RANK = {"none": 0, "MODERATE": 1, "HIGH": 2, "CRITICAL": 3}
 _SEVERITY_NAME = {0: "none", 1: "MODERATE", 2: "HIGH", 3: "CRITICAL"}
 
+# Shock types that warrant lower detection thresholds.
+# Macro shocks are systemic (affect all drugs simultaneously) but produce
+# smaller per-drug deltas than direct supply-chain events.
+MACRO_SHOCK_TYPES = {
+    "currency_devaluation",
+    "budget_cut",
+    "inflation",
+    "currency",
+    "macro",
+    "macro_economic",
+}
 
-def _mean_trigger(baseline_risk: float, shocked_risk: float):
-    """Return (severity_level, percent_increase, trigger_label or None) for mean dimension."""
+# Multiplier applied to all thresholds for macro shocks.
+# 0.60 means thresholds are 60% of their normal values.
+_MACRO_THRESHOLD_FACTOR = 0.60
+
+
+def _mean_trigger(baseline_risk: float, shocked_risk: float, macro: bool = False):
+    """Return (severity_level, percent_increase, trigger_label or None) for mean dimension.
+
+    Args:
+        macro: When True, use 60% of normal absolute and relative thresholds.
+    """
     delta = shocked_risk - baseline_risk
     pct = (delta / baseline_risk * 100) if baseline_risk > 0 else 0
+
     # Mean stockout thresholds (days/yr): 60=2mo critical, 30=chronic, 14=meaningful
     # Relative thresholds catch shocks against low baselines.
-    if pct >= 100 or shocked_risk >= 60:
+    # Normal thresholds: pct>=100/50/25, abs>=60/30/14
+    f = _MACRO_THRESHOLD_FACTOR if macro else 1.0
+    if pct >= 100 * f or shocked_risk >= 60 * f:
         return 3, pct, "mean_critical"
-    if pct >= 50 or shocked_risk >= 30:
+    if pct >= 50 * f or shocked_risk >= 30 * f:
         return 2, pct, "mean_high"
-    if pct >= 25 or shocked_risk >= 14:
+    if pct >= 25 * f or shocked_risk >= 14 * f:
         return 1, pct, "mean_moderate"
     return 0, pct, None
 
 
-def _cvar_abs_trigger(shocked_cvar: float):
-    """Return (severity_level, trigger_label or None) for absolute CVaR dimension."""
+def _cvar_abs_trigger(shocked_cvar: float, macro: bool = False):
+    """Return (severity_level, trigger_label or None) for absolute CVaR dimension.
+
+    Args:
+        macro: When True, use 60% of normal absolute thresholds.
+    """
     # Absolute CVaR_90 thresholds (worst-10% mean stockout days/yr).
     # Higher than mean thresholds because tail is supposed to exceed mean.
-    if shocked_cvar >= 90:
+    # Normal thresholds: 90/45/21 days.
+    f = _MACRO_THRESHOLD_FACTOR if macro else 1.0
+    if shocked_cvar >= 90 * f:
         return 3, "cvar_abs_critical"
-    if shocked_cvar >= 45:
+    if shocked_cvar >= 45 * f:
         return 2, "cvar_abs_high"
-    if shocked_cvar >= 21:
+    if shocked_cvar >= 21 * f:
         return 1, "cvar_abs_moderate"
     return 0, None
 
 
-def _cvar_rel_trigger(baseline_cvar: float, shocked_cvar: float):
-    """Return (severity_level, percent_increase, trigger_label or None) for relative CVaR dimension."""
+def _cvar_rel_trigger(baseline_cvar: float, shocked_cvar: float, macro: bool = False):
+    """Return (severity_level, percent_increase, trigger_label or None) for relative CVaR dimension.
+
+    Args:
+        macro: When True, use 60% of normal relative thresholds.
+    """
     delta = shocked_cvar - baseline_cvar
     pct = (delta / baseline_cvar * 100) if baseline_cvar > 0 else 0
-    if pct >= 100:
+    # Normal thresholds: pct>=100/50/25
+    f = _MACRO_THRESHOLD_FACTOR if macro else 1.0
+    if pct >= 100 * f:
         return 3, pct, "cvar_rel_critical"
-    if pct >= 50:
+    if pct >= 50 * f:
         return 2, pct, "cvar_rel_high"
-    if pct >= 25:
+    if pct >= 25 * f:
         return 1, pct, "cvar_rel_moderate"
     return 0, pct, None
 
@@ -69,6 +110,7 @@ def evaluate_risk_change(
     shocked_risk: float,
     baseline_cvar: Optional[float] = None,
     shocked_cvar: Optional[float] = None,
+    shock_type: str = "unknown",
 ) -> dict:
     """
     Evaluate if risk change warrants alert.
@@ -81,37 +123,77 @@ def evaluate_risk_change(
     CVaR dimensions are skipped when baseline_cvar / shocked_cvar are not provided.
     Existing callers (mean-only) keep working unchanged.
 
+    Macro-economic shocks (shock_type in MACRO_SHOCK_TYPES) use 60% of normal
+    thresholds because macro shocks are systemic — affecting all drugs at once —
+    even when per-drug deltas are small. A "macro_systemic" trigger label is added
+    when the lower threshold fires but the normal threshold would not.
+
     Args:
         baseline_risk: Baseline mean stockout days/yr
         shocked_risk:  Shocked mean stockout days/yr
         baseline_cvar: Baseline CVaR_90 (optional but strongly recommended)
         shocked_cvar:  Shocked CVaR_90  (optional but strongly recommended)
+        shock_type:    Shock category from event_classifier (default "unknown").
+                       Callers that do not pass this argument get normal thresholds.
 
     Returns:
-        dict with severity, should_alert, all numerical fields, and triggers[] for audit.
+        dict with severity, should_alert, all numerical fields, triggers[] for audit,
+        and shock_type for downstream traceability.
     """
+    is_macro = shock_type in MACRO_SHOCK_TYPES
     triggers = []
     level = 0
 
-    mean_level, mean_pct, mean_label = _mean_trigger(baseline_risk, shocked_risk)
+    # --- Mean dimension (normal thresholds) ---
+    mean_level, mean_pct, mean_label = _mean_trigger(baseline_risk, shocked_risk, macro=False)
     if mean_label:
         triggers.append(mean_label)
     level = max(level, mean_level)
+
+    # --- Mean dimension (macro lower thresholds, when applicable) ---
+    # Only add "macro_systemic" if the lower threshold fires but the normal one did not.
+    if is_macro:
+        macro_mean_level, _, macro_mean_label = _mean_trigger(baseline_risk, shocked_risk, macro=True)
+        if macro_mean_label and macro_mean_level > mean_level:
+            triggers.append("macro_systemic")
+            level = max(level, macro_mean_level)
 
     cvar_delta = None
     cvar_pct = None
     if baseline_cvar is not None and shocked_cvar is not None:
         cvar_delta = shocked_cvar - baseline_cvar
 
-        abs_level, abs_label = _cvar_abs_trigger(shocked_cvar)
+        # --- CVaR absolute dimension (normal) ---
+        abs_level, abs_label = _cvar_abs_trigger(shocked_cvar, macro=False)
         if abs_label:
             triggers.append(abs_label)
         level = max(level, abs_level)
 
-        rel_level, cvar_pct, rel_label = _cvar_rel_trigger(baseline_cvar, shocked_cvar)
+        # --- CVaR absolute dimension (macro lower thresholds) ---
+        if is_macro:
+            macro_abs_level, macro_abs_label = _cvar_abs_trigger(shocked_cvar, macro=True)
+            if macro_abs_label and macro_abs_level > abs_level:
+                if "macro_systemic" not in triggers:
+                    triggers.append("macro_systemic")
+                level = max(level, macro_abs_level)
+
+        # --- CVaR relative dimension (normal) ---
+        rel_level, cvar_pct, rel_label = _cvar_rel_trigger(baseline_cvar, shocked_cvar, macro=False)
         if rel_label:
             triggers.append(rel_label)
         level = max(level, rel_level)
+
+        # --- CVaR relative dimension (macro lower thresholds) ---
+        if is_macro:
+            macro_rel_level, _, macro_rel_label = _cvar_rel_trigger(baseline_cvar, shocked_cvar, macro=True)
+            if macro_rel_label and macro_rel_level > rel_level:
+                if "macro_systemic" not in triggers:
+                    triggers.append("macro_systemic")
+                level = max(level, macro_rel_level)
+
+        # Ensure cvar_pct is set even when only macro path fired
+        if cvar_pct is None:
+            _, cvar_pct, _ = _cvar_rel_trigger(baseline_cvar, shocked_cvar, macro=False)
 
     severity = _SEVERITY_NAME[level]
     should_alert = level >= 1
@@ -122,12 +204,13 @@ def evaluate_risk_change(
         parts.append(f"CVaR_90 {baseline_cvar:.1f}d→{shocked_cvar:.1f}d ({cvar_pct:+.0f}%)")
     summary = " | ".join(parts)
 
+    macro_note = " [MACRO/SYSTEMIC]" if is_macro and "macro_systemic" in triggers else ""
     if severity == "none":
         message = f"No action needed. {summary}"
     else:
         icon = "⚠️" if severity in ("CRITICAL", "HIGH") else "ℹ️"
         trigger_str = ",".join(triggers) if triggers else "—"
-        message = f"{icon} {severity}: {summary}  [triggers: {trigger_str}]"
+        message = f"{icon} {severity}: {summary}  [triggers: {trigger_str}]{macro_note}"
 
     return {
         "timestamp": datetime.now().isoformat(),
@@ -142,6 +225,7 @@ def evaluate_risk_change(
         "should_alert": should_alert,
         "severity": severity,
         "triggers": triggers,
+        "shock_type": shock_type,
         "message": message,
     }
 
@@ -163,6 +247,19 @@ def format_alert(alert: dict, drug: str, country: str, event_title: str) -> str:
 
     triggers_str = ",".join(alert.get("triggers", [])) or "—"
 
+    # Surface macro-systemic context when the lower threshold path fired.
+    shock_type = alert.get("shock_type", "unknown")
+    is_macro_alert = "macro_systemic" in alert.get("triggers", [])
+    macro_section = ""
+    if is_macro_alert:
+        macro_section = (
+            f"Shock context: MACRO/SYSTEMIC ({shock_type})\n"
+            f"  This shock is systemic — it compresses procurement budgets across\n"
+            f"  ALL oncology drugs simultaneously. Per-drug deltas are smaller than\n"
+            f"  direct supply events but the aggregate exposure is elevated.\n"
+            f"  Lower detection thresholds applied (60% of normal).\n\n"
+        )
+
     msg = f"""
 ╔══════════════════════════════════════════════════╗
 ║ ONCOSUPPLY RISK ALERT                           ║
@@ -180,7 +277,7 @@ Mean stockout days/year:
   Shocked:   {alert['shocked_risk']:.1f}
   Change:    {alert['risk_delta']:+.1f} days ({alert['percent_increase']:+.0f}%)
 
-{cvar_section}Triggers fired: {triggers_str}
+{cvar_section}{macro_section}Triggers fired: {triggers_str}
 
 Recommendation:
 - Review current inventory levels
@@ -229,3 +326,41 @@ if __name__ == "__main__":
         baseline_cvar=23.2, shocked_cvar=42.8,
     )
     print(format_alert(a, "cisplatin", "Argentina", "India halts API exports"))
+
+    print("\n=== Test 5: Macro smoke test — Trastuzumab/Colombia currency devaluation ===")
+    # Δmean=+1.3d (baseline 8.0 → 9.3), ΔCVaR=+3.2d (baseline 15.0 → 18.2)
+    #
+    # Normal thresholds — why they stay silent:
+    #   mean: pct=+16.25% < 25%; abs=9.3 < 14  → no trigger
+    #   CVaR abs: 18.2 < 21                      → no trigger
+    #   CVaR rel: pct=+21.3% < 25%               → no trigger
+    #
+    # Macro thresholds (60% of normal) — why they fire:
+    #   mean: pct=+16.25% ≥ 15% (60%×25)         → macro_systemic + mean_moderate
+    #   CVaR abs: 18.2 ≥ 12.6 (60%×21)           → macro_systemic + cvar_abs_moderate
+    #   CVaR rel: pct=+21.3% ≥ 15% (60%×25)      → macro_systemic + cvar_rel_moderate
+    a_no_macro = evaluate_risk_change(
+        baseline_risk=8.0, shocked_risk=9.3,
+        baseline_cvar=15.0, shocked_cvar=18.2,
+    )
+    a_macro = evaluate_risk_change(
+        baseline_risk=8.0, shocked_risk=9.3,
+        baseline_cvar=15.0, shocked_cvar=18.2,
+        shock_type="currency_devaluation",
+    )
+    print(f"  Without shock_type → should_alert={a_no_macro['should_alert']}, severity={a_no_macro['severity']}, triggers={a_no_macro['triggers']}")
+    print(f"  With shock_type='currency_devaluation' → should_alert={a_macro['should_alert']}, severity={a_macro['severity']}, triggers={a_macro['triggers']}")
+
+    # Assertion: macro path MUST fire; normal path must NOT
+    assert not a_no_macro["should_alert"], (
+        f"REGRESSION: normal path fired unexpectedly — triggers={a_no_macro['triggers']}"
+    )
+    assert a_macro["should_alert"], (
+        f"FAIL: macro path did not fire for trastuzumab/Colombia case"
+    )
+    assert "macro_systemic" in a_macro["triggers"], (
+        f"FAIL: 'macro_systemic' trigger label missing — triggers={a_macro['triggers']}"
+    )
+    print("  [PASS] Trastuzumab/Colombia macro smoke test passed.")
+    print()
+    print(format_alert(a_macro, "trastuzumab", "Colombia", "Colombia peso devaluation 2026"))
