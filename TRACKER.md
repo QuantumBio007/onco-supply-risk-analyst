@@ -19,8 +19,8 @@ The master action plan is the single source of truth for what to do next. It con
 **Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
 **Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
 **Phase 2c status:** 🟡 IMPLEMENTATION CLEARED 2026-05-05 — three algorithms locked (Kalman + Robust Opt + MAB); pre-registration in place; advisory-board gate explicitly deferred (recruitment lead time)
-**Last updated:** 2026-05-06 (session 24 — INVIMA parser DONE; MAB v1 DONE. 31/31 tests. H3 CLOSED: manufacturing (0.855) >> climate_latam (0.333). 163/163 Phase 2c tests passing.)
-**Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files)
+**Last updated:** 2026-05-06 (session 25 — Literature synthesis complete. 6 papers analyzed + filed. KB `argentina_procurement_system.txt` enriched with CONETEC/HTA section [Marin 2024]. T3.1b Plan B FINAL: H2 PASS 118d median. H4 pre-reg: AUTO-NULL expected. Plan A (amparo backtest) viability assessed — blocked on Marin reply.)
+**Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files) + 5 PDFs in `knowledge_base/literature/`
 
 ---
 
@@ -126,7 +126,20 @@ The master action plan is the single source of truth for what to do next. It con
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Session 20 CLOSING (2026-05-04). EIN SS-4 faxed ✅. PAHO email sent ✅. A4C email sent ✅. One-page CEO narrative created ✅. CEO Gate: 2/4 complete (advisory board + numerical backtest still open). Resume next session with: (1) EIN response (~May 5), (2) DC Articles of Incorporation via CorpOnline, (3) advisory board cold email (zero progress — CEO Gate blocker), (4) monitor Lim/Vasquez/Maza/A4C replies.**
+**STATUS: Session 25 CLOSING (2026-05-06). Literature synthesis done ✅. INVIMA Plan B done ✅. argentina_procurement_system.txt enriched ✅. H4 pre-reg written ✅. Maryland Articles filed ✅. EIN active ✅.**
+
+**Priority 1 — Still blocked / awaiting:**
+- [ ] **Marin reply** (~May 16) — T3.1 Plan A amparo backtest blocked until dataset received
+- [ ] **Maryland Certificate of Incorporation** (expected by 5/20/26) → then file IRS Form 1023-EZ
+- [ ] **Lim / PAHO reply** — letter of support for grant applications
+- [ ] **Vasquez + Maza LinkedIn** — accept connections when they respond
+- [ ] **A4C reply** — email sent 2026-05-04 to communications@angelsforchange.org
+
+**Priority 2 — Ready to execute now:**
+- [ ] Live NewsAPI test — run pipeline end-to-end on real today's articles (script ready)
+- [ ] Advisory board cold email — 1 contact (JHU Carey biostatistician) — CEO Gate blocker
+- [ ] H4 formal analysis run — pre-registered; expected AUTO-NULL; low effort, completes the T3.1b story
+- [ ] ANMAT scraper production bug fix — only 1 alert returned (live HTML structure differs from fixture)
 
 ## ▶ GRANTS FOLDER MAP (always current)
 
@@ -139,6 +152,44 @@ The master action plan is the single source of truth for what to do next. It con
 | Grants master index | `grants/GRANTS_INDEX.md` | Single index of all grant files + blockers |
 | Literature (canonical) | `Literature/cancer_clinical/GRANT_LITERATURE_SYNTHESIS.md` | Same as grants copy — canonical source |
 | Vasquez/Maza references | `Literature/cancer_clinical/REFERENCES_VASQUEZ_MAZA.md` | 35-paper index for PAHO clinical contacts |
+
+---
+
+### Session 25 — Literature synthesis + KB enrichment (2026-05-06)
+
+**Papers analyzed (6 total):**
+
+| # | Paper | Verdict | OncoSupply use |
+|---|---|---|---|
+| 15 | Alcaraz et al. 2024 (Medicina Buenos Aires) — Argentine amparo dataset | PRIMARY | Media precedes amparo by 1–3 months → validates news pipeline thesis. 405 cases, top drugs: nusinersen (21.7%), palbociclib (5.9%). Mean amparo→delivery: 150d. |
+| 16 | Marin GH 2024 (RPSP) — High-cost drugs: individual vs. collective rights | HIGH | CONETEC architecture, cost-opportunity argument ($189M/yr nivolumab+ipilimumab = 3× TB/HIV), Uruguay FNR model, risk-sharing proposals. Confirms structural payer insolvency. |
+| 17 | de Oliveira et al. 2022 (BMC Public Health) — Antineoplastic judicialization Brazil | MODERATE | 2,947 lawsuits Pernambuco; antineoplastics 13× more costly per lawsuit ($7,508 median); 49.8% from public system. Confirms oncology judicialization is regional and not elite-only. |
+| 18 | Kretzschmar et al. 2024 (Rev Saúde Pública) — Zolgensma judicialization Brazil | LOW | 136 lawsuits; courts override HTA criteria in 94.7% of cases. Not oncology supply. Cite only for judicialization dynamics section. |
+| 19 | Guan et al. 2020 (BMJ Open) — China anticancer reimbursement | DROPPED | China NRDL/PRDL system — wrong geography, wrong market structure. File retained, do not integrate. |
+| 20 | Angels for Change 2024 Annual Report | HIGH | US analog to OncoSupply. 323 shortages in 2024 (all-time high). Project GOLD (buffer supply, Cencora/Fresenius/McKesson), GSSN, EDSA (90+ members). Gupta quote: "predict which drugs will go into shortage." EDSA membership ($500) = customer discovery network. |
+
+**Knowledge base updates committed:**
+- `knowledge_base/docs/argentina_procurement_system.txt` — new section: "HTA ARCHITECTURE: CONETEC AND THE MARIN COST-OPPORTUNITY ARGUMENT" (commit d0f6360a). Covers CONETEC (Decree 344/2023), CUFAR, payer insolvency as structural condition, Uruguay FNR, court override rates, and cytotoxic vs. innovative drug failure mode distinction.
+- `knowledge_base/references/reading_list.md` — items 15–19 added with full analysis (local-only, gitignored).
+- `knowledge_base/literature/` — created as home for all paper PDFs (5 files moved, descriptive names). Also gitignored via `*.pdf` rule — local only.
+
+**T3.1b Plan B — FINAL results (completed earlier in session 24–25):**
+- H1: NULL (dual cause — window truncation + INVIMA product-name discontinuity)
+- H2: PASS — openFDA leads INVIMA by **median 118 days** (carboplatin 217d [anchor], methotrexate 19d [marginal])
+- H3: PASS — 3/3 observable `descontinuado` formulations had prior warning signal; 1 left-truncated
+- H4 pre-registration written: expected AUTO-NULL (qualifying N = 1, carboplatin only)
+- Defensible funder claim: *"Cross-database surveillance detected oncology shortages in Colombia 19–217 days before INVIMA's official flag. Strongest case: carboplatin posted on openFDA April 28, 2023 — seven months before INVIMA's December 2023 flag."*
+
+**Plan A (T3.1 amparo backtest) viability assessed:**
+- Alcaraz et al. 2024 dataset covers **2017–2020** with top drug = nusinersen (SMA, not oncology)
+- Oncology subset (palbociclib 5.9%, etc.) too small for stand-alone Spearman/AUC test
+- Marin email sent 2026-05-06: asked for Boni/Marin 2023 drug supply dataset instead
+- Plan A blocked until Marin reply (~May 16)
+
+**Structural insight added to KB (Marin framework):**
+- Cytotoxics (cisplatin, carboplatin, doxorubicin): failure mode = manufacturing concentration + currency/import shock → supply shortage → OncoSupply's INVIMA/openFDA cross-database surveillance is relevant
+- Innovative agents (CDK4/6i, checkpoint inhibitors, HER2 beyond trastuzumab): failure mode = payer refusal → amparo → 150-day delay → OncoSupply's news media monitoring is the relevant early warning tool
+- These are TWO distinct failure modes OncoSupply must model differently — confirmed by data
 
 ### Session 19 — PAHO outreach execution + literature foundation (2026-05-04)
 
