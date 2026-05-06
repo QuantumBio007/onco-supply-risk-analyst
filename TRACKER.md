@@ -159,12 +159,16 @@ The master action plan is the single source of truth for what to do next. It con
 
 **Peru experiment branch:** `experiment/peru-country-params` — committed separately, do not merge until DIGEMID data validates params.
 
-**Tier B — Queued:**
-- ANMAT AJAX endpoint discovery (JS-rendered page — find raw data endpoint)
-- alert_engine macro threshold tuning (trastuzumab/Colombia silent case: Δmean +1.3d below threshold)
-- DIGEMID scraper (Peru regulatory data, parallel to INVIMA)
+**Tier B — COMPLETE (2026-05-06):**
 
-**Tier C:**
+| # | Task | Result |
+|---|---|---|
+| B1 | ANMAT AJAX endpoint discovery | Old URL dead (2018 PDF). Real shortage data: PAMI-hosted ZK Framework app `servicios.pami.org.ar/vademecum`. No REST API — ZK session AJAX protocol. UUIDs stable across sessions. **Live confirmed: Cisplatino 50mg GLENMARK = DISCONTINUACIÓN PERMANENTE.** Rewrite of `anmat_scraper.py` queued (Tier C). |
+| B2 | alert_engine macro threshold tuning | `MACRO_THRESHOLD_FACTOR=0.60` applied to all 3 triggers when shock_type ∈ MACRO_SHOCK_TYPES. `macro_systemic` trigger label added. Trastuzumab/Colombia case (Δmean+1.3d, ΔCVaR+3.2d) now fires. Scheduler updated to pass shock_type. Smoke test passing. |
+| B3 | DIGEMID scraper | New: `phase2_realtime/data_ingestion/digemid_scraper.py`. `fetch_discontinuations()` operational — 2,667 records scraped live: cisplatino 6, carboplatino 7, trastuzumab 1 (OGIVRI biosimilar). `fetch_alerts()` paginated. Registration search returns 403 (needs Playwright — documented). SQLite dedup pattern. |
+
+**Tier C — Queued:**
+- ANMAT scraper rewrite: replace dead URLs with PAMI ZK session protocol (ZK AJAX, stable UUIDs)
 - Public risk dashboard v0 (GitHub Pages + Plotly, 185d trastuzumab/Venezuela headline)
 
 ## ▶ GRANTS FOLDER MAP (always current)
