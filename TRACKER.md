@@ -46,7 +46,7 @@ The master action plan is the single source of truth for what to do next. It con
 
 **Backtest plan status (2026-05-06):**
 - Plan A (full T3.1, ANMAT historical bulletins → predictive backtest of news pipeline): **DEFERRED.** ANMAT scraper has known production bug; only 1 alert ingested. Resuming Plan A requires: (a) ANMAT scraper fix, (b) historical news API ingestion (NewsAPI archive or similar), (c) replay infrastructure to feed news through classifier in chronological order. Estimated 2 weeks. Picked up after Marin reply or after Plan B completes, whichever first.
-- Plan B (INVIMA retrospective lead-time): **IN PROGRESS** — running in background 2026-05-06. ~4 hour effort.
+- Plan B (INVIMA retrospective lead-time): **COMPLETE 2026-05-06.** Verdicts: H1 NULL (window left-truncation; ingest 2022 INVIMA PDFs to retest), **H2 PASS (openFDA leads INVIMA by median 148.5 days; carboplatin 217d, methotrexate 80d — load-bearing finding)**, H3 PASS borderline. Defensible claim: "Cross-database surveillance gives 3-7 months of leading signal on Colombian oncology shortages." Cannot claim live news pipeline predicts shortages. See [phase2_realtime/docs/t3_1b_results_2026-05-06.md](phase2_realtime/docs/t3_1b_results_2026-05-06.md). Suggested H4 follow-up pre-registration: monitorizacion → descontinuado lead-time as a separate hypothesis.
 
 **Open items for tomorrow morning (priority order):**
 1. ~~**Send Marin email.**~~ ✅ SENT 2026-05-06 — `gmarin@med.unlp.edu.ar` cc `info@iecs.org.ar`. Concise Spanish version, one-pager attached. Await reply (~10 days). T3.1 backtest blocked until reply.

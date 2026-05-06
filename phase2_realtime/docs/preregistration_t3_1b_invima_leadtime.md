@@ -120,13 +120,15 @@ A summary table listing every oncology formulation in the population with column
 
 ---
 
-## Result blocks (filled in after analysis runs)
+## Result blocks (filled in 2026-05-06 after analysis ran)
 
-### H1 — INVIMA monitorizacion → desabastecido lead-time
-[To be filled in by `run_t3_1b_leadtime_analysis.py`]
+Full results document: `phase2_realtime/docs/t3_1b_results_2026-05-06.md`. Raw JSON: `phase2_data/t3_1b_results.json`.
 
-### H2 — openFDA precedes INVIMA
-[To be filled in by `run_t3_1b_leadtime_analysis.py`]
+### H1 — INVIMA monitorizacion → desabastecido lead-time: **NULL** (2026-05-06)
+0 qualifying formulations of 57. All 5 oncology desabastecido* events in our 9-snapshot window are left-truncated (already in shortage at first observation). No formulation transitioned monitorizacion → desabastecido in our data; the observable transitions were monitorizacion → descontinuado or already-desabastecido → descontinuado. Honest reading: window opens after the 2023 shortage wave was already underway. To resolve, ingest INVIMA PDFs from 2022. No forbidden moves applied — the available tighter hypothesis ("monitorizacion → descontinuado") is reformulated as suggested H4 for separate pre-registration, not retrofitted here.
 
-### H3 — descontinuado preceded by warning
-[To be filled in by `run_t3_1b_leadtime_analysis.py`]
+### H2 — openFDA `initial_posting_date` precedes INVIMA shortage flag: **PASS** (2026-05-06)
+openFDA leads INVIMA by **median 148.5 days** across 2 matched drugs (carboplatin: 217d, methotrexate: 80d). Pre-registration set N≥2 as the floor for the verdict; this just clears it. Bleomycin matched on INN but did not reach INVIMA shortage status in our window — correctly excluded. The lead-day estimate is a lower bound (INVIMA `pub_date` approximated by snapshot start; actual PDF publication is 2-4 weeks later in the conservative direction). **This is the load-bearing finding.** Defensible claim for funder communication: "Cross-database surveillance gives 80–217 days of leading signal on Colombian oncology shortages."
+
+### H3 — descontinuado preceded by warning: **PASS (borderline)** (2026-05-06)
+100% of 2 observable descontinuado formulations had ≥1 prior monitorizacion or desabastecido* snapshot (carboplatin "para reconstituir" + carboplatin "solución inyectable vial"). 2 left-truncated cases (cisplatin, tamoxifen — already descontinuado at first observation). Pre-registration would have downgraded to PARTIAL-PASS if `left_truncated > observable`; here `left_truncated = observable = 2`, so strict-greater fails and PASS holds. **One additional left-truncated case would have flipped the verdict.** Treat as supporting H2, not standalone. No forbidden moves applied (canonicalization-induced tamoxifen ambiguity left in the data rather than excluded post-hoc).
