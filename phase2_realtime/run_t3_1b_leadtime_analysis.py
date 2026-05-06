@@ -400,6 +400,64 @@ def evaluate_h3(timelines: dict) -> dict:
     }
 
 
+# ── Hypothesis 4 ────────────────────────────────────────────────────────────
+def evaluate_h4(timelines: dict) -> dict:
+    """
+    H4: At the INN level, monitorizacion/riesgo for ANY formulation precedes
+    desabastecido* for ANY formulation of the same INN by >=1 snapshot.
+
+    Pre-registration: phase2_realtime/docs/preregistration_t3_1c_h4_inn_leadtime.md
+    Expected verdict: AUTO-NULL (qualifying N=1, carboplatin only).
+    """
+    inn_first_warn: dict[str, int] = {}
+    inn_first_short: dict[str, int] = {}
+
+    for (inn, _prod), tl in timelines.items():
+        for obs in tl:
+            idx = obs["snapshot_idx"]
+            if obs["estado"] in WARNING_ESTADOS:
+                if inn not in inn_first_warn or idx < inn_first_warn[inn]:
+                    inn_first_warn[inn] = idx
+            if obs["estado"] in SHORTAGE_ESTADOS:
+                if inn not in inn_first_short or idx < inn_first_short[inn]:
+                    inn_first_short[inn] = idx
+
+    rows = []
+    qualifying_leads = []
+    for inn in sorted(inn_first_short):
+        fs = inn_first_short[inn]
+        fw = inn_first_warn.get(inn)
+        left_trunc = fs == 0
+        lead = (fs - fw) if fw is not None else None
+        qualifying = lead is not None and lead > 0
+        if qualifying:
+            qualifying_leads.append(lead)
+        rows.append({
+            "inn": inn,
+            "first_warn_period":  SNAPSHOT_ORDER[fw] if fw is not None else None,
+            "first_short_period": SNAPSHOT_ORDER[fs],
+            "lead_snapshots": lead,
+            "qualifying": qualifying,
+            "left_truncated": left_trunc,
+        })
+
+    n_q = len(qualifying_leads)
+    if n_q < 2:
+        import statistics as _stats
+        verdict = "AUTO-NULL"
+        reason = f"qualifying N={n_q} < 2; one data point cannot establish median trend"
+        median_lead = qualifying_leads[0] if n_q == 1 else None
+    else:
+        import statistics as _stats
+        median_lead = _stats.median(qualifying_leads)
+        verdict = "PASS" if median_lead >= 1 else "NULL"
+        reason = f"qualifying N={n_q}, median lead={median_lead} snapshots"
+
+    return {"verdict": verdict, "reason": reason, "n_qualifying": n_q,
+            "qualifying_leads": qualifying_leads, "median_lead_snapshots": median_lead,
+            "rows": rows}
+
+
 # ── Summary table ───────────────────────────────────────────────────────────
 def build_summary_table(timelines: dict) -> list[dict]:
     out = []
@@ -492,6 +550,17 @@ def main(argv: list[str]) -> int:
     print(f"  observable WITHOUT prior signal:    {h3['n_observable_without_signal']}")
     print(f"  left-truncated (already discontinued): {h3['n_left_truncated']}")
     print(f"  pct with signal:                    {h3['pct_with_signal']}")
+
+    h4 = evaluate_h4(timelines)
+    print()
+    print("─" * 80)
+    print(f"H4 verdict: {h4['verdict']}")
+    print(f"  reason:          {h4['reason']}")
+    print(f"  qualifying INNs: {h4['n_qualifying']} | median lead: {h4['median_lead_snapshots']} snapshots")
+    print(f"  {'INN':<20} {'first_warn':<14} {'first_short':<14} {'lead':<6} {'qualifying'}")
+    for r in h4["rows"]:
+        print(f"  {r['inn']:<20} {str(r['first_warn_period']):<14} {r['first_short_period']:<14} "
+              f"{str(r['lead_snapshots']):<6} {r['qualifying']}")
 
     summary = build_summary_table(timelines)
     print()

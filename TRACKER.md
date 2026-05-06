@@ -126,20 +126,46 @@ The master action plan is the single source of truth for what to do next. It con
 
 ## ▶ PICK UP HERE — NEXT SESSION
 
-**STATUS: Session 25 CLOSING (2026-05-06). Literature synthesis done ✅. INVIMA Plan B done ✅. argentina_procurement_system.txt enriched ✅. H4 pre-reg written ✅. Maryland Articles filed ✅. EIN active ✅.**
+**STATUS: Session 26 CLOSING (2026-05-06). Tier A code sprint complete. All 5 items shipped.**
 
 **Priority 1 — Still blocked / awaiting:**
 - [ ] **Marin reply** (~May 16) — T3.1 Plan A amparo backtest blocked until dataset received
 - [ ] **Maryland Certificate of Incorporation** (expected by 5/20/26) → then file IRS Form 1023-EZ
-- [ ] **Lim / PAHO reply** — letter of support for grant applications
-- [ ] **Vasquez + Maza LinkedIn** — accept connections when they respond
+- [ ] **Lim** — accepted LinkedIn; message sent; await PAHO letter of support
+- [ ] **Vasquez** — LinkedIn connection pending
 - [ ] **A4C reply** — email sent 2026-05-04 to communications@angelsforchange.org
+- [ ] **Pablo (Castello)** — asked for Boni/Marin 2023 ANMAT dataset or Marin intro
+- [ ] **ANMAT (LinkedIn)** — messaged for historical Boletín de Faltantes data
 
 **Priority 2 — Ready to execute now:**
-- [ ] Live NewsAPI test — run pipeline end-to-end on real today's articles (script ready)
+- [x] Live NewsAPI test — COMPLETE. 6 articles fetched macro_latam; 0 processed (all IRRELEVANT — classifier working). Query now fixed (session 26).
 - [ ] Advisory board cold email — 1 contact (JHU Carey biostatistician) — CEO Gate blocker
-- [ ] H4 formal analysis run — pre-registered; expected AUTO-NULL; low effort, completes the T3.1b story
-- [ ] ANMAT scraper production bug fix — only 1 alert returned (live HTML structure differs from fixture)
+- [x] H4 formal analysis run — AUTO-NULL confirmed. evaluate_h4() now in run_t3_1b_leadtime_analysis.py.
+- [ ] ANMAT scraper fix — JS-rendered page (not HTML table). Needs AJAX endpoint discovery. Tier B.
+
+---
+
+## ▶ SESSION 26 — Tier A Code Sprint (2026-05-06)
+
+**All 5 items complete and committed.**
+
+| # | Task | Result |
+|---|---|---|
+| 1 | macro_latam query | Rewritten — anchored on health budget/medicine procurement; no longer catches Asian markets/Ukraine/satellite noise |
+| 2 | NewsAPI daily cadence guard | `_already_ran_today()` + `_mark_category_run()` added to scheduler; `force=True` for tests; 9 req/day not 216 |
+| 3 | paclitaxel/oxaliplatin silent drop | Now logs explicitly: `"skipping {drug} — not in TARGETS"` |
+| 4 | H4 formalization | `evaluate_h4()` added to `run_t3_1b_leadtime_analysis.py`; wired into main(); AUTO-NULL confirmed reproducibly |
+| 5 | Peru KB doc | `knowledge_base/docs/peru_procurement_system.txt` — ESSALUD/MINSA/SIS/DIGEMID/INEN, Vasquez 2016 clinical quote, sim params |
+
+**Peru experiment branch:** `experiment/peru-country-params` — committed separately, do not merge until DIGEMID data validates params.
+
+**Tier B — Queued:**
+- ANMAT AJAX endpoint discovery (JS-rendered page — find raw data endpoint)
+- alert_engine macro threshold tuning (trastuzumab/Colombia silent case: Δmean +1.3d below threshold)
+- DIGEMID scraper (Peru regulatory data, parallel to INVIMA)
+
+**Tier C:**
+- Public risk dashboard v0 (GitHub Pages + Plotly, 185d trastuzumab/Venezuela headline)
 
 ## ▶ GRANTS FOLDER MAP (always current)
 

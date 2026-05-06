@@ -1,13 +1,15 @@
 """
 scheduler.py — Orchestrate the Phase 2 pipeline: news → classify → shock → alert
 
-Runs hourly (or on-demand) to fetch news and update risk estimates.
+Designed for DAILY cadence (not hourly). 9 queries × 1/day = 9 req/day vs. 100/day
+free-tier limit. Running more than once per day per category wastes quota with no benefit —
+shortage signals move on week-to-week timescales, not minute-to-minute.
 """
 
 import hashlib
 import json
 import sqlite3
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 
 from .news_listener import fetch_news, QUERIES
@@ -37,6 +39,32 @@ def _init_db() -> None:
                 classification TEXT
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS category_last_run (
+                category     TEXT PRIMARY KEY,
+                last_run_date TEXT NOT NULL
+            )
+        """)
+
+
+def _already_ran_today(category: str) -> bool:
+    try:
+        with sqlite3.connect(_DB_PATH) as conn:
+            row = conn.execute(
+                "SELECT last_run_date FROM category_last_run WHERE category = ?",
+                (category,),
+            ).fetchone()
+            return row is not None and row[0] == date.today().isoformat()
+    except Exception:
+        return False
+
+
+def _mark_category_run(category: str) -> None:
+    with sqlite3.connect(_DB_PATH) as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO category_last_run (category, last_run_date) VALUES (?, ?)",
+            (category, date.today().isoformat()),
+        )
 
 
 def _article_hash(title: str) -> str:
@@ -71,19 +99,25 @@ def _mark_processed(article_hash: str, severity: str, shock_type: str) -> None:
 _init_db()
 
 
-def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) -> dict:
+def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10,
+              force: bool = False) -> dict:
     """
     Run one complete Phase 2 cycle: fetch → classify → simulate → alert.
 
     Args:
         query_category: one of the QUERIES keys: manufacturing / logistics_latam /
                         latam_politics / regulatory / currency / healthcare_demand /
-                        climate_latam / company_events
+                        climate_latam / company_events / macro_latam
         limit_articles: Max articles to process per cycle (simulation is slow)
+        force: Skip the daily cadence guard (use for testing/smoke tests)
 
     Returns:
         dict with cycle results, alerts, risk deltas
     """
+    if not force and _already_ran_today(category=query_category):
+        print(f"[scheduler] {query_category} already ran today — skipping (use force=True to override)")
+        return {"status": "skipped_daily_guard", "category": query_category,
+                "timestamp": datetime.now().isoformat()}
 
     results = {
         "timestamp": datetime.now().isoformat(),
@@ -134,7 +168,13 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) 
 
                 for drug in affected_drugs:
                     for country in affected_countries:
-                        if drug in TARGETS["drugs"] and country in TARGETS["countries"]:
+                        if drug not in TARGETS["drugs"]:
+                            print(f"[scheduler] skipping {drug} — not in TARGETS (add to DRUG_PARAMS in supply_sim.py to enable)")
+                            continue
+                        if country not in TARGETS["countries"]:
+                            print(f"[scheduler] skipping {country} — not in TARGETS")
+                            continue
+                        if True:
                             # Step 4: Compute risk delta
                             shock_result = trigger_simulation(
                                 classification, drug, country
@@ -186,11 +226,12 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10) 
             print(f"[scheduler] Error: {str(e)}")
             continue
 
+    _mark_category_run(query_category)
     return results
 
 
 if __name__ == "__main__":
-    # Test run
+    # Test run — force=True bypasses daily guard
     print("[scheduler] Starting Phase 2 cycle...")
-    result = run_cycle(query_category="latam_politics")
+    result = run_cycle(query_category="latam_politics", force=True)
     print(json.dumps(result, indent=2))

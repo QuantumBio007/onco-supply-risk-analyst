@@ -51,9 +51,10 @@ QUERIES = {
 
     # Macro-economic signals: oil/commodity shocks → LATAM inflation → health budget compression.
     # Intentionally excludes pharma keywords — the transmission pathway is macro, not supply-side.
-    # Catches articles like "Iran war squeezes Latin America" that would be IRRELEVANT under
-    # pharma-focused queries but represent real procurement budget risk (budget_multiplier channel).
-    "macro_latam": "(oil prices OR fuel prices OR inflation OR 'cost of living' OR 'economic pressure' OR 'energy costs') AND ('Latin America' OR LATAM OR Argentina OR Colombia OR Venezuela OR Brazil) AND (economy OR budget OR spending OR 'purchasing power' OR austerity OR 'public spending' OR households)",
+    # Macro-economic signals: oil/commodity shocks → LATAM health budget compression → procurement cuts.
+    # Tightened 2026-05-06 (session 26): original query too broad, returning Asian markets/Ukraine/satellite
+    # news as IRRELEVANT. New query anchors on health/medicine budget specifically in target countries.
+    "macro_latam": "(health budget OR medicine procurement OR salud presupuesto OR medicamentos) AND (Argentina OR Colombia OR Venezuela OR Peru OR Brazil) AND (recorte OR austerity OR inflation OR devaluation OR 'budget cut' OR desabastecimiento OR shortage OR crisis)",
 }
 
 
