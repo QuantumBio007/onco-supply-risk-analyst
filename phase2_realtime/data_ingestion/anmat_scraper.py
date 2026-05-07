@@ -2,7 +2,9 @@
 anmat_scraper.py — Daily scraper for three ANMAT data streams.
 
 Endpoints:
-  - Shortage list (Listado_Faltantes): Latin-1 / Windows-1252 legacy ASP HTML table
+  - Shortage list: PAMI vademecum ZK Framework app (servicios.pami.org.ar)
+      Real-time oncology drug availability queried via AJAX against the ZK
+      session protocol.  Replaces dead legacy ANMAT ASP endpoint (2018 PDF).
   - Alerts archive (alertas_medicamentos): Latin-1 HTML, reverse-chronological
   - Boletín Oficial Rubro 5006: UTF-8, ANMAT Disposiciones for a given date
 
@@ -16,6 +18,7 @@ Usage:
 
 import hashlib
 import logging
+import re
 import sqlite3
 import time
 from datetime import datetime
@@ -33,7 +36,17 @@ logger = logging.getLogger(__name__)
 
 USER_AGENT = "OncoSupply-research/0.1 (academic research; cmart156@jh.edu)"
 
-SHORTAGE_URL = "http://www.anmat.gob.ar/listados/Listado_Faltantes.asp"
+# Historical reference — dead since ~2018, redirects to a static PDF.
+# SHORTAGE_URL = "http://www.anmat.gob.ar/listados/Listado_Faltantes.asp"
+
+# PAMI vademecum — live ZK Framework 7.0.3 app with shortage data.
+PAMI_VNM_BASE    = "https://servicios.pami.org.ar/vademecum"
+PAMI_ZK_APP      = f"{PAMI_VNM_BASE}/views/consultaPublica/listado.zul"
+PAMI_ZK_AJAX     = f"{PAMI_VNM_BASE}/zkau"
+
+# Oncology IFA (active ingredient) names in Spanish, as used by the registry.
+ONCOLOGY_IFA_NAMES = ["Cisplatino", "Carboplatino", "Doxorrubicina", "Trastuzumab"]
+
 ALERTS_URL = "http://www.anmat.gob.ar/alertas_medicamentos.asp"
 BOLETIN_URL = "https://www.boletinoficial.gob.ar/seccion/primera/"
 
@@ -131,91 +144,211 @@ def _sha1(*parts: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Scraper 1 — Shortage list
+# Scraper 1 — Shortage list  (PAMI ZK Framework vademecum)
 # ---------------------------------------------------------------------------
 
-def fetch_shortage_list() -> list[dict]:
+def _get_zk_session() -> tuple[str, str]:
     """
-    Scrape http://www.anmat.gob.ar/listados/Listado_Faltantes.asp
+    GET the PAMI ZK app page and extract (jsessionid, dtid).
 
-    Returns list of dicts with keys:
-        producto, ifa, laboratorio, certificado, fecha_notificacion,
-        estado, motivo, fecha_normalizacion
+    Returns:
+        (jsessionid, dtid) — both as plain strings.
+
+    Raises:
+        requests.RequestException  if the HTTP request fails.
+        ValueError                 if either token cannot be extracted.
     """
-    resp = _get(SHORTAGE_URL, encoding="latin-1")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    s = _session()
+    resp = s.get(PAMI_ZK_APP, timeout=REQUEST_TIMEOUT)
+    resp.raise_for_status()
 
-    rows = []
-    table = soup.find("table")
-    if table is None:
-        logger.warning("fetch_shortage_list: no <table> found at %s", SHORTAGE_URL)
-        return rows
+    # JSESSIONID from cookie jar
+    jsessionid = s.cookies.get("JSESSIONID", "")
+    if not jsessionid:
+        # Some deployments embed it in a Set-Cookie header instead
+        for header_val in resp.headers.get("Set-Cookie", "").split(";"):
+            m = re.search(r"JSESSIONID=([A-Za-z0-9.]+)", header_val)
+            if m:
+                jsessionid = m.group(1)
+                break
 
-    headers: list[str] = []
-    expected = [
-        "producto", "ifa", "laboratorio", "certificado",
-        "fecha_notificacion", "estado", "motivo", "fecha_normalizacion",
-    ]
+    if not jsessionid:
+        raise ValueError("_get_zk_session: JSESSIONID not found in cookies or headers")
 
-    trs = table.find_all("tr")
-    for tr in trs:
-        cells = tr.find_all(["th", "td"])
-        if not cells:
-            continue
-        texts = [c.get_text(separator=" ", strip=True) for c in cells]
+    # Desktop ID — ZK embeds it as  dt:'<value>'  somewhere in the initial HTML
+    m = re.search(r"dt:'([^']+)'", resp.text)
+    if not m:
+        raise ValueError("_get_zk_session: dtid (dt:'...') not found in page HTML")
+    dtid = m.group(1)
 
-        # Detect header row heuristically (first non-empty row or row containing "Producto")
-        if not headers:
-            lower = [t.lower() for t in texts]
-            if any("producto" in l or "ifa" in l or "laboratorio" in l for l in lower):
-                # Normalise header names to expected keys
-                headers = _normalise_headers(texts)
+    logger.debug("_get_zk_session: jsessionid=%s dtid=%s", jsessionid, dtid)
+    return jsessionid, dtid
+
+
+def _zk_search(
+    jsessionid: str,
+    dtid: str,
+    ifa_name: str,
+    session: requests.Session,
+) -> list[dict]:
+    """
+    POST a ZK search command for *ifa_name* and parse the quasi-JSON response.
+
+    The ZK AJAX response is not valid JSON — it uses JavaScript object syntax
+    with single-quoted strings, unquoted keys, etc.  We parse it with regex.
+
+    Stable component UUIDs (deterministic by ZK component tree position):
+        zk_comp_34  = IFA (active ingredient) textbox
+        zk_comp_80  = "Buscar" (Search) button
+
+    Args:
+        jsessionid: Session token from _get_zk_session().
+        dtid:       Desktop ID from _get_zk_session().
+        ifa_name:   Spanish IFA name, e.g. "Cisplatino".
+        session:    Shared requests.Session (carries cookies).
+
+    Returns:
+        List of dicts with keys:
+            ifa_searched, denominacion, nombre_comercial, certificado,
+            laboratorio, forma_farmaceutica, envase, shortage_status
+    """
+    ajax_url = f"{PAMI_ZK_AJAX};jsessionid={jsessionid}"
+    payload = (
+        f"dtid={dtid}"
+        f"&cmd_0=onChange&uuid_0=zk_comp_34"
+        f'&data_0={{"value":"{ifa_name}"}}'
+        f"&cmd_1=onClick&uuid_1=zk_comp_80"
+        f"&data_1={{}}"
+    )
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+
+    try:
+        resp = session.post(
+            ajax_url,
+            data=payload,
+            headers=headers,
+            timeout=REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+    except requests.RequestException as exc:
+        logger.warning("_zk_search(%s): POST failed — %s", ifa_name, exc)
+        return []
+
+    raw = resp.text
+    rows: list[dict] = []
+
+    try:
+        # ZK sends label values in blocks like:
+        #   {uuid:'zk_comp_NNN',value:'<text>'}
+        # Each drug row consists of 7 consecutive label updates.
+        # We extract all value strings in order, then group them into 7-tuples.
+        # Field order (from network inspection):
+        #   0=certificado, 1=laboratorio, 2=nombre_comercial,
+        #   3=forma_farmaceutica, 4=envase, 5=barcode, 6=denominacion
+
+        # Match  value:'...'  (ZK uses single quotes; internal escapes are rare)
+        # We also handle value:"..." for robustness.
+        value_pattern = re.compile(r"""value\s*:\s*(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")""")
+        values = []
+        for m in value_pattern.finditer(raw):
+            val = m.group(1) if m.group(1) is not None else m.group(2)
+            # Unescape ZK's minimal escaping (\' and \")
+            val = val.replace("\\'", "'").replace('\\"', '"')
+            values.append(val)
+
+        if not values:
+            logger.debug("_zk_search(%s): no value fields in response", ifa_name)
+            return []
+
+        FIELDS_PER_ROW = 7
+        # Drop any leading metadata values — real drug rows follow a detectable
+        # pattern where index 6 (denominacion) contains the IFA name substring.
+        # We slide a window and collect complete 7-tuples.
+        for start in range(0, len(values) - FIELDS_PER_ROW + 1, FIELDS_PER_ROW):
+            chunk = values[start: start + FIELDS_PER_ROW]
+            certificado, laboratorio, nombre_comercial, forma, envase, barcode, denominacion = chunk
+
+            # Basic sanity: certificado should look like a numeric code
+            if not certificado.strip():
                 continue
-            elif all(t == "" for t in texts):
-                continue
-            else:
-                # No recognisable header yet — skip
-                continue
 
-        if len(texts) < len(headers):
-            texts += [""] * (len(headers) - len(texts))
-        row = dict(zip(headers, texts))
+            rows.append({
+                "ifa_searched":      ifa_name,
+                "denominacion":      denominacion.strip(),
+                "nombre_comercial":  nombre_comercial.strip(),
+                "certificado":       certificado.strip(),
+                "laboratorio":       laboratorio.strip(),
+                "forma_farmaceutica": forma.strip(),
+                "envase":            envase.strip(),
+                "shortage_status":   "",   # not fetched at search stage
+            })
 
-        # Ensure all expected fields present
-        for key in expected:
-            row.setdefault(key, "")
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("_zk_search(%s): parse error — %s; returning %d partial rows",
+                       ifa_name, exc, len(rows))
 
-        rows.append(row)
-
-    logger.info("fetch_shortage_list: %d rows parsed", len(rows))
+    logger.info("_zk_search(%s): %d rows parsed", ifa_name, len(rows))
     return rows
 
 
-def _normalise_headers(raw: list[str]) -> list[str]:
-    """Map Spanish column headers to canonical snake_case keys."""
-    mapping = {
-        "producto": "producto",
-        "ifa": "ifa",
-        "laboratorio": "laboratorio",
-        "certificado": "certificado",
-        "fecha de notificacion": "fecha_notificacion",
-        "fecha notificacion": "fecha_notificacion",
-        "notificacion": "fecha_notificacion",
-        "estado": "estado",
-        "motivo": "motivo",
-        "fecha estimada de normalizacion": "fecha_normalizacion",
-        "fecha normalizacion": "fecha_normalizacion",
-        "normalizacion": "fecha_normalizacion",
-    }
-    result = []
-    for h in raw:
-        key = h.strip().lower()
-        # Remove accents for matching
-        key = (key.replace("á", "a").replace("é", "e").replace("í", "i")
-                   .replace("ó", "o").replace("ú", "u").replace("ó", "o")
-                   .replace("ñ", "n"))
-        matched = mapping.get(key, key.replace(" ", "_"))
-        result.append(matched)
+def fetch_shortage_list() -> list[dict]:
+    """
+    Query PAMI vademecum ZK app for oncology drug availability.
+
+    Source: https://servicios.pami.org.ar/vademecum/views/consultaPublica/listado.zul
+    Protocol: ZK Framework 7 AJAX (POST to /zkau;jsessionid=<ID>).
+    Drugs searched: ONCOLOGY_IFA_NAMES (Cisplatino, Carboplatino,
+                    Doxorrubicina, Trastuzumab).
+
+    Returns list of dicts compatible with the anmat_shortages DB schema:
+        producto            (= nombre_comercial from ZK)
+        ifa                 (= IFA name searched)
+        laboratorio
+        certificado
+        fecha_notificacion  (empty — not available via this endpoint)
+        estado              (= shortage_status; empty if not individually fetched)
+        motivo              (empty)
+        fecha_normalizacion (empty)
+
+    On ZK session failure logs a warning and returns [].
+    """
+    try:
+        jsessionid, dtid = _get_zk_session()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("fetch_shortage_list: ZK session setup failed — %s; returning []", exc)
+        return []
+
+    s = _session()
+    # Seed the session cookies so subsequent POSTs are authenticated
+    s.cookies.set("JSESSIONID", jsessionid, domain="servicios.pami.org.ar")
+
+    all_rows: list[dict] = []
+
+    for idx, ifa in enumerate(ONCOLOGY_IFA_NAMES):
+        rows = _zk_search(jsessionid, dtid, ifa, s)
+        all_rows.extend(rows)
+        if idx < len(ONCOLOGY_IFA_NAMES) - 1:
+            time.sleep(POLITE_DELAY)
+
+    # Map to the DB schema expected by _ingest_shortages()
+    result: list[dict] = []
+    for r in all_rows:
+        result.append({
+            "producto":            r.get("nombre_comercial", ""),
+            "ifa":                 r.get("ifa_searched", ""),
+            "laboratorio":         r.get("laboratorio", ""),
+            "certificado":         r.get("certificado", ""),
+            "fecha_notificacion":  "",
+            "estado":              r.get("shortage_status", ""),
+            "motivo":              "",
+            "fecha_normalizacion": "",
+        })
+
+    logger.info("fetch_shortage_list: %d total records across %d IFA searches",
+                len(result), len(ONCOLOGY_IFA_NAMES))
     return result
 
 
@@ -664,4 +797,5 @@ def run_daily_cycle() -> dict:
 if __name__ == "__main__":
     import json
     logging.basicConfig(level=logging.INFO)
-    print(json.dumps(run_daily_cycle(), indent=2))
+    from phase2_realtime.data_ingestion.anmat_scraper import fetch_shortage_list
+    print(json.dumps(fetch_shortage_list(), indent=2, ensure_ascii=False))
