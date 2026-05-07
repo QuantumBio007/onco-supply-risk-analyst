@@ -102,6 +102,9 @@ COUNTRY_PARAMS = {
         "structural_fill_rate":   0.90,
         "structural_budget_cap":  0.75,
         "initial_stock_days":     45,    # realistic starting inventory: ~6 weeks on-hand
+        # Calibrated from PAHO SF price analysis: 20-99% cross-country price variance (Giron, Lim et al. 2023)
+        # Argentina: high — peso devaluation + import controls create large USD-cost uncertainty
+        "procurement_cost_cv":    0.35,
         "label": "Argentina",
     },
     "Venezuela": {
@@ -126,6 +129,9 @@ COUNTRY_PARAMS = {
                                           # (was 0.30 — generic stockouts under-predicted)
         "initial_stock_days":     7,     # KB documents "<2 weeks stock"; 7d = midpoint
                                           # (was 10 — overstated effective starting buffer)
+        # Calibrated from PAHO SF price analysis: 20-99% cross-country price variance (Giron, Lim et al. 2023)
+        # Venezuela: very high — FX controls, hyperinflation history, bolivar collapse vs. USD drug prices
+        "procurement_cost_cv":    0.55,
         "label": "Venezuela",
     },
     "Colombia": {
@@ -138,6 +144,9 @@ COUNTRY_PARAMS = {
         "structural_budget_cap":  0.80,  # EPS presupuestos máximos consistently underfunded;
                                          # Constitutional Court ordered COP 819B unpaid transfers Feb 2025
         "initial_stock_days":     30,    # revised: distributor credit restrictions reduce effective stock
+        # Calibrated from PAHO SF price analysis: 20-99% cross-country price variance (Giron, Lim et al. 2023)
+        # Colombia: moderate — relatively stable procurement via MINSALUD/HEARTS channels
+        "procurement_cost_cv":    0.25,
         "label": "Colombia",
     },
 }
@@ -451,6 +460,11 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
     struct_fill   = cp["structural_fill_rate"]
     struct_budget = cp["structural_budget_cap"]
 
+    # Procurement cost volatility: LogNormal shock to effective budget cap each run.
+    # Backward compatible: defaults to 0.20 if key absent from country entry.
+    # Calibrated from PAHO SF price analysis: 20-99% cross-country price variance (Giron, Lim et al. 2023)
+    cost_cv = cp.get("procurement_cost_cv", 0.20)
+
     # Demand distribution: Poisson for low-count biologics (trastuzumab), Normal otherwise.
     # For Poisson(λ): σ_D = sqrt(λ) — used in safety stock formula SS = z√(d²σ_L² + Lσ_D²).
     # Normal CV assumption underestimates variance at trastuzumab's ~1.5 doses/day volume.
@@ -486,18 +500,29 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
     # reorder point, which assumes a fully-stocked ideal system).
     initial_inv = int(base_d * cp["initial_stock_days"])
 
+    # Pre-compute per-run procurement cost multipliers: LogNormal(mean=1, sigma=cost_cv).
+    # Each run draws an independent cost shock — a high-CV country (Venezuela, 0.55) will
+    # see wider budget variance than a moderate-CV country (Colombia, 0.25), even at the
+    # same structural_budget_cap.  Mean=1 preserves the expected budget level; only the
+    # variance increases.  LogNormal ensures the multiplier is always positive.
+    cost_lv     = np.log(1 + cost_cv**2)
+    cost_mu_log = -0.5 * cost_lv                 # ensures E[X] = 1 for LogNormal(mu, sigma)
+    cost_sigma_log = np.sqrt(cost_lv)
+    rng_cost = np.random.default_rng(seed=9999)  # fixed seed for reproducibility across calls
+    cost_multipliers = rng_cost.lognormal(cost_mu_log, cost_sigma_log, n_runs)
+
     runs = [
         _run_once(
             d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=L_cv,
             fill_rate=eff_fill_rate,
-            budget_multiplier=eff_budget_mult,
+            budget_multiplier=eff_budget_mult * cost_multipliers[i],
             reorder_point=policy["reorder_point"],
             order_quantity=policy["eoq"],
             days=days, seed=i,
             disruption_duration_mean=sp["disruption_duration_mean"],
             base_L_mean=base_L_mean, base_L_cv=base_L_cv,
             base_fill_rate=base_fill_rate,
-            base_budget_multiplier=base_budget_mult,
+            base_budget_multiplier=base_budget_mult * cost_multipliers[i],
             base_d=base_d, base_sigma_d=base_sigma_d,
             initial_inventory=initial_inv,
             demand_dist=demand_dist,
@@ -595,6 +620,11 @@ def simulate_dynamic(drug, country,
     struct_fill   = cp["structural_fill_rate"]
     struct_budget = cp["structural_budget_cap"]
 
+    # Procurement cost volatility: LogNormal shock to effective budget cap each run.
+    # Backward compatible: defaults to 0.20 if key absent from country entry.
+    # Calibrated from PAHO SF price analysis: 20-99% cross-country price variance (Giron, Lim et al. 2023)
+    cost_cv = cp.get("procurement_cost_cv", 0.20)
+
     demand_dist = dp.get("demand_dist", "normal")
 
     # Disruption-state parameters (scenario × structural floor)
@@ -623,18 +653,26 @@ def simulate_dynamic(drug, country,
 
     initial_inv = int(base_d * cp["initial_stock_days"])
 
+    # Per-run procurement cost multipliers: LogNormal(mean=1, sigma=cost_cv).
+    # Calibrated from PAHO SF price analysis: 20-99% cross-country price variance (Giron, Lim et al. 2023)
+    cost_lv        = np.log(1 + cost_cv**2)
+    cost_mu_log    = -0.5 * cost_lv
+    cost_sigma_log = np.sqrt(cost_lv)
+    rng_cost       = np.random.default_rng(seed=9999)
+    cost_multipliers = rng_cost.lognormal(cost_mu_log, cost_sigma_log, n_runs)
+
     runs = [
         _run_once(
             d=d, sigma_d=sigma_d, L_mean=L_mean, L_cv=L_cv,
             fill_rate=eff_fill_rate,
-            budget_multiplier=eff_budget_mult,
+            budget_multiplier=eff_budget_mult * cost_multipliers[i],
             reorder_point=policy["reorder_point"],
             order_quantity=policy["eoq"],
             days=days, seed=i,
             disruption_duration_mean=disruption_duration_mean,
             base_L_mean=base_L_mean, base_L_cv=base_L_cv,
             base_fill_rate=base_fill_rate,
-            base_budget_multiplier=base_budget_mult,
+            base_budget_multiplier=base_budget_mult * cost_multipliers[i],
             base_d=base_d, base_sigma_d=base_sigma_d,
             initial_inventory=initial_inv,
             demand_dist=demand_dist,
