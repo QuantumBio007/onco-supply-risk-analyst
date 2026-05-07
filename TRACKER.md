@@ -16,6 +16,18 @@ The master action plan is the single source of truth for what to do next. It con
 
 ---
 
+## ▶ WHY ONCOSUPPLY EXISTS (pin this — use in every pitch)
+
+PAHO can tell you how much carboplatin Colombia should need based on cancer incidence. OncoSupply tells you carboplatin is about to be unavailable — 217 days before PAHO or INVIMA flag it officially.
+
+Those are two completely different problems. Lim's world is demand quantification. OncoSupply is supply disruption detection. PAHO has no published tool in that space. PAHO's own Feb 2025 press release admits the oncology access gap. Lim at Cartagena 2023 said "the time of discussion is over" — then described aspirational "information system integration" with no platform announced.
+
+**The gap is real. PAHO knows it. Lim has the technical literacy to recognize a well-built solution.**
+
+> QuantMET tells you what countries need. OncoSupply tells you what's about to be unavailable.
+
+---
+
 **Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
 **Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
 **Phase 2c status:** 🟡 IMPLEMENTATION CLEARED 2026-05-05 — three algorithms locked (Kalman + Robust Opt + MAB); pre-registration in place; advisory-board gate explicitly deferred (recruitment lead time)
