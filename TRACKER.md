@@ -19,7 +19,7 @@ The master action plan is the single source of truth for what to do next. It con
 **Phase 1 status:** ✅ COMPLETE — RAG 12/12 perfect on all 5 cases (post-recalibration session 17)
 **Phase 2 status:** ✅ COMPLETE — macro_economic capability live-tested, Venezuela structurally validated
 **Phase 2c status:** 🟡 IMPLEMENTATION CLEARED 2026-05-05 — three algorithms locked (Kalman + Robust Opt + MAB); pre-registration in place; advisory-board gate explicitly deferred (recruitment lead time)
-**Last updated:** 2026-05-06 (session 26 — Tier A + Tier B code sprints complete. macro_latam query fixed, daily cadence guard, H4 eval wired. DIGEMID scraper live (Peru). Macro alert threshold tuned. ANMAT endpoint reverse-engineered — ZK protocol documented, rewrite queued. Branch: phase-2-realtime-news. Waiting on: Marin reply ~May 16, Lim LinkedIn follow-up, Pablo/ANMAT outreach.)
+**Last updated:** 2026-05-07 (session 27 — Tier C complete. ANMAT scraper rewritten to PAMI ZK protocol. Public risk dashboard live (5 sections, HTTP 200). All Tier A/B/C code complete. Waiting on: Marin reply ~May 16, Lim LinkedIn follow-up, Pablo/ANMAT outreach. Next code sprint gated on Marin dataset reply.)
 **Knowledge base scope:** 11 KB docs + 84 drug-country-scenario sim files (4 drugs × 3 countries × 7 scenarios) → ChromaDB (228 chunks, 95 files) + 5 PDFs in `knowledge_base/literature/`
 
 ---
@@ -167,9 +167,12 @@ The master action plan is the single source of truth for what to do next. It con
 | B2 | alert_engine macro threshold tuning | `MACRO_THRESHOLD_FACTOR=0.60` applied to all 3 triggers when shock_type ∈ MACRO_SHOCK_TYPES. `macro_systemic` trigger label added. Trastuzumab/Colombia case (Δmean+1.3d, ΔCVaR+3.2d) now fires. Scheduler updated to pass shock_type. Smoke test passing. |
 | B3 | DIGEMID scraper | New: `phase2_realtime/data_ingestion/digemid_scraper.py`. `fetch_discontinuations()` operational — 2,667 records scraped live: cisplatino 6, carboplatino 7, trastuzumab 1 (OGIVRI biosimilar). `fetch_alerts()` paginated. Registration search returns 403 (needs Playwright — documented). SQLite dedup pattern. |
 
-**Tier C — Queued:**
-- ANMAT scraper rewrite: replace dead URLs with PAMI ZK session protocol (ZK AJAX, stable UUIDs)
-- Public risk dashboard v0 (GitHub Pages + Plotly, 185d trastuzumab/Venezuela headline)
+**Tier C — COMPLETE (2026-05-07):**
+
+| # | Task | Result |
+|---|---|---|
+| C1 | ANMAT ZK rewrite | `anmat_scraper.py` now uses PAMI ZK session protocol. `_get_zk_session()` + `_zk_search()`. Loops 4 IFA names (Cisplatino/Carboplatino/Doxorrubicina/Trastuzumab). run_daily_cycle() unchanged. |
+| C2 | Public risk dashboard | `dashboard.py` (Streamlit, HTTP 200 confirmed). 5 sections: heatmap, scenario explorer, live signal feed, MAB rankings, lead-time intelligence. @st.cache_data on sim calls. Run: `streamlit run dashboard.py` |
 
 ## ▶ GRANTS FOLDER MAP (always current)
 
