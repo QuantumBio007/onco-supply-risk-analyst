@@ -131,7 +131,7 @@ def _execute_tool(name: str, inputs: dict) -> str:
     return f"Unknown tool: {name}"
 
 # ── System prompt ─────────────────────────────────────────────────────────────
-SYSTEM_PROMPT = """You are an expert oncology supply chain analyst at JCNB Biotech Consulting.
+SYSTEM_PROMPT = """You are an expert oncology supply chain analyst at OncoSupply, a nonprofit in formation focused on early-warning intelligence for cancer drug shortages in Latin America.
 
 You produce structured Drug Shortage Risk Briefs for Latin America.
 

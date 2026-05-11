@@ -31,7 +31,7 @@ def check_refusal(drug, country):
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(page_title="OncoSupply Risk Analyst", layout="wide")
 st.title("OncoSupply Risk Analyst")
-st.caption("Oncology drug shortage risk briefs for Latin America · JCNB Biotech Consulting")
+st.caption("Oncology drug shortage risk briefs for Latin America · OncoSupply")
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:

@@ -18,9 +18,31 @@ Literature/
 Modules/
 "Week 6/"
 Week\ 6/
+"Week 8/"
+Week\ 8/
 argentina_template_para_venezuela.txt
 email_pablo_followup.md
 email_souza_venezuela.md
 email_souza_venezuela.txt
 knowledge_base/drafts/
 knowledge_base/references/
+
+# Internal strategy, business, and grant documents — not for public repo
+.claude/
+Strategy/
+Tracker/
+grants/
+algo_research/
+archive/
+
+# Mid-flight refactor folder (duplicates phase2_realtime/) — keep private
+algorithms/
+
+# Backup folders inside optimized/
+optimized/_stage4_backup*
+optimized/_stage4_backup_path
+
+# Node tooling (used locally for docx generation, not project runtime)
+node_modules/
+package.json
+package-lock.json

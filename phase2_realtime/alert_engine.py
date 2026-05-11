@@ -44,6 +44,17 @@ MACRO_SHOCK_TYPES = {
 # 0.60 means thresholds are 60% of their normal values.
 _MACRO_THRESHOLD_FACTOR = 0.60
 
+# ── FIX (2026-05-07): single source of truth for alert thresholds ───────────
+# Audit finding: magic numbers were duplicated across three trigger functions
+# and inline in comments. Extracted here so threshold changes touch one place.
+# Keys: "critical" → severity 3, "high" → 2, "moderate" → 1.
+THRESHOLDS = {
+    "mean_pct":  {"critical": 100, "high": 50, "moderate": 25},   # % increase
+    "mean_abs":  {"critical":  60, "high": 30, "moderate": 14},   # days/yr
+    "cvar_abs":  {"critical":  90, "high": 45, "moderate": 21},   # days/yr
+    "cvar_pct":  {"critical": 100, "high": 50, "moderate": 25},   # % increase
+}
+
 
 def _mean_trigger(baseline_risk: float, shocked_risk: float, macro: bool = False):
     """Return (severity_level, percent_increase, trigger_label or None) for mean dimension.
@@ -54,15 +65,15 @@ def _mean_trigger(baseline_risk: float, shocked_risk: float, macro: bool = False
     delta = shocked_risk - baseline_risk
     pct = (delta / baseline_risk * 100) if baseline_risk > 0 else 0
 
-    # Mean stockout thresholds (days/yr): 60=2mo critical, 30=chronic, 14=meaningful
+    # Mean stockout: 60d=2mo critical, 30d=chronic, 14d=meaningful.
     # Relative thresholds catch shocks against low baselines.
-    # Normal thresholds: pct>=100/50/25, abs>=60/30/14
     f = _MACRO_THRESHOLD_FACTOR if macro else 1.0
-    if pct >= 100 * f or shocked_risk >= 60 * f:
+    pT, aT = THRESHOLDS["mean_pct"], THRESHOLDS["mean_abs"]
+    if pct >= pT["critical"] * f or shocked_risk >= aT["critical"] * f:
         return 3, pct, "mean_critical"
-    if pct >= 50 * f or shocked_risk >= 30 * f:
+    if pct >= pT["high"]     * f or shocked_risk >= aT["high"]     * f:
         return 2, pct, "mean_high"
-    if pct >= 25 * f or shocked_risk >= 14 * f:
+    if pct >= pT["moderate"] * f or shocked_risk >= aT["moderate"] * f:
         return 1, pct, "mean_moderate"
     return 0, pct, None
 
@@ -73,15 +84,15 @@ def _cvar_abs_trigger(shocked_cvar: float, macro: bool = False):
     Args:
         macro: When True, use 60% of normal absolute thresholds.
     """
-    # Absolute CVaR_90 thresholds (worst-10% mean stockout days/yr).
-    # Higher than mean thresholds because tail is supposed to exceed mean.
-    # Normal thresholds: 90/45/21 days.
+    # Absolute CVaR_90 (worst-10% mean stockout days/yr). Higher than mean
+    # thresholds because the tail is supposed to exceed the mean.
     f = _MACRO_THRESHOLD_FACTOR if macro else 1.0
-    if shocked_cvar >= 90 * f:
+    aT = THRESHOLDS["cvar_abs"]
+    if shocked_cvar >= aT["critical"] * f:
         return 3, "cvar_abs_critical"
-    if shocked_cvar >= 45 * f:
+    if shocked_cvar >= aT["high"]     * f:
         return 2, "cvar_abs_high"
-    if shocked_cvar >= 21 * f:
+    if shocked_cvar >= aT["moderate"] * f:
         return 1, "cvar_abs_moderate"
     return 0, None
 
@@ -94,13 +105,13 @@ def _cvar_rel_trigger(baseline_cvar: float, shocked_cvar: float, macro: bool = F
     """
     delta = shocked_cvar - baseline_cvar
     pct = (delta / baseline_cvar * 100) if baseline_cvar > 0 else 0
-    # Normal thresholds: pct>=100/50/25
     f = _MACRO_THRESHOLD_FACTOR if macro else 1.0
-    if pct >= 100 * f:
+    pT = THRESHOLDS["cvar_pct"]
+    if pct >= pT["critical"] * f:
         return 3, pct, "cvar_rel_critical"
-    if pct >= 50 * f:
+    if pct >= pT["high"]     * f:
         return 2, pct, "cvar_rel_high"
-    if pct >= 25 * f:
+    if pct >= pT["moderate"] * f:
         return 1, pct, "cvar_rel_moderate"
     return 0, pct, None
 

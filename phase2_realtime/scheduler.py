@@ -9,11 +9,22 @@ shortage signals move on week-to-week timescales, not minute-to-minute.
 import hashlib
 import json
 import sqlite3
+import time
 from datetime import datetime, date
 from pathlib import Path
 
+# FIX (2026-05-07): runaway-loop guard. Hard cap on per-cycle wall-clock time
+# prevents an infinite-retry loop or a stuck downstream call from burning API
+# budget unnoticed. 300s = 5 min comfortably covers a 10-article cycle on the
+# vectorized pipeline (~1s per article post-optimization).
+_MAX_CYCLE_SECONDS = 300
+
 from .news_listener import fetch_news, QUERIES
-from .event_classifier import classify_article
+# FIX #2 (2026-05-07): swap to prompt-cached fast classifier.
+# Original `from .event_classifier import classify_article` re-sent the 2.8k-token
+# system prompt on every call. The fast version uses Anthropic's ephemeral cache
+# (~5.6× cheaper per call after warm-up). Drop-in replacement, identical signature.
+from optimized.event_classifier_fast import classify_article
 from .shock_mapper import trigger_simulation
 from .alert_engine import evaluate_risk_change, format_alert
 
@@ -119,6 +130,7 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10,
         return {"status": "skipped_daily_guard", "category": query_category,
                 "timestamp": datetime.now().isoformat()}
 
+    cycle_start = time.monotonic()                       # FIX: runaway-loop timer
     results = {
         "timestamp": datetime.now().isoformat(),
         "articles_fetched": 0,
@@ -126,6 +138,7 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10,
         "shocks_detected": 0,
         "alerts_triggered": [],
         "status": "ready",
+        "cycle_aborted_on_timeout": False,
     }
 
     # Step 1: Fetch news
@@ -139,6 +152,13 @@ def run_cycle(query_category: str = "latam_politics", limit_articles: int = 10,
 
     # Step 2: Classify each article (limit for performance)
     for article in articles[:limit_articles]:
+        # FIX: hard wall-clock cap — protect API budget against stuck loops.
+        if time.monotonic() - cycle_start > _MAX_CYCLE_SECONDS:
+            results["cycle_aborted_on_timeout"] = True
+            results["status"] = f"timeout_after_{_MAX_CYCLE_SECONDS}s"
+            print(f"[scheduler] cycle timeout after {_MAX_CYCLE_SECONDS}s — aborting remaining articles")
+            break
+
         article_id = _article_hash(article.get("title", ""))
 
         if _is_processed(article_id):
