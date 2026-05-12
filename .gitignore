@@ -46,3 +46,17 @@ optimized/_stage4_backup_path
 node_modules/
 package.json
 package-lock.json
+
+# Human-AI Fusion pilot logs — contain user PII from override form; pilot data,
+# not source code. Do NOT commit. Each pilot site keeps its own local copy.
+evaluation/outputs/predict_first_log.csv
+evaluation/outputs/override_audit_log.jsonl
+
+# Field-validation interview transcripts — contain practitioner PII; gitignored
+# per MAP §1.9 consent terms. Tracker/ itself is already in .gitignore so this
+# is belt-and-suspenders.
+Tracker/field_interviews/
+
+# Pre-MiniLM-swap backups — kept locally for audit, not committed
+chroma_db_mpnet_backup/
+evaluation/outputs/_mpnet_backup/

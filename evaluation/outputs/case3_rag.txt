@@ -2,100 +2,123 @@ CASE: cisplatin / Argentina / API export restriction
 SOURCE: RAG (ChromaDB retrieval + Claude generation)
 ============================================================
 
+# Drug Shortage Risk Brief: Cisplatin in Argentina
+## API Export Restriction Scenario
+
+---
+
 ## Drug Profile
 
-Cisplatin is a platinum-based alkylating chemotherapy agent used to treat testicular, ovarian, bladder, lung, and head and neck cancers. **Cisplatin is on the WHO Model List of Essential Medicines (oncology section), where it has been listed since 1979.** It is fully off-patent with multiple generic manufacturers worldwide. **The active pharmaceutical ingredient is manufactured overwhelmingly in India and China, which together account for over 80% of global cisplatin API supply.** Argentina has no domestic API manufacturing capacity and is fully import-dependent. Cisplatin is available as an injectable solution or powder for reconstitution and must be stored at room temperature (15–25°C), protected from light — notably, refrigeration causes precipitation and renders the product unusable.
+**Cisplatin** is a platinum-based alkylating chemotherapy agent used to treat testicular, ovarian, bladder, lung, and head and neck cancers in clinical use since 1978. 
+
+**WHO Essential Medicines Status:** Cisplatin has been on the WHO Model List of Essential Medicines since 1979 and remains on the current oncology section. This inclusion signals that Argentina should treat it as a procurement priority; shortages represent a policy failure, not merely a supply chain event.
+
+**Patent Status:** Fully off-patent. Multiple generic manufacturers operate globally, creating price competition that reduces manufacturer margins and increases consolidation risk.
+
+**API Manufacturing Origin:** The overwhelming majority of cisplatin API is manufactured in India and China, together accounting for over 80% of global supply. **No significant API manufacturing exists in Latin America.** Argentina is fully import-dependent with no alternative regional source.
+
+---
 
 ## Supply Chain Vulnerability
 
-Argentina's cisplatin supply chain faces multiple structural vulnerabilities:
+**API Concentration Risk:**
+- Single-source or dual-source API scenarios are common among Argentine importers. An Indian or Chinese export restriction, regulatory enforcement action, or manufacturing shutdown simultaneously disrupts all generic manufacturers globally.
+- One documented facility (Intas Pharmaceuticals, Ahmedabad) produced 24% of U.S. cisplatin supply as of January 2025, illustrating the vulnerability of the global supply to individual-facility disruption.
 
-**Concentrated API Origin:** Over 80% of global cisplatin API originates from India and China. Any export restriction, regulatory enforcement action, or geopolitical disruption in either country simultaneously affects all generic manufacturers globally, including those supplying Argentina.
+**Shared Platinum Supply Chain:**
+The context confirms that cisplatin and carboplatin share the same API supply chain: both are manufactured primarily in India and secondarily in China. **An export restriction affecting one platinum agent simultaneously disrupts the other**, eliminating substitution flexibility for oncology programs that use both drugs. Empirical modeling shows a correlated disruption correlation of approximately r≈0.87 between the two drugs' stockout distributions.
 
-**Generic Market Margins & Manufacturer Exit:** The fully generic status of cisplatin creates intense price competition that reduces manufacturer margins and has historically driven market consolidation. This increases the risk that suppliers will exit the market during periods of low profitability, shrinking the supplier base further.
+**Argentine Procurement Fragmentation:**
+- Oncology drug procurement is fragmented across eight independent channels (national/provincial public systems, public hospitals, obras sociales, PAMI, prepagas, private sector, judicial amparo, and informal routes).
+- No central entity has real-time visibility into national oncology drug stock across all channels.
+- Regulatory constraints: ANMAT (Administración Nacional de Medicamentos, Alimentos y Tecnología Médica) must approve any new supplier or alternative manufacturer before legal distribution. Standard registration timelines are 12–18 months. **During an API export restriction, this regulatory lag extends practical lead time by 6–18 months even if alternative suppliers exist globally.**
+- Chronic fiscal constraints: Procurement budgets are set in Argentine pesos while drugs are priced in USD, creating persistent currency exposure. Current effective budget utilization reflects 75% spending capacity due to structural austerity.
 
-**Regulatory Clearance Lag:** Argentina's ANMAT (Administración Nacional de Medicamentos, Alimentos y Tecnología Médica) requires approval of any new supplier or alternative manufacturer before legal distribution. Standard ANMAT registration timelines are 12–18 months for generic drugs. During an API export restriction, this regulatory requirement becomes a critical constraint — even if alternative suppliers exist globally, they cannot supply Argentina until ANMAT registration is complete, effectively extending practical lead times by 6–18 months.
+**Generic Market Pressure:**
+Low manufacturer margins from price competition have driven market consolidation, increasing the risk that remaining suppliers will exit during supply disruptions.
 
-**Fragmented Procurement Visibility:** Argentina's multi-channel procurement landscape (public hospitals, obras sociales, PAMI, prepagas, and provincial drug banks) creates structural information gaps. No single entity has real-time integrated visibility into national oncology drug stock across all channels. While regulatory traceability systems exist, they are not equivalent to an operational inventory dashboard. This fragmentation means the health system cannot rapidly identify and reallocate available transferable stock during an emergency.
-
-**Formal Coverage vs. Real Access Gap:** A critical distinction in the Argentine system exists between nominal coverage and actual access. Many oncology treatments are formally covered by obras sociales or the public system, but actual access depends on a downstream chain including clinical authorization, reimbursement file processing, supplier contracts, and physical delivery logistics. Each step introduces latency and failure risk independent of drug availability in aggregate. During a supply shock, this gap compounds scarcity.
-
-**Shared Platinum API Supply Chain with Carboplatin:** Cisplatin and carboplatin share the same API supply chain (India and China). An Indian or Chinese API export restriction, manufacturing shutdown, or quality enforcement action disrupts both drugs simultaneously, eliminating substitution flexibility for oncology programs that use both platinum agents.
+---
 
 ## Scenario Impact Analysis
 
-**Modeled Outcome Under API Export Restriction:**
+**API Export Restriction Conditions:**
+An export restriction on cisplatin API from India and/or China is assumed to:
+- Reduce global supply allocation to Argentina to approximately 50% of normal demand
+- Extend procurement lead times from baseline (~7 days) to approximately 30 days (geometric mean disruption duration: 90 days)
+- Trigger ANMAT regulatory clearance requirements for alternative suppliers (adding 12–18 months for full legal distribution)
 
-Monte Carlo simulation (500 runs, 365-day horizon) projects the following performance under an API export restriction scenario affecting India/China cisplatin supplies:
+**Modeled Outcomes (API Export Restriction, Single Shock):**
 
-| Metric | Value | 95% CI |
-|--------|-------|--------|
-| **Stockout days per year** | 7.9 | ±1.35 |
-| **Service level (unit fill rate)** | 98.0% | ±0.0% |
-| **Service level (days without stockout)** | 97.8% | — |
-| **Probability of any stockout** | 30% | — |
-| **Probability of critical shortage (>60 days)** | 1.0% | — |
-| **Average inventory on hand** | 549 units | — |
-| **Mean disruption-period lead time** | 87.5 days | std: 21.9 |
-
-**Risk Classification: LOW**
-
-The modeled scenario assumes:
-- Effective order fill rate of 50% (structural floor of 90% × scenario constraint of 55%), reflecting severe allocation constraints documented during the 2023–2024 cisplatin/carboplatin shortage
-- Effective budget multiplier of 75%, reflecting chronic fiscal constraints in Argentina independent of the scenario shock
-- Disruption duration of ~90 days (geometric distribution), modeling recovery dynamics
-- Lead times extending to 87.5 days on average during the disruption window
+| Metric | Baseline | API Restriction | Change |
+|--------|----------|-----------------|--------|
+| Stockout days/year | 6.0 | 6.2 | +0.2 |
+| Service level | 98.5% | 98.3% | −0.2 pp |
+| Probability of any stockout | 69% | 28% | −41 pp |
+| Probability of critical shortage (>60 days) | 0.0% | 1.4% | +1.4 pp |
+| Average inventory on hand | 211 units | 669 units | +158% |
 
 **Interpretation:**
+Under API export restriction alone, modeled service level remains within acceptable operational range (98.3%), with 6.2 stockout days per year (95% CI: ±1.23 days). The counterintuitive improvement in average inventory reflects the scenario model's assumption that supply allocation drops to 50% fill rate, causing hospitals and distributors to hold larger safety stocks to protect against anticipated scarcity. The 28% probability of experiencing at least one stockout event during the year, and 1.4% probability of a critical shortage (>60 stockout days), signals moderate but real risk.
 
-Under an API export restriction, cisplatin supply in Argentina is projected to experience 7.9 stockout days per year, with a unit service level of 98.0%. This result is within an acceptable operational range for routine inventory management. However, this "low risk" classification carries important caveats:
+**Critical Constraint — Regulatory Lead Time:**
+The modeled 6.2 stockout days underestimates the practical impact because it does not account for ANMAT's 12–18 month registration requirement for alternative suppliers. In real time:
+- Existing approved suppliers will face allocation constraints within weeks of an export restriction.
+- Alternative suppliers exist globally but cannot legally distribute in Argentina until ANMAT registration is complete.
+- The effective practical lead time for restocking via a new approved supplier is 12–18 months, not 30 days.
 
-1. **Assumes Budget Stability:** The 75% effective budget multiplier assumes Argentina can sustain procurement spending during the disruption. Fiscal constraints or competing budget pressures could force this multiplier downward, shifting risk to MODERATE or CRITICAL.
+**Geographic Disparities:**
+Argentina's 25 parallel procurement systems (24 provinces + CABA) experience highly unequal fiscal capacity. Smaller provinces (Formosa, Chaco, Santiago del Estero, La Rioja) report chronic chemotherapy stockouts under baseline conditions and face disproportionate risk during export restrictions. CABA and Buenos Aires Province maintain dedicated high-cost drug bureaus and are less exposed.
 
-2. **Does Not Capture Access Fragmentation Delays:** The simulation models inventory stockouts but does not quantify the additional latency introduced by the multi-channel procurement system, ANMAT regulatory clearance backlogs for alternative suppliers, and formal-vs.-real-access gaps. Actual time-to-patient access during a disruption would exceed the modeled lead time.
-
-3. **Non-Substitutable Drug:** The shared API supply chain with carboplatin means that if an export restriction hits India/China, both cisplatin and carboplatin become scarce simultaneously. Oncology protocols cannot shift to the alternative platinum agent.
-
-4. **Vulnerable Subpopulations:** Uninsured patients without obras sociales or prepaga coverage depend entirely on public hospital supply. If public systems experience stockouts, these patients have no channel fallback and may face treatment delay or suspension. The amparo de salud mechanism exists but is not a substitute for institutional supply reliability.
+---
 
 ## Policy Recommendations
 
-1. **Establish a Strategic Buffer Stock:** Maintain a national-level strategic reserve of 90–120 days of cisplatin consumption (approximately 1,200–1,600 units based on modeled inventory metrics). Pre-position this stock in public hospital networks and provincial drug banks to enable rapid reallocation during disruption.
+**1. Establish a National Strategic Cisplatin Reserve**
+- Create a 60–90 day buffer stock of cisplatin managed at the national level (COFESA or Ministry of Health) with legal authority to redistribute across provincial and channel boundaries during shortage events.
+- Justification: Current fragmentation across eight independent channels means national supply adequacy does not guarantee local access. A strategic reserve addresses the structural coordination failure.
 
-2. **Secure Advance Alternative Supplier Registration:** Proactively identify secondary and tertiary cisplatin API suppliers outside India and China (e.g., in Europe or other regions) and initiate ANMAT pre-registration processes during normal supply periods. This compresses the 12–18 month regulatory lag that would otherwise extend lead times during an actual export restriction.
+**2. Accelerate ANMAT Regulatory Pathways for Alternative Suppliers**
+- Designate cisplatin and carboplatin as "shortage-prone critical medicines" under fast-track registration procedures (target: 6–9 months instead of 12–18 months for pre-qualified suppliers).
+- Prepare pre-approved alternative supplier dossiers during normal supply periods so registration can begin immediately upon API restriction.
+- Justification: Regulatory lag is the binding constraint during export restriction scenarios. Shortening it from 12–18 to 6–9 months materially reduces the window of critical shortage.
 
-3. **Implement Real-Time Inventory Visibility:** Develop an integrated, near-real-time national cisplatin inventory dashboard spanning public hospitals, obras sociales, PAMI, and provincial systems. Designate a single coordinating authority (e.g., within ANMAT or the Ministry of Health) to access this dashboard and trigger reallocation protocols when any node approaches a pre-set alert threshold.
+**3. Implement Cross-Channel Procurement Coordination**
+- Establish a monthly national cisplatin inventory dashboard visible to all eight procurement channels (public hospitals, obras sociales, PAMI, prepagas, provincial systems).
+- Create a legal mechanism (decree or inter-ministerial agreement) permitting transfer of transferable stock from channels with surplus to those with shortfalls during shortage events.
+- Justification: The Argentine system has adequate total supply visibility (regulatory traceability exists) but lacks operational coordination mechanisms. Formal inter-channel transfer protocols convert latent supply into accessible supply.
 
-4. **Formalize Emergency Access Pathways:** Document and standardize the semi-formal mechanisms (inter-hospital loans, emergency purchases outside tender cycles, treatment protocol modifications) currently used to resolve individual shortages. Create a formal emergency procurement protocol that allows public hospitals to access private stock or provincial reserves within 48–72 hours without standard tender delays.
+**4. Currency Risk Mitigation for Oncology Procurement**
+- Implement hedging or forward-contracting mechanisms for USD-priced cisplatin purchases to reduce the effective budget reduction during currency devaluation.
+- Establish a peso-equivalent price floor for budget allocation, protecting oncology procurement from peso collapse independently of API supply shocks.
+- Justification: The current fiscal constraint (75% effective budget utilization) is independent of API supply but acts as a co-morbid vulnerability. Combined with API restriction, it would likely push the scenario from moderate to high risk.
 
-5. **Coordinate Across Payers for Demand Aggregation:** Negotiate formal demand-sharing agreements between PAMI, obras sociales, and public hospital procurement units. During a disruption, aggregate demand forecasting and centralized supplier contact reduce individual channel competition and improve negotiating power with whatever suppliers remain available.
+**5. Strengthen Substitute Drug Planning**
+- Carboplatin shares the same API supply chain as cisplatin and will face simultaneous disruption. Coordinate procurement protocols to ensure that when cisplatin is restricted, carboplatin allocation is not automatically increased (because it faces the same constraint).
+- Document clinical regimens that can sustain either cisplatin or carboplatin and ensure therapeutic protocols are flexible enough to accommodate either drug depending on availability.
+- Justification: The r≈0.87 correlation in disruption means carboplatin cannot serve as a reliable substitute during cisplatin export restriction.
 
-6. **Monitor Regulatory & Geopolitical Triggers:** Establish monthly monitoring of API manufacturing status, regulatory enforcement actions, and export policy signals from India and China. Link supply chain alerts to the Ministry of Health's strategic pharmaceutical planning cycle, with trigger points at 60, 30, and 14 days before projected shortage onset.
+**6. Regional Collaboration via PAHO Strategic Fund**
+- Engage PAHO to include cisplatin and carboplatin in Strategic Fund pooled procurement, which provides WHO-prequalified suppliers and has demonstrated 20–60% price reductions vs. bilateral procurement.
+- Justification: Pooled procurement partially mitigates buying-power fragmentation and currency risk, reducing budget pressure during normal periods and freeing resources for strategic reserves.
 
-7. **Address Carboplatin Simultaneously:** Because cisplatin and carboplatin share the API supply chain, any buffer stock, alternative supplier registration, or inventory visibility initiative for cisplatin must also include carboplatin. Treat both platinum agents as a single supply chain unit.
+---
 
 ## Confidence & Limitations
 
-**Confidence:**
-- The modeled stockout projections (7.9 days/year, 98.0% service level) are derived from validated continuous-review inventory theory (Warren textbook, Badejo & Ierapetritou disruption dynamics) applied to documented 2023–2024 cisplatin shortage parameters.
-- The 87.5-day disruption-period lead time is supported by historical API export delays during 2023–2024 shortage episodes.
-- The 50% effective fill rate reflects observed allocation constraints during the 2023–2024 shortage.
-- The 75% budget multiplier is conservative and reflects Argentina's documented chronic fiscal austerity (oil revenue collapse, structural spending caps).
+**What the Analysis Supports:**
+- API manufacturing is confirmed concentrated in India and China (>80% combined), with no regional Latin American production.
+- Cisplatin is confirmed on the WHO EML (since 1979).
+- Argentina's procurement landscape is confirmed fragmented across eight independent channels with no central real-time inventory visibility.
+- ANMAT registration timelines are confirmed at 12–18 months for generic drugs.
+- Argentina's fiscal constraints are documented (oil revenue collapse, structural austerity, 75% effective budget utilization).
+- The 2023 global cisplatin shortage is documented with a disruption duration of approximately 90 days (February 2023–June 2024).
+- Cisplatin and carboplatin share the API supply chain and face correlated disruption (r≈0.87).
 
-**Limitations:**
-1. **Simulation Does Not Capture Fragmentation Delays:** The inventory model projects physical stockouts but does not quantify the additional latency from multi-channel procurement fragmentation, ANMAT clearance backlogs for alternative suppliers, or the formal-vs.-real-access gap. Actual patient access delays may exceed modeled lead times by weeks or months.
-
-2. **Budget Assumption Sensitivity:** The forecast is highly sensitive to the 75% budget multiplier assumption. If fiscal constraints force this lower (e.g., to 50%), risk would escalate to MODERATE or CRITICAL. Conversely, if emergency procurement budgets are unlocked, risk would improve.
-
-3. **Carboplatin Dependency Not Separately Quantified:** The brief identifies the shared API supply chain with carboplatin but does not separately model carboplatin shortage risk or quantify the therapeutic impact of simultaneous cisplatin/carboplatin scarcity on treatment protocols.
-
-4. **Regulatory Clearance Timing Uncertain:** The 12–18 month ANMAT registration window is an estimate. Actual timelines depend on application completeness, inspectorate workload, and manufacturing site history. Pre-registration activities may compress this, but the uncertainty remains.
-
-5. **Procurement Data Granularity:** National consumption figures and supplier contracts for cisplatin in Argentina are not fully transparent in public sources. Modeled demand distributions (normal, truncated) are typical for mature generic oncology drugs but reflect general category assumptions, not Argentina-specific disaggregated hospital-level data.
-
-6. **Carboplatin Substitution Assumption:** The brief assumes carboplatin cannot substitute for cisplatin if cisplatin becomes scarce (because both share the API supply chain). However, some clinical scenarios may allow protocol modification. The impact of such substitution is not quantified.
-
-7. **Geopolitical Scenario Definition:** "API export restriction" is modeled
+**What the Analysis Does Not Fully Support:**
+- The modeled stockout days (6.2 days/year under API restriction) derive from a single-echelon inventory model that treats the entire Argentine supply chain as one node. This simplification is appropriate for generating shortage risk signals but cannot distinguish between distributor-level shortages and hospital-level shortages across the eight fragmented channels. The actual distribution of shortage impact across specific provinces and hospital systems is not captured.
+- The 50% global fill rate assumption reflects "severe supply allocation constraints documented during the 2023 shortage," but country-specific fill rate for Argentina (vs. other markets) during that shortage is not explicitly stated in the context.
+- The 6.2-day stockout figure does not account for the 12–18 month ANMAT regulatory lag for new suppliers. The modeled 30-day lead time is a procurement parameter, not a regulatory parameter. In reality, the binding constraint would be regulatory, not inventory, making the 6.2-day figure misleading for policy purposes.
+- Service level calculations assume normal demand distribution. Actual demand volatility across the eight channels, especially during crisis periods (e.g., cancer epidemics, treatment-seeking delays causing patient backlog), is not quantified.
 
 ============================================================
 RETRIEVED SOURCES:
@@ -103,32 +126,32 @@ RETRIEVED SOURCES:
 [1] cisplatin_profile.txt
 Cisplatin is a platinum-based alkylating chemotherapy agent used to treat testicular, ovarian, bladder, lung, and head and neck cancers. It has been in clinical use since 1978 and is one of the most widely used chemotherapy drugs globally. WHO Essential Medicines status: Cisplatin has been on the WH...
 
-[2] cisplatin_profile.txt
-- API supply concentrated in two countries (India, China) — any export restriction, regulatory action, or geopolitical disruption simultaneously affects all generic manufacturers globally - Generic market price pressure reduces manufacturer margins, leading some producers to exit the market - Single...
-
-[3] carboplatin_profile.txt
+[2] carboplatin_profile.txt
 Carboplatin is a second-generation platinum-based chemotherapy agent, developed as a less toxic alternative to cisplatin. Carboplatin and cisplatin share the same API supply chain: both drugs' active pharmaceutical ingredients are manufactured primarily in India and secondarily in China. This shared...
 
-[4] argentina_procurement_system.txt
-2023–February 2024 window as laboratories caught up to import-cost-aligned prices after the removal of price controls. The cisplatin/carboplatin global shortage of 2023–2024 (driven by Indian API manufacturing issues and US FDA-forced plant shutdowns) was superimposed on this domestic structural env...
+[3] who_eml_oncology.txt
+The WHO Model List of Essential Medicines (EML) is published by the World Health Organization and updated every two years. It identifies the medicines considered most effective, safe, and cost-effective for priority health conditions. For governments and health systems, EML inclusion is the primary ...
+
+[4] cisplatin_profile.txt
+- API supply concentrated in two countries (India, China) — any export restriction, regulatory action, or geopolitical disruption simultaneously affects all generic manufacturers globally - Generic market price pressure reduces manufacturer margins, leading some producers to exit the market - Single...
 
 [5] argentina_procurement_system.txt
-system, not an exceptional failure mode. Supply chain models that treat formal coverage as equivalent to access will systematically underestimate shortage risk. REGIONAL ACCESS DELAY CONTEXT (FIFARMA WAIT 2024) The Argentine access gap must be understood in the regional context quantified by the FIF...
+Argentina's oncology drug procurement system is highly fragmented across eight distinct channels that operate independently, without central coordination or shared inventory visibility. This structural fragmentation is the primary institutional driver of drug shortage risk — even when total national...
 
-[6] argentina_procurement_system.txt
-these drugs are old enough to be in formularies. However, for innovative oncology drugs (CDK4/6 inhibitors, immune checkpoint inhibitors, HER2-targeted agents beyond trastuzumab IV), Argentina's 4.75-year mean access delay means the amparo de salud mechanism is the primary real-world access route, n...
+[6] supply_chain_optimization_methods.txt
+approximately doubled to tripled during the shortage window). The shortage lasted approximately February 2023–June 2024 for cisplatin, establishing the disruption_duration_mean=90 days (geometric distribution mean) used for this scenario. Malta M, Christian M, Cadwallader AB (2025) "Oncology Drug Sh...
 
-[7] colombia_procurement_system.txt
-13.3 trillion of COP 14.7 trillion filed), yet supply failures persisted — confirming that intermediation friction, not total funding, is the root cause. Health Superintendency 2025 inspections found tons of medicines stored in private warehouses near expiry, confirming financial blockade rather tha...
+[7] argentina_procurement_system.txt
+complete, integrated, real-time operational visibility into national oncology drug stock across all channels. Regulatory traceability systems exist and allow reconstruction of unit movements, but traceability is not equivalent to a national inventory dashboard. No public body can currently determine...
 
-[8] cisplatin_argentina_api_export_restriction.txt
-Simulation Results: Cisplatin (platinum-based chemotherapy) in Argentina Scenario: API export restriction (India/China supply disruption) Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days Demand distribution: Normal (truncate...
+[8] latam_access_delays_pooled_procurement.txt
+Office to expand pooled procurement collaboration across regions. - HTA-driven list updating (February 27, 2025): PAHO published new Health Technology Assessment methodology for updating the Strategic Fund product list, ensuring evidence-based inclusion decisions. Strategic Fund mechanisms for count...
 
-[9] cisplatin_colombia_api_export_restriction.txt
-Simulation Results: Cisplatin (platinum-based chemotherapy) in Colombia Scenario: API export restriction (India/China supply disruption) Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days Demand distribution: Normal (truncated...
+[9] cisplatin_argentina_api_export_restriction.txt
+Service level (days without stockout): 98.3% Average inventory on hand: 669 units --- Risk Assessment --- Overall supply risk: LOW Probability of any stockout during the year: 28% Probability of critical shortage (>60 stockout days): 1.4% --- Interpretation --- Under api export restriction (india/ch...
 
-[10] cisplatin_argentina_api_export_restriction.txt
-api export restriction (india/china supply disruption) conditions, cisplatin supply in Argentina is projected to experience 7.9 stockout days per year (95% CI: ±1.35 days), with a unit service level of 98.0%. This is within acceptable operational range, though monitoring is warranted. The 50% fill r...
+[10] cisplatin_argentina_combined_shock.txt
+CI) Service level (days without stockout): 97.0% Average inventory on hand: 730 units --- Risk Assessment --- Overall supply risk: MODERATE Probability of any stockout during the year: 35% Probability of critical shortage (>60 stockout days): 2.6% --- Interpretation --- Under combined shock (api res...
 
-[11] cisplatin_venezuela_api_export_restriction.txt
-Simulation Results: Cisplatin (platinum-based chemotherapy) in Venezuela Scenario: API export restriction (India/China supply disruption) Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | 500 Monte Carlo runs | 365 days Demand distribution: Normal (truncate...
+[11] cisplatin_argentina_baseline.txt
+inventory on hand: 211 units --- Risk Assessment --- Overall supply risk: LOW Probability of any stockout during the year: 69% Probability of critical shortage (>60 stockout days): 0.0% --- Interpretation --- Under normal operations conditions, cisplatin supply in Argentina is projected to experienc...

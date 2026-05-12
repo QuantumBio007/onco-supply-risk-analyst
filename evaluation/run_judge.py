@@ -96,8 +96,16 @@ def judge_brief(brief_text: str, checks: list[dict], client: anthropic.Anthropic
         f"CHECKLIST ITEMS:\n{checks_str}\n\n"
         f"Score each item per the instructions."
     )
+    # Judge model: Sonnet 4.5 (not Haiku) — removes same-model bias.
+    # The brief generator (agent_core.py) uses Haiku 4.5; if the judge were
+    # also Haiku, model-self-preference would inflate RAG scores. Using a
+    # stronger, architecturally different judge is the standard practice for
+    # rigorous model-as-judge evaluation. Cost is bounded: ~10 calls per eval,
+    # ~$0.50 total. References: G-Eval (Liu et al. 2023), Zheng et al. 2023
+    # LMSYS "Judging LLM-as-a-Judge" — both recommend stronger judges than
+    # generators for credible scoring.
     response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model="claude-sonnet-4-5-20250929",
         max_tokens=2000,
         system=JUDGE_SYSTEM,
         messages=[{"role": "user", "content": user_msg}],

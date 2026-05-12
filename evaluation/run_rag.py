@@ -72,7 +72,7 @@ level to 85%.
 Stockout figures are from a simplified inventory model and are illustrative, not actuarial. \
 Procurement data reflects publicly available sources as of 2024."""
 
-embed_model = SentenceTransformer("all-mpnet-base-v2")
+embed_model = SentenceTransformer("all-MiniLM-L6-v2")
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collection = chroma_client.get_collection("onco_supply")
 claude = anthropic.Anthropic()
@@ -115,6 +115,10 @@ def generate_brief(drug, country, scenario, chunks):
         f"Retrieved context:\n{context}\n\n{FEW_SHOT}\n\n"
         f"Now write the brief for {drug} in {country} under the {scenario} scenario."
     )
+    # max_tokens=2500 (vs 1500 in run_baseline.py) — RAG briefs need more
+    # headroom to summarize ~2,000 tokens of retrieved context plus the
+    # sources block. See run_baseline.py for the full max_tokens rationale
+    # across the eval harness. Intentional asymmetry.
     response = claude.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=2500,

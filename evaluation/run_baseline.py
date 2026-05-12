@@ -41,6 +41,17 @@ client = anthropic.Anthropic()
 
 for drug, country, scenario, outfile in CASES:
     print(f"Generating: {drug} / {country} / {scenario} ...")
+    # max_tokens differs deliberately across the eval harness:
+    #   run_baseline.py = 1500 — prompt-only briefs run shorter (no retrieved
+    #                            context to elaborate on; cuts truncation risk
+    #                            without artificially inflating their length).
+    #   run_rag.py      = 2500 — RAG briefs need more headroom to summarize
+    #                            ~2,000 tokens of retrieved context + sources.
+    #   agent_core.py   = 2000 — per-iteration cap inside agentic loop; not
+    #                            the full brief budget.
+    #   run_judge.py    = 2000 — JSON-only scoring output; needs no more.
+    # Standardizing would either truncate RAG briefs or pad baseline ones —
+    # both would distort the comparison. Intentional, not drift.
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=1500,

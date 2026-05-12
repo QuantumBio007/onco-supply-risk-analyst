@@ -34,11 +34,20 @@ Theoretical foundation:
 """
 
 import numpy as np
-import os
 
 # ── Service level z-scores (normal distribution) ─────────────────────────────
 # Source: Warren OM Textbook Table 6.2 — NORM.INV(ltsl, 0, 1)
 Z_SCORES = {0.90: 1.282, 0.95: 1.645, 0.97: 1.881, 0.99: 2.326}
+
+# ── Risk thresholds and tail parameters (single source of truth) ─────────────
+# Previously hardcoded in 4+ places across simulate() / simulate_dynamic() /
+# simulate_transient() / simulate_correlated_pair(). Centralized to prevent
+# drift when thresholds are revised. Reference for CRITICAL: WHO/PAHO clinical
+# operating guidance — >60 days of cumulative annual stockout for an essential
+# oncology drug is considered a critical access failure. CVaR_90 follows the
+# Badejo & Ierapetritou (AIChE 2025) convention for supply-chain tail risk.
+CRITICAL_STOCKOUT_DAYS = 60   # threshold for prob_critical_shortage
+TAIL_PERCENTILE        = 90   # CVaR_90 (worst-10% mean stockout days)
 
 # ── Drug parameters ───────────────────────────────────────────────────────────
 # Units: treatment doses per day for a representative mid-size oncology center
@@ -285,17 +294,37 @@ def compute_policy(d, sigma_d, L_mean, L_cv, service_level=0.95,
     SS = z * np.sqrt(d**2 * sigma_L**2 + L_mean * sigma_d**2)
     r  = d * L_mean + SS
 
-    # EOQ: ordering cost $50/order, holding cost = 20% of unit cost per year
+    # EOQ: ordering cost $50/order, holding cost = 20% of unit cost per year.
+    # NOTE: classical EOQ minimizes total (order + holding) cost only. It has no
+    # awareness of lead time, service level, or the procurement constraint that
+    # at most one order can be outstanding at a time (the operational reality in
+    # LATAM government procurement cycles). For high-unit-cost biologics like
+    # trastuzumab ($5,000/vial → H ≈ $1,000/unit-year), EOQ collapses to ~18
+    # units — a value that cannot cover even one lead-time demand cycle (≈90
+    # units) and guarantees stockouts on every reorder cycle.
     D_annual  = d * days
     S_order   = 50.0
     H_holding = 0.20 * unit_cost
-    Q_star    = max(10, int(np.sqrt(2 * D_annual * S_order / H_holding)))
+    Q_cost    = max(10, int(np.sqrt(2 * D_annual * S_order / H_holding)))
+
+    # Feasibility floor: Q must cover at least one mean lead-time demand cycle.
+    # This is a hard operational constraint under single-outstanding-order
+    # procurement — without it, the (Q,r) policy is infeasible at any service
+    # level above ~50% regardless of safety stock or reorder point. Reference:
+    # Hopp & Spearman, Factory Physics §2.5 (lead-time demand as Q floor under
+    # capacity-constrained ordering).
+    Q_floor       = int(np.ceil(d * L_mean))
+    Q_star        = max(Q_cost, Q_floor)
+    floor_binding = Q_floor > Q_cost
 
     return {
-        "reorder_point": round(r),
-        "safety_stock":  round(SS),
-        "eoq":           Q_star,
-        "z_score":       z,
+        "reorder_point":      round(r),
+        "safety_stock":       round(SS),
+        "eoq":                Q_star,        # feasibility-corrected (used in simulation)
+        "eoq_cost_optimal":   Q_cost,        # raw EOQ (cost-only, ignores lead time)
+        "q_floor":            Q_floor,       # lead-time feasibility floor (d × L_mean)
+        "q_floor_binding":    floor_binding, # True when EOQ alone would cause guaranteed stockouts
+        "z_score":            z,
     }
 
 
@@ -540,7 +569,7 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
 
     # CVaR_90: expected stockout days in worst 10% of simulations
     # (Badejo & Ierapetritou, AIChE Journal 2025;71(6):e18770)
-    var_90      = float(np.percentile(so, 90))
+    var_90      = float(np.percentile(so, TAIL_PERCENTILE))
     exceedances = so[so >= var_90]
     cvar_90     = round(float(exceedances.mean()) if len(exceedances) > 0 else var_90, 1)
 
@@ -548,10 +577,14 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
         "drug": drug, "country": country, "scenario": scenario,
         "n_runs": n_runs, "days": days,
         "demand_dist": demand_dist,
-        # Policy (from textbook formulas)
+        # Policy (Warren OM Ch.6 + feasibility floor)
         "reorder_point":     policy["reorder_point"],
         "safety_stock":      policy["safety_stock"],
-        "eoq":               policy["eoq"],
+        "eoq":               policy["eoq"],                # feasibility-corrected Q (used in sim)
+        "eoq_cost_optimal":  policy["eoq_cost_optimal"],   # raw EOQ (cost-only, for transparency)
+        "q_floor":           policy["q_floor"],            # lead-time demand floor
+        "q_floor_binding":   policy["q_floor_binding"],    # True if floor overrode EOQ
+        "daily_demand_mean": round(float(d), 2),           # for inventory-model chart
         "lead_time_mean":    round(L_mean, 1),
         "lead_time_std":     round(L_mean * L_cv, 1),
         "fill_rate":              eff_fill_rate,
@@ -570,7 +603,7 @@ def simulate(drug, country, scenario, n_runs=500, days=365,
         "avg_inventory_mean":    round(float(inv.mean()), 1),
         "avg_disruption_days":   round(float(ddays.mean()), 1),
         # Risk flags
-        "prob_critical_shortage": round(float((so > 60).mean()), 3),
+        "prob_critical_shortage": round(float((so > CRITICAL_STOCKOUT_DAYS).mean()), 3),
         "prob_any_stockout":      round(float((so > 0).mean()), 3),
     }
     if return_distribution:
@@ -688,7 +721,7 @@ def simulate_dynamic(drug, country,
 
     ci = lambda a: round(1.96 * a.std() / np.sqrt(n_runs), 2)
 
-    var_90      = float(np.percentile(so, 90))
+    var_90      = float(np.percentile(so, TAIL_PERCENTILE))
     exceedances = so[so >= var_90]
     cvar_90     = round(float(exceedances.mean()) if len(exceedances) > 0 else var_90, 1)
 
@@ -701,12 +734,16 @@ def simulate_dynamic(drug, country,
         "input_demand_multiplier":    round(demand_multiplier, 3),
         "input_fill_rate":            round(fill_rate, 3),
         "input_budget_multiplier":    round(budget_multiplier, 3),
-        # Policy
-        "reorder_point":   policy["reorder_point"],
-        "safety_stock":    policy["safety_stock"],
-        "eoq":             policy["eoq"],
-        "lead_time_mean":  round(L_mean, 1),
-        "lead_time_std":   round(L_mean * L_cv, 1),
+        # Policy (Warren OM Ch.6 + feasibility floor)
+        "reorder_point":     policy["reorder_point"],
+        "safety_stock":      policy["safety_stock"],
+        "eoq":               policy["eoq"],
+        "eoq_cost_optimal":  policy["eoq_cost_optimal"],
+        "q_floor":           policy["q_floor"],
+        "q_floor_binding":   policy["q_floor_binding"],
+        "daily_demand_mean": round(float(d), 2),
+        "lead_time_mean":    round(L_mean, 1),
+        "lead_time_std":     round(L_mean * L_cv, 1),
         "fill_rate":              eff_fill_rate,
         "fill_rate_scenario":     fill_rate,
         "fill_rate_structural":   struct_fill,
@@ -722,7 +759,7 @@ def simulate_dynamic(drug, country,
         "sl_days_mean":        round(float(sld.mean()), 4),
         "avg_inventory_mean":  round(float(inv.mean()), 1),
         "avg_disruption_days": round(float(ddays.mean()), 1),
-        "prob_critical_shortage": round(float((so > 60).mean()), 3),
+        "prob_critical_shortage": round(float((so > CRITICAL_STOCKOUT_DAYS).mean()), 3),
         "prob_any_stockout":      round(float((so > 0).mean()), 3),
     }
     if return_distribution:
@@ -810,10 +847,14 @@ Scenario: {sp["label"]}
 Model: Continuous-review (Q, r) with stochastic lead times and dynamic disruption duration | {r["n_runs"]} Monte Carlo runs | {r["days"]} days
 Demand distribution: {demand_dist_note}
 
---- Optimal Policy (Warren OM Textbook §6.6) ---
+--- Recommended (Q,r) Policy (Warren OM §6.6 + lead-time feasibility floor) ---
 Safety stock (SS = z*sqrt(d^2*sigma_L^2 + L*sigma_D^2)): {r["safety_stock"]} units
 Reorder point (r = d*L + SS): {r["reorder_point"]} units
-Economic Order Quantity (Q*): {r["eoq"]} units
+Recommended order quantity Q*: {r["eoq"]} units
+  - Cost-optimal EOQ (sqrt(2DS/H)): {r.get("eoq_cost_optimal", r["eoq"])} units
+  - Lead-time feasibility floor (d × L_mean): {r.get("q_floor", "n/a")} units
+  - Binding constraint: {"FEASIBILITY FLOOR (EOQ alone undersized; would cause guaranteed stockouts on every cycle)" if r.get("q_floor_binding", False) else "COST-OPTIMAL (EOQ exceeds lead-time demand; no operational risk from sizing)"}
+Mean daily demand (d): {r.get("daily_demand_mean", "n/a")} units/day
 Target service level: 95%
 
 --- Scenario Parameters ---
@@ -972,7 +1013,10 @@ def simulate_correlated_pair(country, scenario="API export restriction",
             )
             arr[i] = res["stockout_days"]
 
-    joint_critical = float(((so_cisplatin > 60) & (so_carboplatin > 60)).mean())
+    joint_critical = float(
+        ((so_cisplatin   > CRITICAL_STOCKOUT_DAYS) &
+         (so_carboplatin > CRITICAL_STOCKOUT_DAYS)).mean()
+    )
     corr = float(np.corrcoef(so_cisplatin, so_carboplatin)[0, 1])
 
     def _cvar90(arr):
@@ -980,17 +1024,37 @@ def simulate_correlated_pair(country, scenario="API export restriction",
         exc = arr[arr >= v]
         return round(float(exc.mean()) if len(exc) > 0 else v, 1)
 
+    # Per-drug policy block — keeps simulate_correlated_pair() consistent with
+    # simulate() / simulate_dynamic() / simulate_transient() schema. The audit
+    # flagged this as a silent blind spot: previously this function called
+    # compute_policy() but did not surface eoq_cost_optimal / q_floor /
+    # q_floor_binding / daily_demand_mean to callers. Closed 2026-05-11.
+    def _policy_block(drug_name):
+        p = drug_configs[drug_name]["policy"]
+        return {
+            "reorder_point":     p["reorder_point"],
+            "safety_stock":      p["safety_stock"],
+            "eoq":               p["eoq"],
+            "eoq_cost_optimal":  p["eoq_cost_optimal"],
+            "q_floor":           p["q_floor"],
+            "q_floor_binding":   p["q_floor_binding"],
+            "daily_demand_mean": round(float(drug_configs[drug_name]["d"]), 2),
+            "lead_time_mean":    round(float(drug_configs[drug_name]["L_mean"]), 1),
+        }
+
     return {
         "country": country, "scenario": scenario, "n_runs": n_runs,
         "cisplatin": {
             "stockout_days_mean": round(float(so_cisplatin.mean()), 1),
             "cvar_90": _cvar90(so_cisplatin),
-            "prob_critical": round(float((so_cisplatin > 60).mean()), 3),
+            "prob_critical": round(float((so_cisplatin > CRITICAL_STOCKOUT_DAYS).mean()), 3),
+            "policy": _policy_block("cisplatin"),
         },
         "carboplatin": {
             "stockout_days_mean": round(float(so_carboplatin.mean()), 1),
             "cvar_90": _cvar90(so_carboplatin),
-            "prob_critical": round(float((so_carboplatin > 60).mean()), 3),
+            "prob_critical": round(float((so_carboplatin > CRITICAL_STOCKOUT_DAYS).mean()), 3),
+            "policy": _policy_block("carboplatin"),
         },
         "joint_critical_prob": round(joint_critical, 3),
         "disruption_correlation": round(corr, 3),
@@ -1293,7 +1357,7 @@ def simulate_transient(drug, country,
 
     ci = lambda a: round(1.96 * a.std() / np.sqrt(n_runs), 2)
 
-    var_90      = float(np.percentile(so, 90))
+    var_90      = float(np.percentile(so, TAIL_PERCENTILE))
     exceedances = so[so >= var_90]
     cvar_90     = round(float(exceedances.mean()) if len(exceedances) > 0 else var_90, 1)
 
@@ -1312,15 +1376,21 @@ def simulate_transient(drug, country,
         "response_trigger_day":   response_trigger_day,
         "response_acceleration":  response_acceleration,
         # Frozen pre-shock policy (the key diagnostic field)
-        "baseline_reorder_point": baseline_policy["reorder_point"],
-        "baseline_safety_stock":  baseline_policy["safety_stock"],
-        "baseline_eoq":           baseline_policy["eoq"],
+        "baseline_reorder_point":    baseline_policy["reorder_point"],
+        "baseline_safety_stock":     baseline_policy["safety_stock"],
+        "baseline_eoq":              baseline_policy["eoq"],
+        "baseline_eoq_cost_optimal": baseline_policy["eoq_cost_optimal"],
+        "baseline_q_floor_binding":  baseline_policy["q_floor_binding"],
         # For API compatibility with simulate_dynamic schema
-        "reorder_point":   baseline_policy["reorder_point"],
-        "safety_stock":    baseline_policy["safety_stock"],
-        "eoq":             baseline_policy["eoq"],
-        "lead_time_mean":  round(shock_L_mean, 1),
-        "lead_time_std":   round(shock_L_mean * shock_L_cv, 1),
+        "reorder_point":     baseline_policy["reorder_point"],
+        "safety_stock":      baseline_policy["safety_stock"],
+        "eoq":               baseline_policy["eoq"],
+        "eoq_cost_optimal":  baseline_policy["eoq_cost_optimal"],
+        "q_floor":           baseline_policy["q_floor"],
+        "q_floor_binding":   baseline_policy["q_floor_binding"],
+        "daily_demand_mean": round(float(base_d), 2),
+        "lead_time_mean":    round(shock_L_mean, 1),
+        "lead_time_std":     round(shock_L_mean * shock_L_cv, 1),
         "fill_rate":              shock_fill_eff,
         "fill_rate_scenario":     fill_rate,
         "fill_rate_structural":   struct_fill,
@@ -1336,7 +1406,7 @@ def simulate_transient(drug, country,
         "sl_days_mean":        round(float(sld.mean()), 4),
         "avg_inventory_mean":  round(float(inv.mean()), 1),
         "avg_disruption_days": round(float(ddays.mean()), 1),
-        "prob_critical_shortage": round(float((so > 60).mean()), 3),
+        "prob_critical_shortage": round(float((so > CRITICAL_STOCKOUT_DAYS).mean()), 3),
         "prob_any_stockout":      round(float((so > 0).mean()), 3),
     }
     if return_distribution:

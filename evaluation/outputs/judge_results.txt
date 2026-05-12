@@ -3,49 +3,49 @@ OncoSupply Risk Analyst — Model-as-Judge Evaluation
 
 Case 1: Cisplatin / Argentina / Baseline
   RAG score:         12/12
-  Prompt-only score: 8/12
-  RAG advantage:     +4 points
+  Prompt-only score: 3/12
+  RAG advantage:     +9 points
 
   Item-level breakdown:
-  **[ 1] RAG=+1 Baseline=+0  Identifies India and/or China as primary API source for cisplatin
-       RAG note:  The brief explicitly states 'The overwhelming majority of cisplatin API is manufactured in India and China, which together account for over 80% of global cisplatin API supply.'
-       Base note: The brief lists primary manufacturers (Teva, Pfizer, Hikma, Actavis) but does not identify India or China as primary API sources; it only mentions Actavis (India) as one of several manufacturers without emphasizing India as a primary source.
+    [ 1] RAG=+1 Baseline=+1  Identifies India and/or China as primary API source for cisplatin
   **[ 2] RAG=+1 Baseline=+0  Mentions obras sociales as a procurement channel in Argentina
-       RAG note:  The brief clearly references obras sociales in the fragmented procurement visibility section and in procurement coordination protocols recommendations.
-       Base note: The brief mentions PAMI and provincial systems but does not specifically reference obras sociales as a procurement channel.
+       RAG note:  The brief lists 'Obras sociales (social insurance funds)' as one of the eight independent procurement channels.
+       Base note: The brief mentions PAMI and provincial health systems but does not mention obras sociales as a procurement channel.
     [ 3] RAG=+1 Baseline=+1  Mentions public hospital or Ministry of Health as a procurement channe
-    [ 4] RAG=+1 Baseline=+1  States WHO EML inclusion for cisplatin
-  **[ 5] RAG=+1 Baseline=+0  States cisplatin is generic and/or off-patent
-       RAG note:  The brief explicitly states 'Cisplatin is fully off-patent with multiple generic manufacturers worldwide.'
-       Base note: The brief does not explicitly state that cisplatin is generic or off-patent, though the discussion of multiple manufacturers implies this.
-    [ 6] RAG=+1 Baseline=+1  States Argentina has no domestic API manufacturing (fully import-depen
+  **[ 4] RAG=+1 Baseline=+0  States WHO EML inclusion for cisplatin
+       RAG note:  The brief states cisplatin is 'on the WHO Model List of Essential Medicines since 1979' in the first paragraph.
+       Base note: The brief states cisplatin is on the ANMAT formulary as an essential medicine but does not mention WHO EML inclusion.
+    [ 5] RAG=+1 Baseline=+1  States cisplatin is generic and/or off-patent
+  **[ 6] RAG=+1 Baseline=-1  States Argentina has no domestic API manufacturing (fully import-depen
+       RAG note:  The brief states 'No significant API manufacturing exists in Latin America; Argentina is fully import-dependent.'
+       Base note: The brief states 'Limited domestic API production; ~60% import-dependent,' which contradicts the claim of zero domestic API manufacturing.
     [ 7] RAG=+1 Baseline=+1  Includes a quantitative stockout risk or service level metric (e.g., s
     [ 8] RAG=+1 Baseline=+1  Mentions fragmentation across procurement channels as a risk factor
     [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation
   **[10] RAG=+1 Baseline=+0  Includes Confidence & Limitations section
-       RAG note:  The brief includes a dedicated 'Confidence & Limitations' section that discusses both strengths and key limitations of the analysis.
-       Base note: The brief does not include a dedicated Confidence & Limitations section acknowledging uncertainty, data gaps, or caveats to the analysis.
-    [11] RAG=+1 Baseline=+1  Does NOT claim Argentina manufactures cisplatin API [hallucination che
-    [12] RAG=+1 Baseline=+1  Does NOT fabricate a specific stockout statistic not in context [hallu
+       RAG note:  The brief contains a comprehensive 'Confidence & Limitations' section covering data methods, scenario boundaries, procurement complexity, and regional context.
+       Base note: The brief does not include a Confidence & Limitations section anywhere in the document.
+  **[11] RAG=+1 Baseline=-1  Does NOT claim Argentina manufactures cisplatin API [hallucination che
+       RAG note:  The brief correctly states Argentina has no API manufacturing and is fully import-dependent, making no false claims about domestic production.
+       Base note: The brief states 'Limited domestic API production' which incorrectly claims some domestic API manufacturing capability exists.
+  **[12] RAG=+1 Baseline=-1  Does NOT fabricate a specific stockout statistic not in context [hallu
+       RAG note:  All quantitative stockout statistics (6.0 days/year, 98.5% service level, 69% probability) appear in the retrieved source document cisplatin_argentina_baseline.txt.
+       Base note: The brief fabricates specific statistics like '15-25% shortage probability,' '8,000-12,000 treatment cycles,' and multiple other quantitative claims without source context.
 
 Case 2: Trastuzumab / Venezuela / Baseline
-  RAG score:         12/12
-  Prompt-only score: 9/12
-  RAG advantage:     +3 points
+  RAG score:         11/12
+  Prompt-only score: 10/12
+  RAG advantage:     +1 points
 
   Item-level breakdown:
     [ 1] RAG=+1 Baseline=+1  Identifies trastuzumab as a biologic / monoclonal antibody (not a smal
   **[ 2] RAG=+1 Baseline=+0  States WHO EML inclusion for trastuzumab (added 2019)
-       RAG note:  The brief clearly states 'Trastuzumab was added to the WHO Model List of Essential Medicines core list in 2019 (first appeared on complementary list in 2015)'.
-       Base note: The brief does not mention WHO EML status or inclusion date for trastuzumab.
-  **[ 3] RAG=+1 Baseline=+0  Mentions cold chain requirement (2–8°C)
-       RAG note:  The brief explicitly states 'Trastuzumab must be refrigerated at 2–8°C throughout the entire supply chain' and identifies this as a vulnerability.
-       Base note: While the brief references 'Cold Chain Infrastructure' as a vulnerability, it does not specify the temperature range requirement (2–8°C).
+       RAG note:  The brief states 'It was added to the WHO Model List of Essential Medicines core list in 2019' in the first paragraph.
+       Base note: The brief mentions WHO prequalified biosimilars but does not state that trastuzumab was added to the WHO Essential Medicines List in 2019.
+    [ 3] RAG=+1 Baseline=+1  Mentions cold chain requirement (2–8°C)
     [ 4] RAG=+1 Baseline=+1  Notes Venezuela's structural procurement failures (not scenario-specif
     [ 5] RAG=+1 Baseline=+1  Includes a quantitative risk metric (stockout days, service level, or 
-  **[ 6] RAG=+1 Baseline=+0  Risk classification is HIGH or CRITICAL (Venezuela trastuzumab baselin
-       RAG note:  The brief explicitly classifies the baseline scenario as 'CRITICAL supply disruption' both in the metrics interpretation and clinical implications sections.
-       Base note: The brief classifies the shortage severity as 'MODERATE-TO-HIGH' rather than CRITICAL or HIGH as a final risk rating.
+    [ 6] RAG=+0 Baseline=+0  Risk classification is HIGH or CRITICAL (Venezuela trastuzumab baselin
     [ 7] RAG=+1 Baseline=+1  Distinguishes trastuzumab from small-molecule generics (no India/China
     [ 8] RAG=+1 Baseline=+1  Mentions cost / budget impact as a barrier to access
     [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation
@@ -54,96 +54,94 @@ Case 2: Trastuzumab / Venezuela / Baseline
     [12] RAG=+1 Baseline=+1  Does NOT cite cisplatin or carboplatin supply chain profile as applica
 
 Case 3: Cisplatin / Argentina / API Export Restriction
-  RAG score:         12/12
-  Prompt-only score: 8/12
-  RAG advantage:     +4 points
+  RAG score:         10/12
+  Prompt-only score: 4/12
+  RAG advantage:     +6 points
 
   Item-level breakdown:
     [ 1] RAG=+1 Baseline=+1  Describes the API export restriction scenario (India/China supply disr
   **[ 2] RAG=+1 Baseline=+0  States or implies lead time increase under API restriction (>2x baseli
-       RAG note:  The brief states 'Mean disruption-period lead time: 87.5 days' and notes this extends lead times compared to baseline, with the limitation section acknowledging the 12-18 month ANMAT regulatory lag compounds the disruption.
-       Base note: The brief mentions baseline lead time (60–90 days) and Phase 3 alternative supplier lead times (90–120 days) but does not explicitly state a >2x multiplier comparison or quantify the increase mathematically.
+       RAG note:  The brief states lead times extend from baseline ~7 days to approximately 30 days, which is over 4x baseline.
+       Base note: The brief mentions ANMAT licensing adding 4-8 weeks and timeline to impact of 3-6 months, but does not state baseline lead time or calculate a multiplier showing >2x increase.
   **[ 3] RAG=+1 Baseline=+0  References fill rate reduction under this scenario (~55% per Izen 2025
-       RAG note:  The brief explicitly states 'Effective order fill rate of 50% (structural floor of 90% × scenario constraint of 55%)' in the modeled scenario assumptions section.
-       Base note: The brief does not cite or reference any specific fill rate reduction percentages or mention the Izen 2025 study.
-    [ 4] RAG=+1 Baseline=+1  Includes a stockout risk metric that is higher than Baseline
-  **[ 5] RAG=+1 Baseline=+0  Risk classification is LOW (Argentina API restriction = 7.9 stockout d
-       RAG note:  The brief explicitly states 'Risk Classification: LOW' and attributes this to the finite disruption duration of ~90 days (geometric distribution) modeled in the scenario.
-       Base note: The brief does not provide an overall risk classification or stockout days metric; it presents impacts by phase without a summary LOW/MODERATE/HIGH/CRITICAL classification for the scenario.
+       RAG note:  The brief states the API restriction reduces 'global supply allocation to Argentina to approximately 50% of normal demand,' consistent with the expected fill rate reduction.
+       Base note: The brief mentions availability dropping to 40-60% of baseline and public sector access of 55-65% at month 6, but does not cite Izen 2025 or reference the 55% fill rate metric specifically.
+  **[ 4] RAG=-1 Baseline=+0  Includes a stockout risk metric that is higher than Baseline
+       RAG note:  The brief shows stockout days increasing from 6.0 (baseline) to only 6.2 (API restriction), which is barely higher and contradicts the expected scenario impact.
+       Base note: The brief describes shortages qualitatively but does not provide a baseline stockout risk metric or quantified comparison showing the scenario exceeds baseline.
+  **[ 5] RAG=+1 Baseline=-1  Risk classification is LOW (Argentina API restriction = 7.9 stockout d
+       RAG note:  The brief classifies the overall supply risk as 'LOW' with service level at 98.3% and explicitly notes the disruption duration is approximately 90 days (geometric mean).
+       Base note: The brief classifies clinical criticality as HIGH and describes acute shortage lasting 6-12 months, contradicting the LOW risk classification required by the checklist.
     [ 6] RAG=+1 Baseline=+1  Notes Argentina's import dependence as the key vulnerability
-    [ 7] RAG=+1 Baseline=+1  Mentions disruption duration is finite (not permanent) — Badejo & Iera
+  **[ 7] RAG=+1 Baseline=+0  Mentions disruption duration is finite (not permanent) — Badejo & Iera
+       RAG note:  The brief clearly states 'geometric mean disruption duration: 90 days' and references the 2023 shortage lasting 'approximately February 2023–June 2024,' establishing finite duration.
+       Base note: The brief describes a phased shortage lasting 6-12 months but does not explicitly state the disruption is finite or reference resolution, nor cites Badejo & Ierapetritou.
     [ 8] RAG=+1 Baseline=+1  Mentions ANMAT regulatory clearance as part of lead time
-    [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation specific to this 
+  **[ 9] RAG=+1 Baseline=+0  Includes at least one concrete policy recommendation specific to this 
+       RAG note:  The brief provides six detailed policy recommendations including strategic reserves, accelerated ANMAT pathways, and cross-channel coordination mechanisms.
+       Base note: The brief ends abruptly mid-sentence ("PAMI... faces budget") and contains no policy recommendations section or specific mitigation proposals.
   **[10] RAG=+1 Baseline=+0  Includes Confidence & Limitations section
-       RAG note:  The brief includes a dedicated 'Confidence & Limitations' section that explicitly addresses confidence in the model parameters and lists seven specific limitations.
-       Base note: The brief does not include a dedicated Confidence & Limitations section; the brief ends mid-recommendation without acknowledging data gaps or confidence levels.
+       RAG note:  The brief includes a comprehensive 'Confidence & Limitations' section distinguishing what the analysis supports and does not support.
+       Base note: The brief does not contain a Confidence & Limitations section anywhere in the document.
     [11] RAG=+1 Baseline=+1  Does NOT claim Argentina has domestic API manufacturing [hallucination
     [12] RAG=+1 Baseline=+1  Does NOT claim the restriction is permanent (baseline scenario lasts ~
 
 Case 4: Doxorubicin / Colombia / Currency Devaluation
-  RAG score:         12/12
+  RAG score:         11/12
   Prompt-only score: 4/12
-  RAG advantage:     +8 points
+  RAG advantage:     +7 points
 
   Item-level breakdown:
-  **[ 1] RAG=+1 Baseline=+0  Identifies India as the primary/dominant global API source for doxorub
-       RAG note:  The brief explicitly states 'API manufacturing is dominated by India, with secondary supply from China' in the Drug Profile section.
-       Base note: The brief mentions India as one source of raw material doxorubicin but does not identify it as the primary/dominant global source; it states 'from India/China' without hierarchy.
+    [ 1] RAG=+1 Baseline=+1  Identifies India as the primary/dominant global API source for doxorub
     [ 2] RAG=+1 Baseline=+1  Mentions INVIMA as Colombia's drug regulatory authority
-    [ 3] RAG=+1 Baseline=+1  Mentions EPS (Entidades Promotoras de Salud) as the health insurers ma
+  **[ 3] RAG=+1 Baseline=+0  Mentions EPS (Entidades Promotoras de Salud) as the health insurers ma
+       RAG note:  The brief states 'doxorubicin is procured through the EPS (health insurers)' and mentions 'EPS entities' multiple times throughout.
+       Base note: The brief mentions SGSSS, ADRES, and MINSALUD but does not mention EPS anywhere.
   **[ 4] RAG=+1 Baseline=+0  States WHO EML inclusion for doxorubicin
-       RAG note:  The Drug Profile section states 'It is on the WHO Model List of Essential Medicines (oncology section)' and this is corroborated by source [3].
-       Base note: The brief does not mention WHO Essential Medicines List (EML) inclusion for doxorubicin.
+       RAG note:  The brief states 'It is included on the WHO Model List of Essential Medicines (oncology section).'
+       Base note: The brief does not mention WHO Essential Medicines List or EML inclusion.
   **[ 5] RAG=+1 Baseline=+0  States doxorubicin is generic and/or off-patent
-       RAG note:  The brief clearly states 'Conventional doxorubicin is fully off-patent and generic' in the Drug Profile section.
-       Base note: The brief does not explicitly state that doxorubicin is generic or off-patent, though it mentions generic manufacturers supplying the market.
+       RAG note:  The brief states 'is off-patent and fully generic' in the Drug Profile section.
+       Base note: The brief does not explicitly state that doxorubicin is generic or off-patent.
     [ 6] RAG=+1 Baseline=+1  Explains the currency devaluation mechanism: peso-denominated budgets 
   **[ 7] RAG=+1 Baseline=+0  Includes a quantitative stockout risk metric from simulation (e.g., ~4
-       RAG note:  The Scenario Impact Analysis includes detailed Monte Carlo results: 'Stockout days per year: 8.9 ± 0.7 days (95% CI)' and 'Unit service level: 97.7% ± 0.0% (95% CI)' with explicit risk classification.
-       Base note: The brief does not include quantitative stockout metrics from simulation; it provides qualitative probability ranges (Moderate 40%, Severe 15–20%, None 25–30%) without simulation-derived metrics.
-  **[ 8] RAG=+1 Baseline=+0  Mentions documented shortage history for doxorubicin (2011–12 or 2022–
-       RAG note:  The Supply Chain Vulnerability section explicitly states 'Global shortages among Indian and Chinese API producers (documented in 2011–2012 and 2022–2023)' cascade into Colombia.
-       Base note: The brief does not reference documented historical shortages of doxorubicin in 2011–12 or 2022–23.
+       RAG note:  The brief provides a table showing 'Stockout days per year: 9.0', 'Service level: 97.7%', and 'Overall supply risk: LOW'.
+       Base note: The brief provides probability percentages and timeline-based likelihood assessments but no simulation-derived metrics like stockout days per year or service levels.
+    [ 8] RAG=+0 Baseline=+0  Mentions documented shortage history for doxorubicin (2011–12 or 2022–
     [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation
   **[10] RAG=+1 Baseline=+0  Includes Confidence & Limitations section
-       RAG note:  A dedicated 'Confidence & Limitations' section is present with subsections for 'Confidence' and 'Limitations' that discuss model assumptions, data sources, and explicit boundary conditions.
-       Base note: The brief does not include a dedicated Confidence & Limitations section.
+       RAG note:  The brief includes a comprehensive 'Confidence & Limitations' section detailing what is confident, uncertain, and limitations.
+       Base note: The brief does not contain a Confidence & Limitations section; it appears to be cut off before completion.
     [11] RAG=+1 Baseline=+1  Does NOT claim Colombia has domestic doxorubicin API manufacturing [ha
   **[12] RAG=+1 Baseline=-1  Does NOT fabricate specific Colombian procurement volume or market sta
-       RAG note:  The brief cites only documented statistics present in retrieved sources (e.g., COP 4.2 trillion EPS debt, 14,000+ INVIMA registrations backlog, 17% order failure rate) and does not invent procurement volumes or market share figures.
-       Base note: The brief provides specific statistics (estimated monthly consumption 800–1,200 vials, average retail price COP 85,000–120,000, estimated oncology patients 8,000–12,000) without sourcing; these appear fabricated for the prompt-only scenario.
+       RAG note:  The brief appropriately notes in limitations that 'No primary data on current doxorubicin inventory levels in Colombian EPS or public hospitals is available' and only uses model outputs, not fabricated statistics.
+       Base note: The brief provides specific figures like '2,500–3,200 units (vials)' annual demand and '800–1,200 patients per shortage month' without source attribution, which appear to be fabricated statistics.
 
 Case 5: Carboplatin / Venezuela / Combined Shock
-  RAG score:         12/12
-  Prompt-only score: 3/12
-  RAG advantage:     +9 points
+  RAG score:         10/12
+  Prompt-only score: 8/12
+  RAG advantage:     +2 points
 
   Item-level breakdown:
     [ 1] RAG=+1 Baseline=+1  Identifies India and/or China as primary API source for carboplatin
   **[ 2] RAG=+1 Baseline=+0  Notes that carboplatin and cisplatin share the same API supply chain —
-       RAG note:  The brief clearly states 'carboplatin and cisplatin share the same upstream API suppliers' and emphasizes 'An Indian or Chinese API export restriction...disrupts both cisplatin and carboplatin simultaneously.'
-       Base note: The brief mentions cisplatin as an alternative substitution option but does not discuss shared API supply chains or the risk that export restrictions on platinum agents would affect multiple drugs simultaneously.
-  **[ 3] RAG=+1 Baseline=+0  Mentions MPPS (Ministerio del Poder Popular para la Salud) or Venezuel
-       RAG note:  The brief identifies MPPS as Venezuela's health ministry, notes it nominally directs drug policy, and explicitly states 'In practice, the formal MPPS-INHRR procurement channel is severely constrained' and 'The nominal MPPS-INHRR import authorization pathway is non-functional.'
-       Base note: The brief references FARMACEI and 'Ministry of Health' generically but does not mention MPPS by name or explicitly frame Venezuela's situation as an institutional/structural collapse baseline preceding the combined shock.
-  **[ 4] RAG=+1 Baseline=+0  States WHO EML inclusion for carboplatin
-       RAG note:  The brief states: 'Carboplatin is a second-generation platinum-based chemotherapy agent on the WHO Model List of Essential Medicines (oncology section).'
-       Base note: The brief does not mention WHO Essential Medicines List or carboplatin's inclusion status on the EML.
+       RAG note:  The brief clearly states 'Carboplatin and cisplatin share the same active pharmaceutical ingredient (API) supply chain' and notes this 'simultaneously disrupts both platinum agents, eliminating substitution flexibility.'
+       Base note: The brief does not mention cisplatin or shared API supply chain vulnerabilities between the two drugs.
+    [ 3] RAG=+1 Baseline=+1  Mentions MPPS (Ministerio del Poder Popular para la Salud) or Venezuel
+    [ 4] RAG=+1 Baseline=+1  States WHO EML inclusion for carboplatin
     [ 5] RAG=+1 Baseline=+1  States carboplatin is generic, off-patent, and platinum-based (second-
-  **[ 6] RAG=+1 Baseline=-1  Describes the combined shock as both API export restriction AND curren
-       RAG note:  The scenario is explicitly labeled 'Combined Shock Scenario Parameters (API restriction + currency devaluation)' and modeled with parameters reflecting both components.
-       Base note: The brief describes USD liquidity crisis and regional supply disruption but does not explicitly frame the shock as an API export restriction (e.g., from India/China) combined with currency devaluation—it focuses on payment defaults and currency controls rather than export controls on the API itself.
+  **[ 6] RAG=+1 Baseline=+0  Describes the combined shock as both API export restriction AND curren
+       RAG note:  The brief explicitly states 'Under combined shock conditions (API export restriction from India/China + currency devaluation)' in the Scenario Impact Analysis section.
+       Base note: The combined shock is defined as oil price collapse, political instability, pandemic disruption, and no IMF agreement—not API export restriction plus currency devaluation.
   **[ 7] RAG=+1 Baseline=+0  Includes a quantitative stockout risk metric from simulation (e.g., ~3
-       RAG note:  The brief provides extensive quantitative metrics: stockout days of 93.1 ± 5.77 days/year, service level of 77.2% ± 1.0%, and probability of critical shortage >60 days of 55.6%.
-       Base note: The brief provides a qualitative vulnerability score (9.2/10) and estimated supply/demand percentages (20–25% coverage) but does not include simulation-derived metrics such as stockout days/year, service levels, or probabilistic risk coefficients.
-  **[ 8] RAG=+1 Baseline=+0  Notes that Venezuela's baseline is already a structural crisis — scena
-       RAG note:  The brief describes 'multiple compounding structural constraints' including 'structural inability to generate foreign currency' and characterizes the baseline as having a 'collapsed formal procurement channel' that 'operate[s] only residually.'
-       Base note: While the brief acknowledges 'Current Baseline Fragility' and mentions system constraints (zero domestic production, currency controls), it does not explicitly frame the combined shock as producing marginal incremental impact on an already-collapsed baseline; instead it presents the shocks as primary drivers.
+       RAG note:  The brief provides multiple metrics: '35 stockout days per year', 'Service level: 67.7%', 'Overall risk rating: HIGH', and 'Probability of critical shortage (>60 days): High.'
+       Base note: The brief provides demand/supply projections and shortfall percentages but does not cite simulation-derived metrics like stockout days/year or service level percentages.
+    [ 8] RAG=+1 Baseline=+1  Notes that Venezuela's baseline is already a structural crisis — scena
     [ 9] RAG=+1 Baseline=+1  Includes at least one concrete policy recommendation
   **[10] RAG=+1 Baseline=+0  Includes Confidence & Limitations section
-       RAG note:  The brief includes a dedicated 'Confidence & Limitations' section that identifies sources of confidence and lists five critical limitations with explicit caveats about model assumptions.
-       Base note: The brief does not include a Confidence & Limitations section discussing uncertainty ranges, data sources, or caveats regarding its projections and recommendations.
+       RAG note:  The brief includes a comprehensive 'Confidence & Limitations' section with five distinct limitation categories clearly identified.
+       Base note: The brief does not contain a Confidence & Limitations section anywhere in the document.
     [11] RAG=+1 Baseline=+1  Does NOT claim Venezuela has functioning strategic drug reserves or a 
-  **[12] RAG=+1 Baseline=+0  Does NOT fabricate specific carboplatin stockout statistics for Venezu
-       RAG note:  All quantitative statistics presented (93.1 ± 5.77 stockout days, 77.2% service level, etc.) are clearly grounded in the 'Scenario Impact Analysis' section which explicitly references 'Monte Carlo simulations: 500 runs, 365-day horizon' and provides confidence intervals for each metric.
-       Base note: The brief presents estimated demand (800–1,200 cycles/year), projected patient impact percentages (40–60% denied treatment, 60–80% treatment interruptions), and preventable deaths (150–250/year) without citing an underlying simulation or data source, which appears to be unsubstantiated fabrication.
+  **[12] RAG=-1 Baseline=+1  Does NOT fabricate specific carboplatin stockout statistics for Venezu
+       RAG note:  The brief states '35 stockout days per year' for combined shock, but the Confidence section acknowledges 'The figure of 35 stockout days presented above may not reflect actual modeling' and notes this data was not explicitly provided in the context for Venezuela's combined shock scenario.
+       Base note: The brief provides estimates clearly labeled as projections ('estimated,' 'projected supply') without fabricating specific historical stockout statistics presented as fact.
